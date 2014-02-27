@@ -16,37 +16,44 @@ build_all()
     upload_results master
 }
 
+git_update()
+{
+	cwd=`pwd`
+	if [ -d "${1}" ]; then
+		cd "${1}"
+		git remote set-branches --add origin "${2}"
+		git pull
+		git checkout "${2}"
+		git submodule update --init
+	else
+		mkdir -p "${1}"
+		git init "${1}"
+		cd "${1}"
+		git remote add --no-tags -t "${2}" origin "${3}"
+		git fetch --depth=1
+		git checkout "${2}"
+		git submodule update --init
+	fi
+	cd "${cwd}"
+}
+
 build_setup()
 {
 	cwd=`pwd`
-	if [ -d boost-reports ]; then
-		cd boost-reports/boost_root
-		git remote set-branches --add origin develop
-		git pull
-		git checkout develop
-		git submodule update --init
-	else
-		mkdir boost-reports
-		cd boost-reports
-		mkdir develop
-		mkdir master
-		git init boost_root
-		cd boost_root
-		git remote add --no-tags -t develop origin 'https://github.com/boostorg/boost.git'
-		git fetch --depth=1
-		git checkout develop
-		git submodule update --init
-	fi
+	mkdir -p boost-reports/develop
+	mkdir -p boost-reports/master
+	git_update "${cwd}/boost-reports/boost_root" master 'https://github.com/boostorg/boost.git'
+	git_update "${cwd}/boost-reports/boost_regression" develop 'https://github.com/boostorg/regression.git'
 	cd "${cwd}"
 }
 
 update_tools()
 {
     cwd=`pwd`
-    cd boost-reports/boost_root
+    cd "${cwd}/boost-reports/boost_root"
     ./bootstrap.sh
-    cd tools/regression/build
-    ../../../b2 install
+    cd "${cwd}/boost-reports/boost_regression/build"
+    "${cwd}/boost-reports/boost_root/b2" install
     cd "${cwd}"
 }
 
@@ -101,15 +108,15 @@ HTML
 
 build_results()
 {
-    tag=${1?'error: command line missing branch-name argument'}
+    tag="${1?'error: command line missing branch-name argument'}"
     reports="dd,ds,i,n"
     cwd=`pwd`
     cd boost-reports
-    cd ${1}
+    cd "${1}"
     root=`pwd`
     boost=${cwd}/boost-reports/boost_root
     report_info
-    python "${boost}/tools/regression/xsl_reports/boost_wide_report.py" \
+    python "${cwd}/boost_regression/xsl_reports/boost_wide_report.py" \
         --locate-root="${root}" \
         --tag=${tag} \
         --expected-results="${boost}/status/expected_results.xml" \
@@ -117,7 +124,7 @@ build_results()
         --comment="comment.html" \
         --user="" \
         --reports=${reports} \
-        --boost-report=${boost}/tools/regression/build/bin/boost_report
+        "--boost-report=${cwd}/boost_regression/build/bin/boost_report"
     cd "${cwd}"
 }
 

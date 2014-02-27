@@ -1,35 +1,21 @@
 # Regression test status reporting tools build Jamfile
 
-# Copyright Rene Rivera
+# Copyright Rene Rivera 2014
 
 # Distributed under the Boost Software License, Version 1.0.
 # See http://www.boost.org/LICENSE_1_0.txt
  
 
-if [ glob ../../../boost-build.jam ]
-{
-    use-project /boost : ../../.. ;
-}
-else
-{
-    import modules ;
-    use-project /boost : [ MATCH --boost=(.*) : [ modules.peek : ARGV ] ] ;
-}
+import modules ;
+use-project /boost : [ MATCH --boost=(.*) : [ modules.peek : ARGV ] ] ;
 
-if ! [ glob ../src/process_jam_log.cpp ]
-{
-    project boost/regression
-        :
-        source-location ..
-        ;
-}
-else
-{
-    project boost/regression
-        :
-        source-location ../src
-        ;
-}
+project boost_regression
+    :
+    source-location ../src
+    :
+    requirements
+    <dependency>/boost//headers
+    ;
 
 obj tiny_xml
     :

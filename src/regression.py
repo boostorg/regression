@@ -39,9 +39,9 @@ git_info = {
         'subdir' : '',
         },
     'regression' : {
-        'git' : 'https://github.com/boostorg/boost.git',
-        'dir' : 'boost_root',
-        'subdir' : 'tools/regression',
+        'git' : 'https://github.com/boostorg/regression.git',
+        'dir' : 'boost_regression',
+        'subdir' : '',
         },
     'boost-build.jam' : {
         'raw' : 'https://raw.github.com/boostorg/boost/%s/boost-build.jam'
