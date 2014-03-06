@@ -450,7 +450,7 @@ class runner:
                 self.regression_results,
                 self.runner, self.tag, self.platform, comment_path,
                 self.timestamp_path,
-                self.user,
+                "",
                 source, run_type,
                 self.dart_server, self.proxy,
                 revision )
@@ -485,7 +485,7 @@ class runner:
                     upload_logs(
                         self.regression_results,
                         self.runner, self.group,
-                        self.user,
+                        "",
                         self.ftp_proxy,
                         self.debug_level, self.send_bjam_log,
                         self.timestamp_path,
@@ -498,7 +498,7 @@ class runner:
                     upload_logs(
                         self.regression_results,
                         self.runner, self.group,
-                        self.user,
+                        "",
                         self.ftp_proxy,
                         self.debug_level, self.send_bjam_log,
                         self.timestamp_path,
@@ -790,36 +790,6 @@ class runner:
 
                 zip_cmd.main( file_path, archive_path )
                 utils.log( 'Done compressing "%s".' % archive_path )
-
-    #~ Dowloading source, from SVN...
-
-    def svn_checkout( self ):
-        os.chdir( self.regression_root )
-        self.svn_command( 'co %s %s' % (self.svn_repository_url(self.tag),'boost') )
-
-    def svn_update( self ):
-        os.chdir( self.boost_root )
-        self.svn_command( 'update' )
-
-    def svn_command( self, command ):
-        svn_anonymous_command_line  = 'svn --non-interactive %(command)s'
-        svn_command_line            = 'svn --non-interactive --username=%(user)s %(command)s'
-
-        if not hasattr(self,'user') or self.user is None or self.user == 'anonymous':
-            cmd = svn_anonymous_command_line % { 'command': command }
-        else:
-            cmd = svn_command_line % { 'user': self.user, 'command': command }
-
-        self.log( 'Executing SVN command "%s"' % cmd )
-        rc = os.system( cmd )
-        if rc != 0:
-            raise Exception( 'SVN command "%s" failed with code %d' % ( cmd, rc ) )
-
-    def svn_repository_url( self, path ):
-        if self.user != 'anonymous' and self.user != '':
-            return '%s%s' % (repo_root['user'],path)
-        else:
-            return '%s%s' % (repo_root['anon'],path)
 
     #~ Downloading source, from GIT...
 
