@@ -279,7 +279,7 @@ class runner:
         if self.use_git:
             self.git_checkout(
                 git_info['regression'],
-                self.git_branch())
+                'develop')
 #         else:
 #             self.retry( lambda: self.download_tarball(
 #                 os.path.basename(self.tools_regression_root)+".tar.bz2",

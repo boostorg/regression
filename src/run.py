@@ -36,7 +36,7 @@ script_local = root
 if use_local:
     script_remote = 'file://'+os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
 else:
-    script_remote = 'https://raw.github.com/boostorg/regression/src'
+    script_remote = 'https://raw.github.com/boostorg/regression/develop/src'
 script_dir = os.path.join(root,'boost_regression_src')
 
 if not no_update:
@@ -47,7 +47,7 @@ if not no_update:
         shutil.rmtree(script_dir)
     os.mkdir(script_dir)
     #~ * Get new scripts, either from local working copy, or from remote
-    if os.path.exists(script_local):
+    if use_local and os.path.exists(script_local):
         print '# Copying regression scripts from %s...' % script_local
         for src in script_sources:
             shutil.copyfile( os.path.join(script_local,src), os.path.join(script_dir,src) )
