@@ -7,7 +7,7 @@
  
 
 import modules ;
-use-project /boost : [ MATCH --boost=(.*) : [ modules.peek : ARGV ] ] ;
+use-project /boost : [ MATCH --boost-root=(.*) : [ modules.peek : ARGV ] ] ;
 
 project boost_regression
     :

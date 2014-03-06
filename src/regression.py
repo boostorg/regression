@@ -18,24 +18,10 @@ import time
 #~ Place holder for xsl_reports/util module
 utils = None
 
-repo_root = {
-    'anon'          : 'http://svn.boost.org/svn/boost/',
-    'user'          : 'https://svn.boost.org/svn/boost/'
-    }
-repo_path = {
-    'trunk'         : 'trunk',
-    'release'       : 'branches/release',
-    'build'         : 'trunk/tools/build/v2',
-    'jam'           : 'trunk/tools/build/v2/engine',
-    'regression'    : 'trunk/tools/regression',
-    'boost-build.jam'
-                    : 'trunk/boost-build.jam'
-    }
-
 git_info = {
     'build' : {
         'git' : 'https://github.com/boostorg/build.git',
-        'dir' : 'tools_bb',
+        'dir' : 'boost_bb',
         'subdir' : '',
         },
     'regression' : {
@@ -104,8 +90,6 @@ class runner:
         opt.add_option( '--platform' )
 
         #~ Source Options:
-        opt.add_option( '--user',
-            help="Boost SVN user ID" )
         opt.add_option( '--local',
             help="the name of the boost tarball" )
         opt.add_option( '--force-update',
@@ -114,9 +98,6 @@ class runner:
         opt.add_option( '--have-source',
             help="do neither a tarball download nor a repo update; used primarily for testing script changes",
             action='store_true' )
-        opt.add_option( '--use-svn',
-            help="use old svn repo instead of new git repo",
-            action='store_true')
         opt.add_option( '--use-dulwich',
             help="use dulwich git implementation for git access",
             action='store_true')
@@ -159,7 +140,6 @@ class runner:
         self.bjam_toolset=''
         self.pjl_toolset=''
         self.platform=self.platform_name()
-        self.user='anonymous'
         self.local=None
         self.force_update=False
         self.have_source=False
@@ -174,14 +154,9 @@ class runner:
         self.skip_tests=False
         self.use_git=True
         self.use_dulwich=False
-        self.use_svn=False
         ( _opt_, self.actions ) = opt.parse_args(None,self)
         if not self.actions or self.actions == []:
             self.actions = [ 'regression' ]
-
-        #~ Allow overriding git repo with legacy svn repo for comparison testing.
-        if self.use_svn:
-            self.use_git = False
 
         #~ Set the reporting group if it wasn't specified.
         if not self.group:
@@ -189,23 +164,24 @@ class runner:
 
         #~ Initialize option dependent values.
         self.regression_root = root
+        
+        #~ Boost paths.
         self.boost_root = os.path.join( self.regression_root, 'boost_root' )
         self.regression_results = os.path.join( self.regression_root, 'results' )
         if self.pjl_toolset != 'python':
             self.regression_log = os.path.join( self.regression_results, 'bjam.log' )
         else:
             self.regression_log = os.path.join( self.regression_results, 'bjam.xml' )
-        self.tools_bb_root = os.path.join( self.regression_root,'tools_bb' )
-        if self.use_git:
-            self.tools_bb_root = os.path.join( self.tools_bb_root, 'src')
-            self.tools_bjam_root = os.path.join( self.regression_root,'tools_bb', 'src', 'engine' )
-        else:
-            self.tools_bjam_root = os.path.join( self.regression_root,'tools_bb', 'v2', 'engine' )
-        if self.use_git:
-            self.tools_regression_root = os.path.join( self.regression_root,'boost_root', 'tools', 'regression' )
-        else:
-            self.tools_regression_root = os.path.join( self.regression_root,'tools_regression' )
+        
+        #~ Boost Build paths.
+        self.tools_bb_root = os.path.join( self.regression_root,'boost_bb' )
+        self.tools_bb_root = os.path.join( self.tools_bb_root, 'src')
+        self.tools_bjam_root = os.path.join( self.regression_root,'boost_bb', 'src', 'engine' )
+        
+        #~ Regression tools paths.
+        self.tools_regression_root = os.path.join( self.regression_root,'boost_regression' )
         self.xsl_reports_dir = os.path.join( self.tools_regression_root, 'xsl_reports' )
+        
         self.timestamp_path = os.path.join( self.regression_root, 'timestamp' )
         if sys.platform == 'win32':
             self.patch_boost = 'patch_boost.bat'
@@ -270,10 +246,7 @@ class runner:
 
         if 'source' in args:
             self.log( 'Cleaning up "%s" directory ...' % self.boost_root )
-            if self.use_git:
-                self.git_source_checkout(True)
-            else:
-                self.rmtree( self.boost_root )
+            self.git_source_checkout(True)
 
         if 'bin' in args:
             boost_bin_dir = os.path.join( self.boost_root, 'bin' )
@@ -294,48 +267,33 @@ class runner:
             self.git_checkout(
                 git_info['build'],
                 'develop')
-        elif self.user and self.user != '':
-            os.chdir( os.path.dirname(self.tools_bb_root) )
-            self.svn_command( 'co %s %s' % (
-                self.svn_repository_url(repo_path['build']),
-                os.path.basename(self.tools_bb_root) ) )
-        else:
-            self.retry( lambda: self.download_tarball(
-                os.path.basename(self.tools_bb_root)+".tar.bz2",
-                self.tarball_url(repo_path['build']) ) )
-            self.unpack_tarball(
-                self.tools_bb_root+".tar.bz2",
-                os.path.basename(self.tools_bb_root) )
+#         else:
+#             self.retry( lambda: self.download_tarball(
+#                 os.path.basename(self.tools_bb_root)+".tar.bz2",
+#                 self.tarball_url(repo_path['build']) ) )
+#             self.unpack_tarball(
+#                 self.tools_bb_root+".tar.bz2",
+#                 os.path.basename(self.tools_bb_root) )
         #~ Get the regression tools and utilities...
         self.log( 'Getting regression tools and utilities...' )
         if self.use_git:
             self.git_checkout(
                 git_info['regression'],
                 self.git_branch())
-        elif self.user and self.user != '':
-            os.chdir( os.path.dirname(self.tools_regression_root) )
-            self.svn_command( 'co %s %s' % (
-                self.svn_repository_url(repo_path['regression']),
-                os.path.basename(self.tools_regression_root) ) )
-        else:
-            self.retry( lambda: self.download_tarball(
-                os.path.basename(self.tools_regression_root)+".tar.bz2",
-                self.tarball_url(repo_path['regression']) ) )
-            self.unpack_tarball(
-                self.tools_regression_root+".tar.bz2",
-                os.path.basename(self.tools_regression_root) )
+#         else:
+#             self.retry( lambda: self.download_tarball(
+#                 os.path.basename(self.tools_regression_root)+".tar.bz2",
+#                 self.tarball_url(repo_path['regression']) ) )
+#             self.unpack_tarball(
+#                 self.tools_regression_root+".tar.bz2",
+#                 os.path.basename(self.tools_regression_root) )
 
         #~ We get a boost-build.jam to make the tool build work even if there's
         #~ an existing boost-build.jam above the testing root.
         self.log( 'Getting boost-build.jam...' )
-        if self.use_git:
-            self.http_get(
-                git_info['boost-build.jam']['raw']%(self.git_branch()),
-                os.path.join(self.regression_root, 'boost-build.jam') )
-        else:
-            self.http_get(
-                self.svn_repository_url(repo_path['boost-build.jam']),
-                os.path.join( self.regression_root, 'boost-build.jam' ) )
+        self.http_get(
+            git_info['boost-build.jam']['raw']%(self.git_branch()),
+            os.path.join(self.regression_root, 'boost-build.jam') )
 
     def command_get_source(self):
         self.refresh_timestamp()
@@ -343,22 +301,17 @@ class runner:
 
         if self.use_git:
             self.retry(self.git_source_checkout)
-        elif self.user and self.user != '':
-            self.retry( self.svn_checkout )
-        else:
-            self.retry( self.get_tarball )
+#         else:
+#             self.retry( self.get_tarball )
         pass
 
     def command_update_source(self):
+        self.refresh_timestamp()
+        self.log( 'Updating sources (%s)...' % self.timestamp() )
         if self.use_git:
             self.retry(self.git_source_checkout)
-        elif self.user and self.user != '' \
-            or os.path.exists( os.path.join( self.boost_root, '.svn' ) ):
-            open( self.timestamp_path, 'w' ).close()
-            self.log( 'Updating sources from SVN (%s)...' % self.timestamp() )
-            self.retry( self.svn_update )
-        else:
-            self.command_get_source( )
+#         else:
+#             self.retry( self.get_tarball )
         pass
 
     def command_patch(self):
@@ -442,10 +395,7 @@ class runner:
             fn = os.path.join(d, "test_log.xml")
             cd = os.getcwd()
             try:
-                if self.use_git:
-                    os.chdir (os.path.join (self.boost_root, 'tools/build/test'))
-                else:
-                    os.chdir (os.path.join (self.boost_root, 'tools/build/v2/test'))
+                os.chdir (os.path.join (self.boost_root, 'tools/build/test'))
                 bjam_path = os.path.dirname (self.tool_path( self.bjam ))
                 self.log( "Using bjam binary in '%s'" % (bjam_path))
                 os.putenv('PATH', bjam_path + os.pathsep + os.environ['PATH'])
@@ -489,23 +439,6 @@ class runner:
             revision = f.read()
             f.close()
             revision = revision.strip()
-        else:
-            svn_root_file = os.path.join( self.boost_root, '.svn' )
-            svn_info_file = os.path.join( self.boost_root, 'svn_info.txt' )
-            if os.path.exists( svn_root_file ):
-                source = 'SVN'
-                self.svn_command( 'info --xml "%s" >"%s"' % (self.boost_root,svn_info_file) )
-            if os.path.exists( svn_info_file ):
-                f = open( svn_info_file, 'r' )
-                svn_info = f.read()
-                f.close()
-                i = svn_info.find( 'Revision:' )
-                if i < 0: i = svn_info.find( 'revision=' )  # --xml format
-                if i >= 0:
-                    i += 10
-                    while svn_info[i] >= '0' and svn_info[i] <= '9':
-                      revision += svn_info[i]
-                      i += 1
 
         if self.pjl_toolset != 'python':
             from collect_and_upload_logs import collect_logs
@@ -727,7 +660,7 @@ class runner:
             self.log( 'Found preinstalled "%s"; will use it.' % tool[ 'path' ] )
             return
 
-        self.log( 'Preinstalled "%s" is not found; building one...' % tool[ 'path' ] )
+        self.log( 'Preinstalled "%s" not found; building one...' % tool[ 'path' ] )
 
         if toolset is None:
             if self.toolsets is not None:
@@ -795,6 +728,7 @@ class runner:
             ' "-sBOOST_BUILD_PATH=%(bbpath)s"' +\
             ' "-sBOOST_ROOT=%(boost)s"' +\
             ' "--boost=%(boost)s"' +\
+            ' "--boost-root=%(boost)s"' +\
             ' "--boost-build=%(bb)s"' +\
             ' "--debug-configuration"' +\
             ' %(arg)s'
@@ -916,7 +850,7 @@ class runner:
                 if clean:
                     self.git_command( 'reset', '--hard' )
                     self.git_command( 'clean', '-fxd')
-                    self.git_command( 'status' )
+                    # self.git_command( 'status' )
             else:
                 self.git_command(
                     'init',
@@ -930,7 +864,7 @@ class runner:
                 self.git_command(
                     'checkout', branch )
                 self.git_command(
-                    'submodule', 'update', '--init', '--merge' )
+                    'submodule', 'update', '--init' )
         os.chdir( self.regression_root )
 
     def git_source_checkout(self, clean = False):

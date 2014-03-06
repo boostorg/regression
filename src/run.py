@@ -37,7 +37,7 @@ if use_local:
     script_remote = 'file://'+os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
 else:
     script_remote = 'https://raw.github.com/boostorg/regression/src'
-script_dir = os.path.join(root,'tools_regression_src')
+script_dir = os.path.join(root,'boost_regression_src')
 
 if not no_update:
     #~ Bootstrap.
@@ -64,7 +64,7 @@ if not no_update:
                 '%s/%s' % (script_remote,src), os.path.join(script_dir,src) )
 
 #~ * Make the scripts available to Python
-sys.path.insert(0,os.path.join(root,'tools_regression_src'))
+sys.path.insert(0,os.path.join(root,'boost_regression_src'))
 
 #~ Launch runner.
 from regression import runner
