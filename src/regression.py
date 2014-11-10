@@ -233,9 +233,9 @@ class runner:
             self.bjam_options += ' "--limit-tests=' + \
                 "|".join(lib for lib in self.libraries if lib != "build") + '"'
 
-        # if no -m bjam option add -m4 (limit target to 4kb of output)
+        # if no -m bjam option add -m64 (limit target to 64 kb of output)
         if self.bjam_options.find('-m') == -1:
-            self.bjam_options += ' -m4'
+            self.bjam_options += ' -m64'
 
         self.main()
 
@@ -818,6 +818,7 @@ class runner:
                 self.git_command( 'submodule', 'update', '--init' )
                 self.git_command( 'checkout', branch)
                 if clean:
+                    self.git_command( 'submodule', 'foreach "git reset --quiet --hard ; git clean -fxd"')
                     self.git_command( 'reset', '--hard' )
                     self.git_command( 'clean', '-fxd')
                     # self.git_command( 'status' )
