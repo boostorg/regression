@@ -30,7 +30,7 @@ git_info = {
         'subdir' : '',
         },
     'boost-build.jam' : {
-        'raw' : 'https://raw.github.com/boostorg/boost/%s/boost-build.jam'
+        'raw' : 'https://raw.githubusercontent.com/boostorg/boost/%s/boost-build.jam'
         },
     'boost' : {
         'git' : 'https://github.com/boostorg/boost.git',
