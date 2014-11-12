@@ -119,7 +119,7 @@ build_results()
     root=`pwd`
     boost=${cwd}/boost-reports/boost_root
     report_info
-    python "${cwd}/boost_regression/xsl_reports/boost_wide_report.py" \
+    python "${cwd}/boost-reports/boost_regression/xsl_reports/boost_wide_report.py" \
         --locate-root="${root}" \
         --tag=${tag} \
         --expected-results="${boost}/status/expected_results.xml" \
@@ -127,7 +127,7 @@ build_results()
         --comment="comment.html" \
         --user="" \
         --reports=${reports} \
-        "--boost-report=${cwd}/boost_regression/build/bin/boost_report"
+        "--boost-report=${cwd}/boost-reports/boost_regression/build/bin/boost_report"
     cd "${cwd}"
 }
 
