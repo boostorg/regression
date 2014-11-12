@@ -22,9 +22,9 @@ git_update()
 	if [ -d "${1}" ]; then
 		cd "${1}"
 		git remote set-branches --add origin "${2}"
-		git pull
-		git checkout "${2}"
+		git pull --recurse-submodules
 		git submodule update --init
+		git checkout "${2}"
 	else
 		mkdir -p "${1}"
 		git init "${1}"
@@ -44,16 +44,19 @@ build_setup()
 	mkdir -p boost-reports/master
 	git_update "${cwd}/boost-reports/boost_root" master 'https://github.com/boostorg/boost.git'
 	git_update "${cwd}/boost-reports/boost_regression" develop 'https://github.com/boostorg/regression.git'
+	git_update "${cwd}/boost-reports/boost_bb" develop 'https://github.com/boostorg/build.git'
 	cd "${cwd}"
 }
 
 update_tools()
 {
     cwd=`pwd`
-    cd "${cwd}/boost-reports/boost_root"
+    cd "${cwd}/boost-reports/boost_bb"
     ./bootstrap.sh
     cd "${cwd}/boost-reports/boost_regression/build"
-    "${cwd}/boost-reports/boost_root/b2" install
+    "${cwd}/boost-reports/boost_bb/b2" \
+        "--boost-build=${cwd}/boost-reports/boost_bb/src" \
+        "--boost-root=${cwd}/boost-reports/boost_root" install
     cd "${cwd}"
 }
 
