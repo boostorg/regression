@@ -523,6 +523,7 @@ def execute_tasks(
             command_line += ' "%s"' % f
 
         utils.log("Producing the reports...")
+        utils.log("> "+command_line)
         os.system(command_line)
 
         return
