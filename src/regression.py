@@ -426,19 +426,37 @@ class runner:
             f.close()
 
         source = 'tarball'
-        revision = ''
-
-        if self.use_git:
-            git_head_file = os.path.join(self.boost_root, '.git', 'HEAD')
-            f = open( git_head_file, 'r' )
-            git_head_info = f.read()
-            f.close()
-            git_head_info = git_head_info.strip().rpartition(' ')[2]
-            git_ref_file = os.path.join(self.boost_root, '.git', git_head_info)
-            f = open( git_ref_file, 'r' )
-            revision = f.read()
-            f.close()
-            revision = revision.strip()
+        revision = self.git_revision(self.boost_root)
+        
+        # Generate expanded comment file that has extra status
+        # information. In particular the revisions of all the git
+        # repos in the test tree.
+        base_comment_path = comment_path
+        comment_path = os.path.join(
+            os.path.dirname(base_comment_path),
+            'full-'+os.path.basename(base_comment_path))
+        with open(comment_path, 'w') as comment_file:
+            comment_file.write("\n")
+            with open(base_comment_path, 'r') as base_comment_file:
+                comment_file.write(base_comment_file.read())
+            comment_file.write("<hr>\n")
+            comment_file.write("<table><tr><th>Repo</th><th>Revision</th></tr>\n")
+            for dir_root, dir_names, file_names in os.walk( self.regression_root ):
+                for dir_name in dir_names:
+                    if dir_name == '.git':
+                        repo_dir = os.path.relpath(dir_root, self.regression_root)
+                        repo_revision = self.git_revision(dir_root)
+                        comment_file.write(
+                            "<tr><td><pre>%s</pre></td><td><pre>%s</pre></td></tr>\n"
+                            %(repo_dir, repo_revision))
+                for file_name in file_names:
+                    if file_name == '.git':
+                        repo_dir = os.path.relpath(dir_root, self.regression_root)
+                        repo_revision = self.git_revision(dir_root)
+                        comment_file.write(
+                            "<tr><td><pre>%s</pre></td><td><pre>%s</pre></td></tr>\n"
+                            %(repo_dir, repo_revision))
+            comment_file.write("</table>\n")
 
         if self.pjl_toolset != 'python':
             from collect_and_upload_logs import collect_logs
@@ -847,6 +865,23 @@ class runner:
             return git_branch[self.tag]
         else:
             return self.tag
+    
+    def git_revision(self, root):
+        if self.use_git:
+            dot_git = os.path.join(root, '.git')
+            if os.path.isfile(dot_git):
+                with open(dot_git, 'r') as f:
+                    subref = f.read().strip().rpartition(' ')[2]
+                    git_rev_file = os.path.join(
+                        root, subref, 'HEAD')
+            else:
+                with open(os.path.join(dot_git, 'HEAD'), 'r') as f:
+                    git_head_info = f.read().strip().rpartition(' ')[2]
+                    git_rev_file = os.path.join(dot_git, git_head_info)
+            with open( git_rev_file, 'r' ) as f:
+                return f.read().strip()
+        else:
+            return ''
 
     #~ Downloading and extracting source archives, from tarballs or zipballs...
 
