@@ -1,6 +1,6 @@
 #!/bin/sh
 
-#~ Copyright Rene Rivera 2014
+#~ Copyright Rene Rivera 2014-2015
 #~ Distributed under the Boost Software License, Version 1.0.
 #~ (See accompanying file LICENSE_1_0.txt or http://www.boost.org/LICENSE_1_0.txt)
 
@@ -10,8 +10,8 @@ build_all()
 {
 	build_setup
     update_tools
-    time build_results develop 2>&1 | tee boost-reports/develop.log
-    time build_results master 2>&1 | tee boost-reports/master.log
+    build_results develop 2>&1 | tee boost-reports/develop.log
+    build_results master 2>&1 | tee boost-reports/master.log
     upload_results develop
     upload_results master
 }
