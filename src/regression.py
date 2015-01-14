@@ -435,28 +435,34 @@ class runner:
         comment_path = os.path.join(
             os.path.dirname(base_comment_path),
             'full-'+os.path.basename(base_comment_path))
-        with open(comment_path, 'w') as comment_file:
+        comment_file = open(comment_path, 'w')
+        try:
             comment_file.write("\n")
-            with open(base_comment_path, 'r') as base_comment_file:
+            base_comment_file = open(base_comment_path, 'r')
+            try:
                 comment_file.write(base_comment_file.read())
+            finally:
+                base_comment_file.close()
             comment_file.write("<hr>\n")
             comment_file.write("<table><tr><th>Repo</th><th>Revision</th></tr>\n")
             for dir_root, dir_names, file_names in os.walk( self.regression_root ):
                 for dir_name in dir_names:
                     if dir_name == '.git':
-                        repo_dir = os.path.relpath(dir_root, self.regression_root)
+                        repo_dir = dir_root.replace(self.regression_root, '')
                         repo_revision = self.git_revision(dir_root)
                         comment_file.write(
                             "<tr><td><pre>%s</pre></td><td><pre>%s</pre></td></tr>\n"
                             %(repo_dir, repo_revision))
                 for file_name in file_names:
                     if file_name == '.git':
-                        repo_dir = os.path.relpath(dir_root, self.regression_root)
+                        repo_dir = dir_root.replace(self.regression_root, '')
                         repo_revision = self.git_revision(dir_root)
                         comment_file.write(
                             "<tr><td><pre>%s</pre></td><td><pre>%s</pre></td></tr>\n"
                             %(repo_dir, repo_revision))
             comment_file.write("</table>\n")
+        finally:
+            comment_file.close()
 
         if self.pjl_toolset != 'python':
             from collect_and_upload_logs import collect_logs
@@ -867,21 +873,30 @@ class runner:
             return self.tag
     
     def git_revision(self, root):
+        result = ''
         if self.use_git:
             dot_git = os.path.join(root, '.git')
             if os.path.isfile(dot_git):
-                with open(dot_git, 'r') as f:
+                f = open(dot_git, 'r')
+                try:
                     subref = f.read().strip().rpartition(' ')[2]
                     git_rev_file = os.path.join(
                         root, subref, 'HEAD')
+                finally:
+                    f.close()
             else:
-                with open(os.path.join(dot_git, 'HEAD'), 'r') as f:
+                f = open(os.path.join(dot_git, 'HEAD'), 'r')
+                try:
                     git_head_info = f.read().strip().rpartition(' ')[2]
                     git_rev_file = os.path.join(dot_git, git_head_info)
-            with open( git_rev_file, 'r' ) as f:
-                return f.read().strip()
-        else:
-            return ''
+                finally:
+                    f.close()
+            f = open( git_rev_file, 'r' )
+            try:
+                result = f.read().strip()
+            finally:
+                f.close()
+        return result
 
     #~ Downloading and extracting source archives, from tarballs or zipballs...
 
