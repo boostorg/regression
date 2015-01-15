@@ -6,14 +6,21 @@
 
 set -e
 
+log_time()
+{
+    echo `date` "::" $1 >> boost-reports-time.log
+}
+
 build_all()
 {
+    log_time "Start of testing. [build_all]"
 	build_setup
     update_tools
     build_results develop 2>&1 | tee boost-reports/develop.log
     build_results master 2>&1 | tee boost-reports/master.log
     upload_results develop
     upload_results master
+    log_time "End of testing. [build_all]"
 }
 
 git_update()
@@ -39,17 +46,22 @@ git_update()
 
 build_setup()
 {
+    log_time "Get tools. [build_setup]"
 	cwd=`pwd`
 	mkdir -p boost-reports/develop
 	mkdir -p boost-reports/master
+	log_time "Git; boost_root [build_setup]"
 	git_update "${cwd}/boost-reports/boost_root" master 'https://github.com/boostorg/boost.git'
+	log_time "Git; boost_regression [build_setup]"
 	git_update "${cwd}/boost-reports/boost_regression" develop 'https://github.com/boostorg/regression.git'
+	log_time "Git; boost_bb [build_setup]"
 	git_update "${cwd}/boost-reports/boost_bb" develop 'https://github.com/boostorg/build.git'
 	cd "${cwd}"
 }
 
 update_tools()
 {
+    log_time "Build tools. [update_tools]"
     cwd=`pwd`
     cd "${cwd}/boost-reports/boost_bb"
     ./bootstrap.sh
@@ -112,6 +124,7 @@ HTML
 build_results()
 {
     tag="${1?'error: command line missing branch-name argument'}"
+    log_time "Build results for branch ${tag}. [build_results]"
     reports="dd,ds,i,n"
     cwd=`pwd`
     cd boost-reports
@@ -133,6 +146,7 @@ build_results()
 
 upload_results()
 {
+    log_time "Upload results for branch $1. [upload_results]"
     cwd=`pwd`
     cd boost-reports
     upload_dir=/home/grafik/www.boost.org/testing
@@ -155,4 +169,5 @@ upload_results()
     cd "${cwd}"
 }
 
+echo "=====-----=====-----=====-----=====-----=====-----=====-----=====-----" >> boost-reports-time.log
 build_all 2>&1 | tee boost-reports.log
