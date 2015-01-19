@@ -30,7 +30,6 @@ git_update()
 		cd "${1}"
 		git remote set-branches --add origin "${2}"
 		git pull --recurse-submodules
-		git submodule update --init
 		git checkout "${2}"
 	else
 		mkdir -p "${1}"
@@ -39,8 +38,15 @@ git_update()
 		git remote add --no-tags -t "${2}" origin "${3}"
 		git fetch --depth=1
 		git checkout "${2}"
-		git submodule update --init
 	fi
+	cd "${cwd}"
+}
+
+git_submodule_update()
+{
+	cwd=`pwd`
+	cd "${1}"
+	git submodule update --init "${2}"
 	cd "${cwd}"
 }
 
@@ -52,6 +58,53 @@ build_setup()
 	mkdir -p boost-reports/master
 	log_time "Git; boost_root [build_setup]"
 	git_update "${cwd}/boost-reports/boost_root" master 'https://github.com/boostorg/boost.git'
+	git_submodule_update "${cwd}/boost-reports/boost_root" libs/algorithm
+	git_submodule_update "${cwd}/boost-reports/boost_root" libs/any
+	git_submodule_update "${cwd}/boost-reports/boost_root" libs/array
+	git_submodule_update "${cwd}/boost-reports/boost_root" libs/assert
+	git_submodule_update "${cwd}/boost-reports/boost_root" libs/bind
+	git_submodule_update "${cwd}/boost-reports/boost_root" libs/concept_check
+	git_submodule_update "${cwd}/boost-reports/boost_root" libs/config
+	git_submodule_update "${cwd}/boost-reports/boost_root" libs/container
+	git_submodule_update "${cwd}/boost-reports/boost_root" libs/core
+	git_submodule_update "${cwd}/boost-reports/boost_root" libs/crc
+	git_submodule_update "${cwd}/boost-reports/boost_root" libs/date_time
+	git_submodule_update "${cwd}/boost-reports/boost_root" libs/detail
+	git_submodule_update "${cwd}/boost-reports/boost_root" libs/exception
+	git_submodule_update "${cwd}/boost-reports/boost_root" libs/filesystem
+	git_submodule_update "${cwd}/boost-reports/boost_root" libs/foreach
+	git_submodule_update "${cwd}/boost-reports/boost_root" libs/format
+	git_submodule_update "${cwd}/boost-reports/boost_root" libs/function
+	git_submodule_update "${cwd}/boost-reports/boost_root" libs/functional
+	git_submodule_update "${cwd}/boost-reports/boost_root" libs/integer
+	git_submodule_update "${cwd}/boost-reports/boost_root" libs/io
+	git_submodule_update "${cwd}/boost-reports/boost_root" libs/iostreams
+	git_submodule_update "${cwd}/boost-reports/boost_root" libs/iterator
+	git_submodule_update "${cwd}/boost-reports/boost_root" libs/lexical_cast
+	git_submodule_update "${cwd}/boost-reports/boost_root" libs/math
+	git_submodule_update "${cwd}/boost-reports/boost_root" libs/move
+	git_submodule_update "${cwd}/boost-reports/boost_root" libs/mpl
+	git_submodule_update "${cwd}/boost-reports/boost_root" libs/numeric/conversion
+	git_submodule_update "${cwd}/boost-reports/boost_root" libs/optional
+	git_submodule_update "${cwd}/boost-reports/boost_root" libs/predef
+	git_submodule_update "${cwd}/boost-reports/boost_root" libs/preprocessor
+	git_submodule_update "${cwd}/boost-reports/boost_root" libs/property_tree
+	git_submodule_update "${cwd}/boost-reports/boost_root" libs/program_options
+	git_submodule_update "${cwd}/boost-reports/boost_root" libs/range
+	git_submodule_update "${cwd}/boost-reports/boost_root" libs/regex
+	git_submodule_update "${cwd}/boost-reports/boost_root" libs/smart_ptr
+	git_submodule_update "${cwd}/boost-reports/boost_root" libs/static_assert
+	git_submodule_update "${cwd}/boost-reports/boost_root" libs/system
+	git_submodule_update "${cwd}/boost-reports/boost_root" libs/throw_exception
+	git_submodule_update "${cwd}/boost-reports/boost_root" libs/tokenizer
+	git_submodule_update "${cwd}/boost-reports/boost_root" libs/tuple
+	git_submodule_update "${cwd}/boost-reports/boost_root" libs/type_index
+	git_submodule_update "${cwd}/boost-reports/boost_root" libs/type_traits
+	git_submodule_update "${cwd}/boost-reports/boost_root" libs/unordered
+	git_submodule_update "${cwd}/boost-reports/boost_root" libs/utility
+	git_submodule_update "${cwd}/boost-reports/boost_root" libs/variant
+	git_submodule_update "${cwd}/boost-reports/boost_root" libs/wave
+	git_submodule_update "${cwd}/boost-reports/boost_root" tools/inspect
 	log_time "Git; boost_regression [build_setup]"
 	git_update "${cwd}/boost-reports/boost_regression" develop 'https://github.com/boostorg/regression.git'
 	log_time "Git; boost_bb [build_setup]"
@@ -68,7 +121,7 @@ update_tools()
     cd "${cwd}/boost-reports/boost_regression/build"
     "${cwd}/boost-reports/boost_bb/b2" \
         "--boost-build=${cwd}/boost-reports/boost_bb/src" \
-        "--boost-root=${cwd}/boost-reports/boost_root" install
+        "--boost-root=${cwd}/boost-reports/boost_root" bin_boost_report
     cd "${cwd}"
 }
 
@@ -140,7 +193,7 @@ build_results()
         --comment="comment.html" \
         --user="" \
         --reports=${reports} \
-        "--boost-report=${cwd}/boost-reports/boost_regression/build/bin/boost_report"
+        "--boost-report=${cwd}/boost-reports/boost_regression/build/bin_boost_report/boost_report"
     cd "${cwd}"
 }
 
