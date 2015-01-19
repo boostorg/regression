@@ -89,3 +89,6 @@ explicit boost_report ;
 alias install : bin ;
 install bin : process_jam_log compiler_status boost_report ;
 explicit install bin ;
+
+install bin_boost_report : boost_report ;
+explicit bin_boost_report ;
