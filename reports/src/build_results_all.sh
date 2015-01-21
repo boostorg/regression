@@ -18,8 +18,8 @@ build_all()
     update_tools
     build_results develop 2>&1 | tee boost-reports/develop.log
     build_results master 2>&1 | tee boost-reports/master.log
-    #upload_results develop
-    #upload_results master
+    upload_results develop
+    upload_results master
     log_time "End of testing. [build_all]"
 }
 
