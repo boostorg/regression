@@ -11,10 +11,7 @@
 </head>
 
 <body>
-  <h1>
-    <img src="../../../boost.png" alt="boost.png (6897 bytes)" width="277"
-      height="86" /> Running Regression Test Reports
-  </h1>
+  <h1>Running Regression Test Reports</h1>
 
   <h2>Introduction</h2>
 
@@ -65,7 +62,7 @@ mkdir boost-reports    # or some other name of your choice
   <blockquote>
     <pre>
 cd ~/boost/boost-reports # i.e. the directory created above
-curl -o build_results_all.sh https://raw.githubusercontent.com/boostorg/regression/develop/xsl_reports/build_results_all.sh
+curl -o build_results_all.sh https://raw.githubusercontent.com/boostorg/regression/develop/reports/src/build_results_all.sh
 chmod +x build_results_all.sh
 ./build_results_all.sh
     </pre>
@@ -80,8 +77,6 @@ chmod +x build_results_all.sh
   <h2>To Do</h2>
 
   <ul>
-    <li>Avoid the clone --recursive; just install the core libraries needed
-      to build the report generator.</li>
   </ul>
 
   <h2>Acknowledgements</h2>
@@ -92,14 +87,7 @@ chmod +x build_results_all.sh
   </p>
   <hr />
 
-  <p>
-    Revised
-    <!--webbot bot="Timestamp" S-Type="EDITED" S-Format="%d %B %Y" startspan -->
-    10 December 2014
-    <!--webbot bot="Timestamp" endspan i-checksum="32403" -->
-  </p>
-
-  <p>Copyright Beman Dawes 2014. Copyright Rene Rivera 2014.</p>
+  <p>Copyright Beman Dawes 2014. Copyright Rene Rivera 2014-2015.</p>
 
   <p>
     Distributed under the <a href="http://www.boost.org/LICENSE_1_0.txt">Boost
