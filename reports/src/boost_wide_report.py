@@ -57,10 +57,6 @@ else:
 def map_path( path ):
     return os.path.join( run_dir, path ) 
 
-
-def xsl_path( xsl_file_name ):
-    return map_path( os.path.join( 'xsl/v2', xsl_file_name ) )
-
 class file_info:
     def __init__( self, file_name, file_size, file_date ):
         self.name = file_name
@@ -225,144 +221,6 @@ class action:
             if os.path.exists( result ):
                 os.unlink( result )
     
-class merge_xml_action( action ):
-    def __init__( self, source, destination, expected_results_file, failures_markup_file, tag ):
-        action.__init__( self, destination )
-        self.source_ = source
-        self.destination_ = destination
-        self.tag_ = tag
-        
-        self.expected_results_file_ = expected_results_file
-        self.failures_markup_file_  = failures_markup_file
-
-        self.dependencies_.extend( [
-            self.source_
-            , self.expected_results_file_
-            , self.failures_markup_file_
-            ]
-            )
-
-        self.relevant_paths_.extend( [ self.source_ ] )
-        self.boost_paths_.extend( [ self.expected_results_file_, self.failures_markup_file_ ] ) 
-
-
-        
-    def update( self ):
-        def filter_xml( src, dest ):
-            
-            class xmlgen( xml.sax.saxutils.XMLGenerator ):
-                def __init__( self, writer ):
-                   xml.sax.saxutils.XMLGenerator.__init__( self, writer )
-                  
-                   self.trimmed = 0
-                   self.character_content = ""
-
-                def startElement( self, name, attrs):
-                    self.flush()
-                    xml.sax.saxutils.XMLGenerator.startElement( self, name, attrs )
-
-                def endElement( self, name ):
-                    self.flush()
-                    xml.sax.saxutils.XMLGenerator.endElement( self, name )
-                    
-                def flush( self ):
-                    content = self.character_content
-                    self.character_content = ""
-                    self.trimmed = 0
-                    xml.sax.saxutils.XMLGenerator.characters( self, content )
-
-                def characters( self, content ):
-                    if not self.trimmed:
-                        max_size = pow( 2, 16 )
-                        self.character_content += content
-                        if len( self.character_content ) > max_size:
-                            self.character_content = self.character_content[ : max_size ] + "...\n\n[The content has been trimmed by the report system because it exceeds %d bytes]" % max_size
-                            self.trimmed = 1
-
-            o = open( dest, "w" )
-            try: 
-                gen = xmlgen( o )
-                xml.sax.parse( src, gen )
-            finally:
-                o.close()
-
-            return dest
-
-            
-        utils.log( 'Merging "%s" with expected results...' % shorten( self.source_ ) )
-        try:
-            trimmed_source = filter_xml( self.source_, '%s-trimmed.xml' % os.path.splitext( self.source_ )[0] )
-            utils.libxslt(
-                  utils.log
-                , trimmed_source
-                , xsl_path( 'add_expected_results.xsl' )
-                , self.file_path_
-                , {
-                    "expected_results_file" : self.expected_results_file_
-                  , "failures_markup_file": self.failures_markup_file_
-                  , "source" : self.tag_ 
-                  }
-                )
-
-            os.unlink( trimmed_source )
-
-        except Exception, msg:
-            utils.log( '  Skipping "%s" due to errors (%s)' % ( self.source_, msg ) )
-            if os.path.exists( self.file_path_ ):
-                os.unlink( self.file_path_ )
-
-        
-    def _xml_timestamp( xml_path ):
-
-        class timestamp_reader( xml.sax.handler.ContentHandler ):
-            def startElement( self, name, attrs ):
-                if name == 'test-run':
-                    self.timestamp = attrs.getValue( 'timestamp' )
-                    raise self
-
-        try:
-            xml.sax.parse( xml_path, timestamp_reader() )
-            raise 'Cannot extract timestamp from "%s". Invalid XML file format?' % xml_path
-        except timestamp_reader, x:
-            return x.timestamp
-
-
-class make_links_action( action ):
-    def __init__( self, source, destination, output_dir, tag, run_date, comment_file, failures_markup_file ):
-        action.__init__( self, destination )
-        self.dependencies_.append( source )
-        self.source_ = source
-        self.output_dir_ = output_dir
-        self.tag_        = tag
-        self.run_date_   = run_date 
-        self.comment_file_ = comment_file
-        self.failures_markup_file_ = failures_markup_file
-        self.links_file_path_ = os.path.join( output_dir, 'links.html' )
-        
-    def update( self ):
-        utils.makedirs( os.path.join( os.path.dirname( self.links_file_path_ ), "output" ) )
-        utils.makedirs( os.path.join( os.path.dirname( self.links_file_path_ ), "developer", "output" ) )
-        utils.makedirs( os.path.join( os.path.dirname( self.links_file_path_ ), "user", "output" ) )
-        utils.log( '    Making test output files...' )
-        try:
-            utils.libxslt( 
-                  utils.log
-                , self.source_
-                , xsl_path( 'links_page.xsl' )
-                , self.links_file_path_
-                , {
-                    'source':                 self.tag_
-                  , 'run_date':               self.run_date_
-                  , 'comment_file':           self.comment_file_
-                  , 'explicit_markup_file':   self.failures_markup_file_
-                  }
-                )
-        except Exception, msg:
-            utils.log( '  Skipping "%s" due to errors (%s)' % ( self.source_, msg ) )
-
-        open( self.file_path_, "w" ).close()
-
-
 class unzip_action( action ):
     def __init__( self, source, destination, unzip_func ):
         action.__init__( self, destination )
@@ -424,42 +282,6 @@ def unzip_archives_task( source_dir, processed_dir, unzip_func ):
     for a in actions:
         a.run()
    
-def merge_xmls_task( source_dir, processed_dir, merged_dir, expected_results_file, failures_markup_file, tag ):    
-    utils.log( '' )
-    utils.log( 'merge_xmls_task: merging updated XMLs in "%s"...' % source_dir )
-    __log__ = 1
-        
-    utils.makedirs( merged_dir )
-    target_files = [ os.path.join( merged_dir, os.path.basename( x ) ) for x in glob.glob( os.path.join( processed_dir, "*.xml" ) ) ] + glob.glob( os.path.join( merged_dir, "*.xml" ) )
-    actions = [ merge_xml_action( os.path.join( processed_dir, os.path.basename( x ) )
-                                  , x
-                                  , expected_results_file
-                                  , failures_markup_file 
-                                  , tag ) for x in target_files ]
-
-    for a in actions:
-        a.run()
-
-
-def make_links_task( input_dir, output_dir, tag, run_date, comment_file, extended_test_results, failures_markup_file ):
-    utils.log( '' )
-    utils.log( 'make_links_task: make output files for test results in "%s"...' % input_dir )
-    __log__ = 1
-
-    target_files = [ x + ".links"  for x in glob.glob( os.path.join( input_dir, "*.xml" ) ) ] + glob.glob( os.path.join( input_dir, "*.links" ) )
-    actions = [ make_links_action( x.replace( ".links", "" )
-                                   , x
-                                   , output_dir
-                                   , tag
-                                   , run_date
-                                   , comment_file
-                                   , failures_markup_file 
-                                   ) for x in target_files ]
-
-    for a in actions:
-        a.run()
-
-
 class xmlgen( xml.sax.saxutils.XMLGenerator ):
     document_started = 0
     
@@ -467,33 +289,6 @@ class xmlgen( xml.sax.saxutils.XMLGenerator ):
         if not self.document_started:
             xml.sax.saxutils.XMLGenerator.startDocument( self )
             self.document_started = 1
-
-
-def merge_processed_test_runs( test_runs_dir, tag, writer ):
-    utils.log( '' )
-    utils.log( 'merge_processed_test_runs: merging processed test runs from %s into a single XML...' % test_runs_dir )
-    __log__ = 1
-    
-    all_runs_xml = xmlgen( writer, encoding='utf-8' )
-    all_runs_xml.startDocument()
-    all_runs_xml.startElement( 'all-test-runs', {} )
-    
-    files = glob.glob( os.path.join( test_runs_dir, '*.xml' ) )
-    for test_run in files:
-        #file_pos = writer.stream.tell()
-        file_pos = writer.tell()
-        try:
-            utils.log( '    Writing "%s" into the resulting XML...' % test_run )
-            xml.sax.parse( test_run, all_runs_xml )
-        except Exception, msg:
-            utils.log( '    Skipping "%s" due to errors (%s)' % ( test_run, msg ) )
-            #writer.stream.seek( file_pos )
-            #writer.stream.truncate()
-            writer.seek( file_pos )
-            writer.truncate()
-
-    all_runs_xml.endElement( 'all-test-runs' )
-    all_runs_xml.endDocument()
 
 
 def execute_tasks(
@@ -530,228 +325,29 @@ def execute_tasks(
 
     unzip_archives_task( incoming_dir, processed_dir, utils.unzip )
 
-    if report_executable:
-        if not os.path.exists( merged_dir ):
-            os.makedirs( merged_dir )
+    if not os.path.exists( merged_dir ):
+        os.makedirs( merged_dir )
 
-        command_line = report_executable
-        command_line += " --expected " + '"%s"' % expected_results_file 
-        command_line += " --markup " + '"%s"' % failures_markup_file
-        command_line += " --comment " + '"%s"' % comment_file
-        command_line += " --tag " + tag
-        # command_line += " --run-date " + '"%s"' % run_date
-        command_line += " -rl"
-        for r in reports:
-            command_line += ' -r' + r
-        command_line += " --css " + xsl_path( 'html/master.css' )
+    command_line = report_executable
+    command_line += " --expected " + '"%s"' % expected_results_file 
+    command_line += " --markup " + '"%s"' % failures_markup_file
+    command_line += " --comment " + '"%s"' % comment_file
+    command_line += " --tag " + tag
+    # command_line += " --run-date " + '"%s"' % run_date
+    command_line += " -rl"
+    for r in reports:
+        command_line += ' -r' + r
+    command_line += " --css " + map_path( 'master.css' )
 
-        for f in glob.glob( os.path.join( processed_dir, '*.xml' ) ):
-            command_line += ' "%s"' % f
+    for f in glob.glob( os.path.join( processed_dir, '*.xml' ) ):
+        command_line += ' "%s"' % f
 
-        utils.log("Producing the reports...")
-        utils.log("> "+command_line)
-        os.system(command_line)
-
-        return
-
-    merge_xmls_task( incoming_dir, processed_dir, merged_dir, expected_results_file, failures_markup_file, tag )
-    make_links_task( merged_dir
-                     , output_dir
-                     , tag
-                     , run_date
-                     , comment_file
-                     , extended_test_results
-                     , failures_markup_file )
-
-
-    results_xml_path = os.path.join( output_dir, 'extended_test_results.xml' )
-    #writer = codecs.open( results_xml_path, 'w', 'utf-8' )
-    writer = open( results_xml_path, 'w' )
-    merge_processed_test_runs( merged_dir, tag, writer )
-    writer.close()
-
-    
-    make_result_pages(
-          extended_test_results
-        , expected_results_file
-        , failures_markup_file
-        , tag
-        , run_date
-        , comment_file
-        , output_dir
-        , reports
-        , warnings
-        )
+    utils.log("Producing the reports...")
+    utils.log("> "+command_line)
+    os.system(command_line)
 
         
-def make_result_pages(
-          extended_test_results
-        , expected_results_file
-        , failures_markup_file
-        , tag
-        , run_date
-        , comment_file
-        , output_dir
-        , reports
-        , warnings
-        ):
-
-    utils.log( 'Producing the reports...' )
-    __log__ = 1
-
-    warnings_text = '+'.join( warnings )
-    
-    if comment_file != '':
-        comment_file = os.path.abspath( comment_file )
-        
-    links = os.path.join( output_dir, 'links.html' )
-    
-    utils.makedirs( os.path.join( output_dir, 'output' ) )
-    for mode in ( 'developer', 'user' ):
-        utils.makedirs( os.path.join( output_dir, mode , 'output' ) )
-        
-    issues = os.path.join( output_dir, 'developer', 'issues.html'  )
-    if 'i' in reports:
-        utils.log( '    Making issues list...' )
-        utils.libxslt( 
-              utils.log
-            , extended_test_results
-            , xsl_path( 'issues_page.xsl' )
-            , issues
-            , {
-                  'source':                 tag
-                , 'run_date':               run_date
-                , 'warnings':               warnings_text
-                , 'comment_file':           comment_file
-                , 'expected_results_file':  expected_results_file
-                , 'explicit_markup_file':   failures_markup_file
-                , 'release':                "yes"
-                }
-            )
-
-    for mode in ( 'developer', 'user' ):
-        if mode[0] + 'd' in reports:
-            utils.log( '    Making detailed %s  report...' % mode )
-            utils.libxslt( 
-                  utils.log
-                , extended_test_results
-                , xsl_path( 'result_page.xsl' )
-                , os.path.join( output_dir, mode, 'index.html' )
-                , { 
-                      'links_file':             'links.html'
-                    , 'mode':                   mode
-                    , 'source':                 tag
-                    , 'run_date':               run_date
-                    , 'warnings':               warnings_text
-                    , 'comment_file':           comment_file
-                    , 'expected_results_file':  expected_results_file
-                    , 'explicit_markup_file' :  failures_markup_file
-                    }
-                )
-    
-    for mode in ( 'developer', 'user' ):
-        if mode[0] + 's' in reports:
-            utils.log( '    Making summary %s  report...' % mode )
-            utils.libxslt(
-                  utils.log
-                , extended_test_results
-                , xsl_path( 'summary_page.xsl' )
-                , os.path.join( output_dir, mode, 'summary.html' )
-                , { 
-                      'mode' :                  mode 
-                    , 'source':                 tag
-                    , 'run_date':               run_date 
-                    , 'warnings':               warnings_text
-                    , 'comment_file':           comment_file
-                    , 'explicit_markup_file' :  failures_markup_file
-                    }
-                )
-
-    for mode in ( 'developer', 'user' ):
-        if mode[0] + 'dr' in reports:
-            utils.log( '    Making detailed %s release report...' % mode )
-            utils.libxslt( 
-                  utils.log
-                , extended_test_results
-                , xsl_path( 'result_page.xsl' )
-                , os.path.join( output_dir, mode, 'index_release.html' )
-                , { 
-                      'links_file':             'links.html'
-                    , 'mode':                   mode
-                    , 'source':                 tag
-                    , 'run_date':               run_date 
-                    , 'warnings':               warnings_text
-                    , 'comment_file':           comment_file
-                    , 'expected_results_file':  expected_results_file
-                    , 'explicit_markup_file' :  failures_markup_file
-                    , 'release':                "yes"
-                    }
-                )
-
-    for mode in ( 'developer', 'user' ):
-        if mode[0] + 'sr' in reports:
-            utils.log( '    Making summary %s release report...' % mode )
-            utils.libxslt(
-                  utils.log
-                , extended_test_results
-                , xsl_path( 'summary_page.xsl' )
-                , os.path.join( output_dir, mode, 'summary_release.html' )
-                , { 
-                      'mode' :                  mode
-                    , 'source':                 tag
-                    , 'run_date':               run_date 
-                    , 'warnings':               warnings_text
-                    , 'comment_file':           comment_file
-                    , 'explicit_markup_file' :  failures_markup_file
-                    , 'release':                'yes'
-                    }
-                )
-        
-    if 'e' in reports:
-        utils.log( '    Generating expected_results ...' )
-        utils.libxslt(
-              utils.log
-            , extended_test_results
-            , xsl_path( 'produce_expected_results.xsl' )
-            , os.path.join( output_dir, 'expected_results.xml' )
-            )
-
-    if  'n' in reports:
-        utils.log( '    Making runner comment files...' )
-        utils.libxslt(
-              utils.log
-            , extended_test_results
-            , xsl_path( 'runners.xsl' )
-            , os.path.join( output_dir, 'runners.html' )
-            )
-
-    shutil.copyfile(
-          xsl_path( 'html/master.css' )
-        , os.path.join( output_dir, 'master.css' )
-        )
-
-    fix_file_names( output_dir )
-
-
-def fix_file_names( dir ):
-    """
-    The current version of xslproc doesn't correctly handle
-    spaces. We have to manually go through the
-    result set and decode encoded spaces (%20).
-    """
-    utils.log( 'Fixing encoded file names...' )
-    for root, dirs, files in os.walk( dir ):
-        for file in files:
-            if file.find( "%20" ) > -1:
-                new_name = file.replace( "%20", " " )
-                utils.rename(
-                      utils.log
-                    , os.path.join( root, file )
-                    , os.path.join( root, new_name )
-                    )
-
-
-def build_xsl_reports( 
+def build_reports( 
           locate_root_dir
         , tag
         , expected_results_file
@@ -899,7 +495,7 @@ The following options are useful in debugging:
 '''
 
 def main():
-    build_xsl_reports( *accept_args( sys.argv[ 1 : ] ) )
+    build_reports( *accept_args( sys.argv[ 1 : ] ) )
 
 if __name__ == '__main__':
     main()
