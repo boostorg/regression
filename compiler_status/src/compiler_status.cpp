@@ -29,8 +29,8 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
 #include <boost/filesystem/fstream.hpp>
-#include "detail/tiny_xml.hpp"
-#include "detail/common.hpp"
+#include "tiny_xml.hpp"
+#include "common.hpp"
 namespace fs = boost::filesystem;
 namespace xml = boost::tiny_xml;
 

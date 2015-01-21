@@ -43,32 +43,6 @@ exe process_jam_log
     ;
 #~ explicit process_jam_log ;
 
-exe compiler_status
-    :
-    compiler_status.cpp
-    tiny_xml
-    /boost/filesystem//boost_filesystem/<link>static
-    :
-    <define>BOOST_ALL_NO_LIB=1
-    <implicit-dependency>/boost//headers
-    :
-    release
-    ;
-explicit compiler_status ;
-
-exe library_status
-    :
-    library_status.cpp
-    tiny_xml
-    /boost/filesystem//boost_filesystem/<link>static
-    :
-    <define>BOOST_ALL_NO_LIB=1
-    <implicit-dependency>/boost//headers
-    :
-    release
-    ;
-explicit library_status ;
-
 exe boost_report
     :
     [ glob report/*.cpp ]
@@ -87,8 +61,8 @@ exe boost_report
 explicit boost_report ;
 
 alias install : bin ;
-install bin : process_jam_log compiler_status boost_report ;
+install bin : process_jam_log/<variant>release ;
 explicit install bin ;
 
-install bin_boost_report : boost_report ;
+install bin_boost_report : boost_report/<variant>release ;
 explicit bin_boost_report ;

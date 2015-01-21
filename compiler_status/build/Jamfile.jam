@@ -1,0 +1,20 @@
+# Copyright Rene Rivera 2015
+
+# Distributed under the Boost Software License, Version 1.0.
+# See http://www.boost.org/LICENSE_1_0.txt
+ 
+
+exe compiler_status
+    :
+    ../src/compiler_status.cpp
+    ../../common/build//tiny_xml
+    /boost/filesystem//boost_filesystem/<link>static
+    :
+    <define>BOOST_ALL_NO_LIB=1
+    <implicit-dependency>/boost//headers
+    ;
+explicit compiler_status ;
+
+alias install : bin ;
+install bin : compiler_status/<variant>release ;
+explicit install bin ;
