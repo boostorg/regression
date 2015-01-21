@@ -30,7 +30,7 @@ program maintenance.
 
 namespace fs = boost::filesystem;
 
-#include "detail/tiny_xml.hpp"
+#include "tiny_xml.hpp"
 namespace xml = boost::tiny_xml;
 
 #include <boost/iterator/transform_iterator.hpp>

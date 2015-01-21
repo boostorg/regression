@@ -1,0 +1,21 @@
+# Copyright Rene Rivera 2014-2015
+
+# Distributed under the Boost Software License, Version 1.0.
+# See http://www.boost.org/LICENSE_1_0.txt
+ 
+
+project common
+    :
+    : usage-requirements
+        <include>../src
+    ;
+
+obj tiny_xml
+    :
+    ../src/tiny_xml.cpp
+    :
+    <define>BOOST_ALL_NO_LIB=1
+    <define>_CRT_SECURE_NO_WARNINGS
+    <implicit-dependency>/boost//headers
+    ;
+explicit tiny_xml ;
