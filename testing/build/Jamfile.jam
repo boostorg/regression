@@ -1,0 +1,21 @@
+# Copyright Rene Rivera 2015
+
+# Distributed under the Boost Software License, Version 1.0.
+# See http://www.boost.org/LICENSE_1_0.txt
+ 
+
+exe process_jam_log
+    :
+    ../src/process_jam_log.cpp
+    ../../common/build//tiny_xml
+    /boost/filesystem//boost_filesystem/<link>static
+    :
+    <define>BOOST_ALL_NO_LIB=1
+    <define>_CRT_SECURE_NO_WARNINGS
+    <implicit-dependency>/boost//headers
+    ;
+explicit process_jam_log ;
+
+alias install : bin ;
+install bin : process_jam_log/<variant>release ;
+explicit install bin ;
