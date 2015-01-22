@@ -62,7 +62,7 @@ class utils:
         
     @staticmethod
     def checked_system( commands, valid_return_codes = [ 0 ] ):
-        rc = system( commands ) 
+        rc = utils.system( commands ) 
         if rc not in [ 0 ] + valid_return_codes:
             raise Exception( 'Command sequence "%s" failed with return code %d' % ( commands, rc ) )
         return rc
@@ -83,7 +83,7 @@ class utils:
     
     @staticmethod
     def log( message ):
-        sys.stderr.write( '# ' + '    ' * log_level() +  message + '\n' )
+        sys.stderr.write( '# ' + '    ' * utils.log_level() +  message + '\n' )
         sys.stderr.flush()
 
 class runner:

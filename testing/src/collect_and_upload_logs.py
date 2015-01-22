@@ -21,6 +21,7 @@ import sys
 import re
 import urlparse
 import getopt
+import inspect
 
 
 class utils:
@@ -36,7 +37,7 @@ class utils:
     
     @staticmethod
     def log( message ):
-        sys.stderr.write( '# ' + '    ' * log_level() +  message + '\n' )
+        sys.stderr.write( '# ' + '    ' * utils.log_level() +  message + '\n' )
         sys.stderr.flush()
     
     @staticmethod
