@@ -60,7 +60,7 @@ def get_date( f, words ):
     seconds = int( modtime[12:14] )
     return ( year, month, day, hours, minutes, seconds, 0, 0, 0)
 
-def list_ftp( f ):
+def list_ftp( f, filter_runners = None ):
     # f is an ftp object
     utils.log( "listing source content" )
     lines = []
@@ -70,6 +70,9 @@ def list_ftp( f ):
 
     # 2. split lines into words
     word_lines = [ x.split( None, 8 ) for x in lines ]
+
+    if filter_runners != None:
+        word_lines = [ x for x in word_lines if re.match( filter_runners, x[-1], re.IGNORECASE ) ]
 
     # we don't need directories
     result = [ file_info( l[-1], int( l[4] ), get_date( f, l ) ) for l in word_lines if l[0][0] != "d" ]
@@ -352,7 +355,7 @@ class unzip_action( action ):
             utils.log( '  Skipping "%s" due to errors (%s)' % ( self.source_, msg ) )
 
 
-def ftp_task( site, site_path , destination ):
+def ftp_task( site, site_path , destination, filter_runners = None ):
     __log__ = 1
     utils.log( '' )
     utils.log( 'ftp_task: "ftp://%s/%s" -> %s' % ( site, site_path, destination ) )
@@ -363,7 +366,7 @@ def ftp_task( site, site_path , destination ):
     utils.log( '    cwd to "%s"' % site_path )
     f.cwd( site_path )
 
-    source_content = list_ftp( f )
+    source_content = list_ftp( f, filter_runners )
     source_content = [ x for x in source_content if re.match( r'.+[.](?<!log[.])zip', x.name ) and x.name.lower() != 'boostbook.zip' ]
     destination_content = list_dir( destination )
     d = diff( source_content, destination_content )
@@ -484,6 +487,7 @@ def execute_tasks(
         , expected_results_file
         , failures_markup_file
         , report_executable
+        , filter_runners
         ):
 
     incoming_dir = os.path.join( results_dir, 'incoming', tag )
@@ -500,7 +504,7 @@ def execute_tasks(
         ftp_site = 'boost.cowic.de'
         site_path = '/boost/do-not-publish-this-url/results/%s' % tag
 
-        ftp_task( ftp_site, site_path, incoming_dir )
+        ftp_task( ftp_site, site_path, incoming_dir, filter_runners )
 
     unzip_archives_task( incoming_dir, processed_dir, utils.unzip )
 
@@ -739,6 +743,7 @@ def build_xsl_reports(
         , warnings = []
         , user = None
         , upload = False
+        , filter_runners = None
         ):
 
     ( run_date ) = time.strftime( '%Y-%m-%dT%H:%M:%SZ', time.gmtime() )
@@ -773,6 +778,7 @@ def build_xsl_reports(
         , expected_results_file
         , failures_markup_file
         , report_executable
+        , filter_runners
         )
 
     if upload:
@@ -804,6 +810,7 @@ def accept_args( args ):
         , 'user='
         , 'upload'
         , 'help'
+        , 'filter-runners='
         ]
         
     options = { 
@@ -815,6 +822,7 @@ def accept_args( args ):
         , '--tag': None
         , '--user': None
         , 'upload': False
+        , '--filter-runners': None
         }
     
     utils.accept_args( args_spec, args, options, usage )
@@ -823,6 +831,8 @@ def accept_args( args ):
 
     if not options.has_key( '--results-prefix' ):
         options[ '--results-prefix' ] = 'all'
+
+    warnings = []
     
     return ( 
           options[ '--locate-root' ]
@@ -835,8 +845,10 @@ def accept_args( args ):
         , options.has_key( '--dont-collect-logs' )
         , options[ '--reports' ].split( ',' )
         , options[ '--boost-report' ]
+        , warnings
         , options[ '--user' ]
         , options.has_key( '--upload' )
+        , options[ '--filter-runners' ]
         )
 
 
@@ -870,6 +882,8 @@ The following options are useful in debugging:
 \t                        x  - extended results file
 \t                        i  - issues
 \t                        n  - runner comment files
+\t--filter-runners    use only those runners that match specified
+\t                    regex (case insensitive)
 '''
 
 def main():
