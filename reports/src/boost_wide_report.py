@@ -48,6 +48,19 @@ import utils
 
 report_types = [ 'us', 'ds', 'ud', 'dd', 'l', 'p', 'i', 'n', 'ddr', 'dsr', 'udr', 'usr' ]
 
+default_filter_runners = {
+    'master' : [
+        'Sandia-.*',
+        'BP.*',
+        'DebSid.*',
+        'Debian-Sid',
+        'PNNL-.*',
+        'teeks99-.*',
+        'NA-QNX.*',
+        '.*jc-bell',
+        ]
+    }
+
 if __name__ == '__main__':
     run_dir = os.path.abspath( os.path.dirname( sys.argv[ 0 ] ) )
 else:
@@ -94,7 +107,17 @@ def list_ftp( f, filter_runners = None ):
     word_lines = [ x.split( None, 8 ) for x in lines ]
 
     if filter_runners != None:
-        word_lines = [ x for x in word_lines if re.match( filter_runners, x[-1], re.IGNORECASE ) ]
+        if isinstance(filter_runners, list):
+            runners = []
+            for word_line in word_lines:
+                for filter_runner in filter_runners:
+                    if re.match(filter_runner, word_line[-1], re.IGNORECASE):
+                        utils.log("    matched runner '%s' with filter '%s'"%(word_line[-1], filter_runner))
+                        runners.append(word_line)
+                        break
+            word_lines = runners
+        else:
+            word_lines = [ x for x in word_lines if re.match( filter_runners, x[-1], re.IGNORECASE ) ]
 
     # we don't need directories
     result = [ file_info( l[-1], int( l[4] ), get_date( f, l ) ) for l in word_lines if l[0][0] != "d" ]
@@ -385,6 +408,10 @@ def build_reports(
 
 
     extended_test_results = os.path.join( output_dir, 'extended_test_results.xml' )
+    
+    if filter_runners == None:
+        if default_filter_runners.has_key(tag):
+            filter_runners = default_filter_runners[tag]
         
     execute_tasks(
           tag
