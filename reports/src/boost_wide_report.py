@@ -61,6 +61,9 @@ default_filter_runners = {
         ]
     }
 
+# How long results are considered , in seconds = 2 weeks
+result_decay_time_seconds = 60*60*24*14
+
 if __name__ == '__main__':
     run_dir = os.path.abspath( os.path.dirname( sys.argv[ 0 ] ) )
 else:
@@ -121,6 +124,16 @@ def list_ftp( f, filter_runners = None ):
 
     # we don't need directories
     result = [ file_info( l[-1], int( l[4] ), get_date( f, l ) ) for l in word_lines if l[0][0] != "d" ]
+    
+    # we discard old results
+    recent_results = []
+    current_t = time.time()
+    for r in result:
+        t = mkgmtime(r.date)
+        if current_t-t <= result_decay_time_seconds:
+            recent_results.append(r)
+    result = recent_results
+    
     for f in result:
         utils.log( "    %s" % f )
     return result
