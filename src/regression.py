@@ -126,6 +126,9 @@ class runner:
         opt.add_option( '--skip-tests',
             help="do not run bjam; used for testing script changes",
             action='store_true' )
+        opt.add_option( '--verbose-log-processing',
+            help="enable verbose processing of bjam logs",
+            action='store_true' )
 
         #~ Defaults
         self.runner = None
@@ -154,6 +157,7 @@ class runner:
         self.skip_tests=False
         self.use_git=True
         self.use_dulwich=False
+        self.verbose_log_processing=False
         ( _opt_, self.actions ) = opt.parse_args(None,self)
         if not self.actions or self.actions == []:
             self.actions = [ 'regression' ]
@@ -409,8 +413,9 @@ class runner:
         cd = os.getcwd()
         os.chdir( os.path.join( self.boost_root, 'status' ) )
         utils.checked_system( [
-            '"%s" "%s" <"%s"' % (
+            '"%s" %s "%s" <"%s"' % (
                 self.tool_path(self.process_jam_log),
+                '--echo' if self.verbose_log_processing else '',
                 self.regression_results,
                 self.regression_log )
             ] )
