@@ -58,6 +58,7 @@ default_filter_runners = {
         'teeks99-.*',
         'NA-QNX.*',
         '.*jc-bell',
+        'CrystaX.*',
         ]
     }
 
