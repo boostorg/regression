@@ -59,6 +59,7 @@ default_filter_runners = {
         'NA-QNX.*',
         '.*jc-bell',
         'CrystaX.*',
+        'marshall-.*',
         ]
     }
 
