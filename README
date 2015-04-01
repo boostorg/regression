@@ -1,0 +1,23 @@
+Regression Test Reporting Tools
+-------------------------------
+
+To run Boost's automated regression testing and reporting, and to report
+the results back to the Boost community, see
+
+    www.boost.org/development/running_regression_tests.html
+
+To build and run Boost's local regression testing and reporting tools,
+clone the GitHub boostorg/regression repository to your local machine:
+
+    git clone git@github.com:boostorg/regression.git
+                 -- or --
+    git clone https://github.com/boostorg/regression.git
+
+then view index.html with a web browser for more information, 
+including build instructions
+
+--------------------------
+Copyright Beman Dawes 2015
+
+Distributed under the Boost Software License, Version 1.0.
+http://www.boost.org/LICENSE_1_0.txt 
