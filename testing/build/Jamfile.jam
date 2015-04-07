@@ -7,15 +7,16 @@
 exe process_jam_log
     :
     ../src/process_jam_log.cpp
-    ../../common/build//tiny_xml
-    /boost/filesystem//boost_filesystem/<link>static
-    :
-    <define>BOOST_ALL_NO_LIB=1
-    <define>_CRT_SECURE_NO_WARNINGS
-    <implicit-dependency>/boost//headers
+    ../../common/build//process_jam_log
     ;
 explicit process_jam_log ;
 
-alias install : bin ;
-install bin : process_jam_log/<variant>release ;
-explicit install bin ;
+alias install : exec ;
+install exec
+    :
+    process_jam_log/<variant>release
+    :
+    <install-type>EXE
+    <location>$(INSTALL_PREFIX_EXEC)
+    ;
+explicit install exec ;

@@ -1,5 +1,57 @@
-# Copyright Rene Rivera 2014
+# Copyright Rene Rivera 2014-2015
 # Distributed under the Boost Software License, Version 1.0.
 # See http://www.boost.org/LICENSE_1_0.txt
 
-boost-build [ MATCH --boost-build=(.*) : $(ARGV) ] ;
+rule get-dir-option ( option )
+{
+    local path
+        = [ MATCH $(option)=(.*) : $(ARGV) ] ;
+    local is-rooted
+        = [ MATCH "^([/]+)" : $(path) ] [ MATCH "^(.:\\[^\\])" : $(path) ] ;
+    if ! $(is-rooted)
+    {
+        local pwd = [ PWD ] ;
+        path = $(pwd)/$(path) ;
+    }
+    # ECHO @@@ $(option) ==> $(path) ;
+    return $(path) ;
+}
+
+BOOST_ROOT ?= [ get-dir-option --boost-root ] ;
+BOOST_BUILD ?= [ get-dir-option --boost-build ] ;
+BOOST_BUILD ?= $(BOOST_ROOT)/tools/build/src ;
+INSTALL_PREFIX ?= $(PREFIX) ;
+INSTALL_PREFIX ?= [ get-dir-option --prefix ] ;
+INSTALL_PREFIX ?= $(.boost-build-file:D)/stage ;
+INSTALL_PREFIX_EXEC ?= $(EPREFIX) ;
+INSTALL_PREFIX_EXEC ?= [ get-dir-option --exec-prefix ] ;
+INSTALL_PREFIX_EXEC ?= $(INSTALL_PREFIX)/bin ;
+
+local error ;
+local help ;
+if ( --help in $(ARGV) ) || ( -h in $(ARGV) )
+{
+    help = YES ;
+}
+if ! $(error) && ! $(help) && ! $(BOOST_ROOT)
+{
+    error = "Boost root not specified or found." ;
+}
+if ! $(error) && ! $(help) && ! $(BOOST_BUILD)
+{
+    error = "Boost Build not specified or found." ;
+}
+if $(error) || $(help)
+{
+    EXIT
+        "\nERROR: $(error)\n"
+        "\nUsage:"
+        "b2"
+        "--boost-root=<BOOST_ROOT>"
+        "[ --boost-build=<BOOST_BUILD> ]"
+        "[ --prefix=<PREFIX> ]"
+        "[ --exec-prefix=<EPREFIX> ]"
+        "\n" ;
+}
+
+boost-build $(BOOST_BUILD) ;

@@ -51,6 +51,8 @@ namespace xml = boost::tiny_xml;
 
 using std::string;
 
+extern int process_jam_log( const std::vector<std::string> & args );
+
 const string pass_msg( "Pass" );
 const string warn_msg( "<i>Warn</i>" );
 const string fail_msg( "<font color=\"#FF0000\"><i>Fail</i></font>" );
@@ -754,44 +756,48 @@ namespace
    }
 }// unnamed namespace
 
-//  main  --------------------------------------------------------------------//
-
-#define BOOST_NO_CPP_MAIN_SUCCESS_MESSAGE
-#include <boost/test/included/prg_exec_monitor.hpp>
-
-int cpp_main( int argc, char * argv[] ) // note name!
+int library_status( const std::vector<std::string> & args )
 {
     fs::path initial_path = fs::initial_path();
+    fs::path status_file_path("library_status.html");
+    fs::path links_file_path("library_status_links.html");
 
-    while ( argc > 1 && *argv[1] == '-' )
+    bool args_error = false;
+    std::vector<std::string>::const_iterator args_i = args.begin();
+    std::vector<std::string>::const_iterator args_e = args.end();
+    for(++args_i; args_i < args_e && !args_error; ++args_i)
     {
-        if ( argc > 2 && std::strcmp( argv[1], "--compiler" ) == 0 )
-        { specific_compiler = argv[2]; --argc; ++argv; }
-        else if ( argc > 2 && std::strcmp( argv[1], "--locate-root" ) == 0 )
-        { locate_root = fs::path( argv[2] ); --argc; ++argv; }
-        else if ( std::strcmp( argv[1], "--ignore-pass" ) == 0 ) ignore_pass = true;
-        else if ( std::strcmp( argv[1], "--no-warn" ) == 0 ) no_warn = true;
-        else if ( std::strcmp( argv[1], "--v2" ) == 0 )
-        {--argc; ++argv ;} // skip
-        else if ( argc > 2 && std::strcmp( argv[1], "--jamfile" ) == 0)
-        {--argc; ++argv;} // skip
-        else { std::cerr << "Unknown option: " << argv[1] << "\n"; argc = 1; }
-        --argc;
-        ++argv;
+        if ( *args_i == "--compiler" )
+        { ++args_i; specific_compiler = *args_i; }
+        else if ( *args_i == "--ignore-pass" ) ignore_pass = true;
+        else if ( *args_i == "--no-warn" ) no_warn = true;
+        else if ( *args_i == "--locate-root" )
+        { ++args_i; locate_root = fs::path( *args_i ); }
+        else if ( *args_i == "--status-file" )
+        { ++args_i; status_file_path = fs::path( *args_i ); }
+        else if ( *args_i == "--links-file" )
+        { ++args_i; links_file_path = fs::path( *args_i ); }
+        else
+        { std::cerr << "Unknown option: " << *args_i << "\n"; args_error = true ; }
     }
 
-    if ( argc != 2 && argc != 3 )
+    if ( args_error )
     {
         std::cerr <<
-            "Usage: library_status [options...] status-file [links-file]\n"
+            "Usage: library_status [options...]\n"
             "  boost-root is the path to the boost tree root directory.\n"
             "  status-file and links-file are paths to the output files.\n"
-            "  options: --compiler name     Run for named compiler only\n"
-            "           --ignore-pass       Do not report tests which pass all compilers\n"
-            "           --no-warn           Warnings not reported if test passes\n"
-            "           --locate-root path  Path to ALL_LOCATE_TARGET for bjam;\n"
-            "                               default boost-root.\n"
-            "Example: library_status --compiler gcc /boost-root cs.html cs-links.html\n"
+            "  options:\n"
+            "    --compiler name     Run for named compiler only\n"
+            "    --ignore-pass       Do not report tests which pass all compilers\n"
+            "    --no-warn           Warnings not reported if test passes\n"
+            "    --locate-root path  Path to ALL_LOCATE_TARGET for bjam;\n"
+            "                        default boost-root.\n"
+            "    --status-file path  Path to output html file;\n"
+            "                        default library_status.html.\n"
+            "    --links-file path   Path to output html file;\n"
+            "                        default library_status_links.html.\n"
+            "Example: library_status --compiler gcc --locate-root /boost-root\n"
             "Note: Only the leaf of the links-file path is\n"
             "used in status-file HTML links. Thus for browsing, status-file,\n"
             "links-file must be in the same directory.\n"
@@ -803,25 +809,20 @@ int cpp_main( int argc, char * argv[] ) // note name!
         if(! fs::exists("bin") && ! fs::exists("bin.v2"))
             locate_root = find_boost_root(initial_path);
 
-    report.open( fs::path( argv[1] ) );
+    report.open( status_file_path );
     if ( !report )
     {
-        std::cerr << "Could not open report output file: " << argv[2] << std::endl;
+        std::cerr << "Could not open report output file: " << status_file_path << std::endl;
         return 1;
     }
 
-    if ( argc == 3 )
+    links_name = links_file_path.filename().string();
+    links_file.open( links_file_path );
+    if ( !links_file )
     {
-        fs::path links_path( argv[2] );
-        links_name = links_path.filename().string();
-        links_file.open( links_path );
-        if ( !links_file )
-        {
-            std::cerr << "Could not open links output file: " << argv[3] << std::endl;
-            return 1;
-        }
+        std::cerr << "Could not open links output file: " << links_file_path << std::endl;
+        return 1;
     }
-    else no_links = true;
 
     const string library_name = find_lib_name(initial_path);
 
@@ -887,4 +888,59 @@ int cpp_main( int argc, char * argv[] ) // note name!
             ;
     }
     return 0;
+}
+
+//  main  --------------------------------------------------------------------//
+
+#define BOOST_NO_CPP_MAIN_SUCCESS_MESSAGE
+#include <boost/test/included/prg_exec_monitor.hpp>
+
+int cpp_main( int argc, char * argv[] ) // note name!
+{
+    std::vector<std::string> process_jam_log_args;
+    std::vector<std::string> library_status_args;
+    process_jam_log_args.push_back("process_jam_log");
+    library_status_args.push_back("library_status");
+    --argc; ++argv;
+    while ( argc > 0 )
+    {
+        std::string arg = *argv;
+        if (arg == "--compiler" ||
+            arg == "--status-file" ||
+            arg == "--links-file")
+        {
+            library_status_args.push_back(*argv);
+            --argc; ++argv;
+            library_status_args.push_back(*argv);
+            --argc; ++argv;
+        }
+        else if (arg == "--ignore-pass" ||
+            arg == "--no-warn")
+        {
+            library_status_args.push_back(*argv);
+            --argc; ++argv;
+        }
+        else if (arg == "--locate-root")
+        {
+            process_jam_log_args.push_back(*argv);
+            library_status_args.push_back(*argv);
+            --argc; ++argv;
+        }
+        else if (arg == "--echo" ||
+            arg == "--create-directories")
+        {
+        	process_jam_log_args.push_back(*argv);
+            --argc; ++argv;
+        }
+        else if (arg == "--boost-root" ||
+            arg == "--input-file")
+        {
+            process_jam_log_args.push_back(*argv);
+            --argc; ++argv;
+        }
+    }
+    int result = 0;
+    if (!result) result = process_jam_log(process_jam_log_args);
+    if (!result) result = library_status(library_status_args);
+    return result;
 }

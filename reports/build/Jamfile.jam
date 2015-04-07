@@ -19,6 +19,12 @@ exe boost_report
     ;
 explicit boost_report ;
 
-alias install : bin ;
-install bin : boost_report/<variant>release ;
-explicit install bin ;
+alias install : exec ;
+install exec
+    :
+    boost_report/<variant>release
+    :
+    <install-type>EXE
+    <location>$(INSTALL_PREFIX_EXEC)
+    ;
+explicit install exec ;

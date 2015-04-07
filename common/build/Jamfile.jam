@@ -5,17 +5,30 @@
  
 
 project common
-    :
+    : requirements
+        <define>BOOST_ALL_NO_LIB=1
+        <define>_CRT_SECURE_NO_WARNINGS
+        <implicit-dependency>/boost//headers
     : usage-requirements
+        <define>BOOST_ALL_NO_LIB=1
+        <define>_CRT_SECURE_NO_WARNINGS
+        <implicit-dependency>/boost//headers
         <include>../src
     ;
 
 obj tiny_xml
     :
     ../src/tiny_xml.cpp
-    :
-    <define>BOOST_ALL_NO_LIB=1
-    <define>_CRT_SECURE_NO_WARNINGS
-    <implicit-dependency>/boost//headers
     ;
 explicit tiny_xml ;
+
+obj process_jam_log
+    :
+    ../src/process_jam_log.cpp
+    :
+    :
+    :
+    <source>tiny_xml
+    <library>/boost/filesystem//boost_filesystem/<link>static
+    ;
+explicit process_jam_log ;

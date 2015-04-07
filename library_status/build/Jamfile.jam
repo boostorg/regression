@@ -7,6 +7,7 @@
 exe library_status
     :
     ../src/library_status.cpp
+    ../../common/build//process_jam_log
     ../../common/build//tiny_xml
     /boost/filesystem//boost_filesystem/<link>static
     :
@@ -15,6 +16,12 @@ exe library_status
     ;
 explicit library_status ;
 
-alias install : bin ;
-install bin : library_status/<variant>release ;
-explicit install bin ;
+alias install : exec ;
+install exec
+    :
+    library_status/<variant>release
+    :
+    <install-type>EXE
+    <location>$(INSTALL_PREFIX_EXEC)
+    ;
+explicit install exec ;

@@ -1,6 +1,8 @@
 //  process jam regression test output into XML  -----------------------------//
 
-//  Copyright Beman Dawes 2002.  Distributed under the Boost
+//  Copyright Beman Dawes 2002.
+//  Copyright Rene Rivera 2015.
+//  Distributed under the Boost
 //  Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -10,8 +12,8 @@
 
 #include <boost/config/warning_disable.hpp>
 
-#include "detail/tiny_xml.hpp"
-#include "detail/common.hpp"
+#include "tiny_xml.hpp"
+#include "common.hpp"
 #include "boost/filesystem/operations.hpp"
 #include "boost/filesystem/fstream.hpp"
 #include "boost/filesystem/exception.hpp"
@@ -25,6 +27,7 @@
 #include <ctime>
 #include <cctype>   // for tolower
 #include <cstdlib>  // for exit
+#include <vector>
 
 using std::string;
 namespace xml = boost::tiny_xml;
@@ -600,7 +603,7 @@ namespace
 //  main  --------------------------------------------------------------------//
 
 
-int main( int argc, char ** argv )
+int process_jam_log( const std::vector<std::string> & args )
 {
   // Turn off synchronization with corresponding C standard library files. This
   // gives a significant speed improvement on platforms where the standard C++
@@ -610,93 +613,75 @@ int main( int argc, char ** argv )
   fs::initial_path();
   std::istream* input = 0;
 
-  if ( argc <= 1 )
+  if ( args.size() <= 1 )
   {
-    std::cout <<  "process_jam_log [--echo] [--create-directories] [--v1|--v2]\n"
-                  "                [--boost-root boost_root] [--locate-root locate_root]\n"
-                  "                [--input-file input_file]\n"
-                  "                [locate-root]\n"
-                  "--echo               - verbose diagnostic output.\n"
-                  "--create-directories - if the directory for xml file doesn't exists - creates it.\n"
-                  "                       usually used for processing logfile on different machine\n"
-                  "--v2                 - bjam version 2 used (default).\n"
-                  "--v1                 - bjam version 1 used.\n"
-                  "--boost-root         - the root of the boost installation being used. If not defined\n"
-                  "                       assume to run from within it and discover it heuristically.\n"
-                  "--locate-root        - the same as the bjam ALL_LOCATE_TARGET\n"
-                  "                       parameter, if any. Default is boost-root.\n"
-                  "--input-file         - the output of a bjam --dump-tests run. Default is std input.\n"
-                  ;
+    std::cout <<
+        "process_jam_log [options...]\n"
+        "  options:\n"
+        "    --echo               - verbose diagnostic output.\n"
+        "    --create-directories - if the directory for xml file doesn't exists - creates it.\n"
+        "                           usually used for processing logfile on different machine\n"
+        "    --boost-root path    - the root of the boost installation being used. If not defined\n"
+        "                           assume to run from within it and discover it heuristically.\n"
+        "    --locate-root path   - the same as the bjam ALL_LOCATE_TARGET\n"
+        "                           parameter, if any. Default is boost-root.\n"
+        "    --input-file path    - the output of a bjam --dump-tests run. Default is std input.\n"
+        ;
     return 1;
   }
 
-  while ( argc > 1 )
+  std::vector<std::string>::const_iterator args_i = args.begin();
+  std::vector<std::string>::const_iterator args_e = args.end();
+  for(++args_i; args_i < args_e; ++args_i)
   {
-    if ( std::strcmp( argv[1], "--echo" ) == 0 )
+    if ( *args_i == "--echo" )
     {
       echo = true;
-      --argc; ++argv;
     }
-    else if ( std::strcmp( argv[1], "--create-directories" ) == 0 )
+    else if ( *args_i == "--create-directories" )
     {
         create_dirs = true;
-        --argc; ++argv;
     }
-    else if ( std::strcmp( argv[1], "--v2" ) == 0 )
+    else if ( *args_i == "--boost-root" )
     {
-      boost_build_v2 = true;
-      --argc; ++argv;
-    }
-    else if ( std::strcmp( argv[1], "--v1" ) == 0 )
-    {
-      boost_build_v2 = false;
-      --argc; ++argv;
-    }
-    else if ( std::strcmp( argv[1], "--boost-root" ) == 0 )
-    {
-      --argc; ++argv;
-      if ( argc == 1 )
+      ++args_i;
+      if ( args_i == args_e )
       {
         std::cout << "Abort: option --boost-root requires a directory argument\n";
         std::exit(1);
       }
-      boost_root = fs::path( argv[1] );
+      boost_root = fs::path( *args_i );
       if ( !boost_root.is_complete() )
         boost_root = ( fs::initial_path() / boost_root ).normalize();
-
-      --argc; ++argv;
     }
-    else if ( std::strcmp( argv[1], "--locate-root" ) == 0 )
+    else if ( *args_i == "--locate-root" )
     {
-      --argc; ++argv;
-      if ( argc == 1 )
+      ++args_i;
+      if ( args_i == args_e )
       {
         std::cout << "Abort: option --locate-root requires a directory argument\n";
         std::exit(1);
       }
-      locate_root = fs::path( argv[1] );
-      --argc; ++argv;
+      locate_root = fs::path( *args_i );
     }
-    else if ( std::strcmp( argv[1], "--input-file" ) == 0 )
+    else if ( *args_i == "--input-file" )
     {
-      --argc; ++argv;
-      if ( argc == 1 )
+      ++args_i;
+      if ( args_i == args_e )
       {
         std::cout << "Abort: option --input-file requires a filename argument\n";
         std::exit(1);
       }
-      input = new std::ifstream(argv[1]);
-      --argc; ++argv;
+      input = new std::ifstream( *args_i );
     }
-    else if ( *argv[1] == '-' )
+    else if ( (*args_i)[1] == '-' )
     {
-      std::cout << "Abort: unknown option; invoke with no arguments to see list of valid options\n";
+      std::cout << "Abort: unknown option '" << *args_i << "'; invoke with no arguments to see list of valid options\n";
       return 1;
     }
     else
     {
-      locate_root = fs::path( argv[1] );
-      --argc; ++argv;
+      locate_root = fs::path( *args_i );
     }
   }
 
