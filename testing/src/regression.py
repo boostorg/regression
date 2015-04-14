@@ -252,7 +252,7 @@ class runner:
         self.process_jam_log = {
             'name' : self.process_jam_log['name'],
             'build_cmd' : self.bjam_cmd,
-            'path' : os.path.join(self.regression_root,'stage','bin',self.process_jam_log['name']),
+            'path' : os.path.join(self.tools_regression_root,'stage','bin',self.process_jam_log['name']),
             'source_dir' : os.path.join(self.tools_regression_root,'testing','src'),
             'build_dir' : os.path.join(self.tools_regression_root,'testing','build'),
             'build_args' : 'install -d2'
