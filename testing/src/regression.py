@@ -22,11 +22,13 @@ git_info = {
         'git' : 'https://github.com/boostorg/build.git',
         'dir' : 'boost_bb',
         'subdir' : '',
+        'branch' : 'develop',
         },
     'regression' : {
         'git' : 'https://github.com/boostorg/regression.git',
         'dir' : 'boost_regression',
         'subdir' : '',
+        'branch' : 'reorg',
         },
     'boost-build.jam' : {
         'raw' : 'https://raw.githubusercontent.com/boostorg/boost/%s/boost-build.jam'
@@ -233,11 +235,11 @@ class runner:
             self.process_jam_log = { 'name' : 'process_jam_log.exe' }
         elif sys.platform == 'cygwin':
             self.patch_boost = 'patch_boost'
-            self.bjam = { 'name' : 'bjam.exe' }
+            self.bjam = { 'name' : 'b2.exe' }
             self.process_jam_log = { 'name' : 'process_jam_log.exe' }
         else:
             self.patch_boost = 'patch_boost'
-            self.bjam = { 'name' : 'bjam' }
+            self.bjam = { 'name' : 'b2' }
             self.process_jam_log = { 'name' : 'process_jam_log' }
         self.bjam = {
             'name' : self.bjam['name'],
@@ -250,10 +252,10 @@ class runner:
         self.process_jam_log = {
             'name' : self.process_jam_log['name'],
             'build_cmd' : self.bjam_cmd,
-            'path' : os.path.join(self.regression_root,self.process_jam_log['name']),
-            'source_dir' : os.path.join(self.tools_regression_root,'build'),
-            'build_dir' : os.path.join(self.tools_regression_root,'build'),
-            'build_args' : 'process_jam_log -d2'
+            'path' : os.path.join(self.regression_root,'stage','bin',self.process_jam_log['name']),
+            'source_dir' : os.path.join(self.tools_regression_root,'testing','src'),
+            'build_dir' : os.path.join(self.tools_regression_root,'testing','build'),
+            'build_args' : 'install -d2'
             }
 
         if self.debug_level > 0:
@@ -307,31 +309,14 @@ class runner:
     def command_get_tools(self):
         #~ Get Boost.Build v2...
         self.log( 'Getting Boost.Build v2...' )
-        if self.use_git:
-            self.git_checkout(
-                git_info['build'],
-                'develop')
-#         else:
-#             self.retry( lambda: self.download_tarball(
-#                 os.path.basename(self.tools_bb_root)+".tar.bz2",
-#                 self.tarball_url(repo_path['build']) ) )
-#             self.unpack_tarball(
-#                 self.tools_bb_root+".tar.bz2",
-#                 os.path.basename(self.tools_bb_root) )
+        self.git_checkout(
+            git_info['build'],
+            git_info['build']['branch'])
         #~ Get the regression tools and utilities...
         self.log( 'Getting regression tools and utilities...' )
-        if self.use_git:
-            self.git_checkout(
-                git_info['regression'],
-                'develop')
-#         else:
-#             self.retry( lambda: self.download_tarball(
-#                 os.path.basename(self.tools_regression_root)+".tar.bz2",
-#                 self.tarball_url(repo_path['regression']) ) )
-#             self.unpack_tarball(
-#                 self.tools_regression_root+".tar.bz2",
-#                 os.path.basename(self.tools_regression_root) )
-
+        self.git_checkout(
+            git_info['regression'],
+            git_info['regression']['branch'])
         #~ We get a boost-build.jam to make the tool build work even if there's
         #~ an existing boost-build.jam above the testing root.
         self.log( 'Getting boost-build.jam...' )
@@ -342,20 +327,13 @@ class runner:
     def command_get_source(self):
         self.refresh_timestamp()
         self.log( 'Getting sources (%s)...' % self.timestamp() )
-
-        if self.use_git:
-            self.retry(self.git_source_checkout)
-#         else:
-#             self.retry( self.get_tarball )
+        self.retry(self.git_source_checkout)
         pass
 
     def command_update_source(self):
         self.refresh_timestamp()
         self.log( 'Updating sources (%s)...' % self.timestamp() )
-        if self.use_git:
-            self.retry(self.git_source_checkout)
-#         else:
-#             self.retry( self.get_tarball )
+        self.retry(self.git_source_checkout)
         pass
 
     def command_patch(self):
@@ -448,7 +426,7 @@ class runner:
         cd = os.getcwd()
         os.chdir( os.path.join( self.boost_root, 'status' ) )
         utils.checked_system( [
-            '"%s" %s "%s" <"%s"' % (
+            '"%s" %s --locate-root "%s" --input-file "%s"' % (
                 self.tool_path(self.process_jam_log),
                 '--echo' if self.verbose_log_processing else '',
                 self.regression_results,

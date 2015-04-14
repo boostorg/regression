@@ -6,6 +6,8 @@
 
 set -e
 
+REGRESSION_BRANCH=reorg
+
 log_time()
 {
     echo `date` "::" $1 >> boost-reports-time.log
@@ -106,7 +108,7 @@ build_setup()
 	git_submodule_update "${cwd}/boost-reports/boost_root" libs/wave
 	git_submodule_update "${cwd}/boost-reports/boost_root" tools/inspect
 	log_time "Git; boost_regression [build_setup]"
-	git_update "${cwd}/boost-reports/boost_regression" develop 'https://github.com/boostorg/regression.git'
+	git_update "${cwd}/boost-reports/boost_regression" ${REGRESSION_BRANCH} 'https://github.com/boostorg/regression.git'
 	log_time "Git; boost_bb [build_setup]"
 	git_update "${cwd}/boost-reports/boost_bb" develop 'https://github.com/boostorg/build.git'
 	cd "${cwd}"
@@ -193,7 +195,7 @@ build_results()
         --comment="comment.html" \
         --user="" \
         --reports=${reports} \
-        "--boost-report=${cwd}/boost-reports/boost_regression/reports/build/bin/boost_report"
+        "--boost-report=${cwd}/boost-reports/boost_regression/stage/bin/boost_report"
     cd "${cwd}"
 }
 

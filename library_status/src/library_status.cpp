@@ -765,7 +765,7 @@ int library_status( const std::vector<std::string> & args )
     bool args_error = false;
     std::vector<std::string>::const_iterator args_i = args.begin();
     std::vector<std::string>::const_iterator args_e = args.end();
-    for(++args_i; args_i < args_e && !args_error; ++args_i)
+    for(++args_i; args_i != args_e && !args_error; ++args_i)
     {
         if ( *args_i == "--compiler" )
         { ++args_i; specific_compiler = *args_i; }
@@ -925,6 +925,9 @@ int cpp_main( int argc, char * argv[] ) // note name!
             process_jam_log_args.push_back(*argv);
             library_status_args.push_back(*argv);
             --argc; ++argv;
+            process_jam_log_args.push_back(*argv);
+            library_status_args.push_back(*argv);
+            --argc; ++argv;
         }
         else if (arg == "--echo" ||
             arg == "--create-directories")
@@ -935,6 +938,8 @@ int cpp_main( int argc, char * argv[] ) // note name!
         else if (arg == "--boost-root" ||
             arg == "--input-file")
         {
+            process_jam_log_args.push_back(*argv);
+            --argc; ++argv;
             process_jam_log_args.push_back(*argv);
             --argc; ++argv;
         }

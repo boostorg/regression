@@ -632,7 +632,7 @@ int process_jam_log( const std::vector<std::string> & args )
 
   std::vector<std::string>::const_iterator args_i = args.begin();
   std::vector<std::string>::const_iterator args_e = args.end();
-  for(++args_i; args_i < args_e; ++args_i)
+  for(++args_i; args_i != args_e; ++args_i)
   {
     if ( *args_i == "--echo" )
     {

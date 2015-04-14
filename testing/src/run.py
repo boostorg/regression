@@ -36,7 +36,7 @@ script_local = root
 if use_local:
     script_remote = 'file://'+os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
 else:
-    script_remote = 'https://raw.githubusercontent.com/boostorg/regression/develop/testing/src'
+    script_remote = 'https://raw.githubusercontent.com/boostorg/regression/reorg/testing/src'
 script_dir = os.path.join(root,'boost_regression_src')
 
 if not no_update:
