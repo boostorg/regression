@@ -60,6 +60,7 @@ default_filter_runners = {
         '.*jc-bell',
         'CrystaX.*',
         'marshall-.*',
+        'GLIS.*',
         ]
     }
 
