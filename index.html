@@ -12,60 +12,88 @@
 <body>
   <h1>Regression Test Reporting Tools</h1>
 
-  <p>This repository is the home of tools used to run Boost's automated 
-  regression testing and reporting, and tools that may (optionally) be used by 
-  Boost developers to perform local regression test reporting.</p>
+  <p>This repository is the home of tools used to run Boost's automated
+    regression testing and reporting, and tools that may (optionally) be used by
+    Boost developers to perform local regression test reporting.</p>
 
-  <p>Instructions
-      for running Boost's automated regression testing and reporting, and 
-  reporting<br>
-  the results back to the Boost community are
-  <a href="http://www.boost.org/development/running_regression_tests.html">
-  available on the Boost web site</a>.</p>
+  <p>
+    Instructions for running Boost's automated regression testing and reporting,
+    and reporting<br /> the results back to the Boost community are <a
+      href="http://www.boost.org/development/running_regression_tests.html">
+      available on the Boost web site</a>.
+  </p>
 
-  <p>To build developers local test reporting tools, cd to the specific tool's 
-  build directory, then invoke b2 like this:</p>
+  <p>To build developers local test reporting tools, cd to the specific
+    tool's build directory, then invoke b2 like this:</p>
 
   <blockquote>
-    <pre>b2 --boost-root=<b><i>path</i></b> --boost-build=<i><b>path</b></i>/build/src install</pre>
+    <pre>b2 --boost-root=<b><i>path</i></b> install</pre>
   </blockquote>
   <p>For example:</p>
   <blockquote>
     <pre>cd regression/library_status/build
-b2 --boost-root=c:/boost --boost-build=c:/boost/tools/build/src install</pre>
+b2 --boost-root=c:/boost install</pre>
   </blockquote>
-  Absolute paths are currently required.<p>There are two developers local test 
-  reporting tools, plus the <code>process_jam_log</code> tool that prepares data 
-  for the reporting tools.</p>
+  <p>Options for building are:</p>
+  <dl>
+    <dt>
+      --boost-root=<i>path</i>
+    </dt>
+    <dd>Specify where to find the Boost tree to use to compile the tools.
+      Defaults to environment variable "BOOST_ROOT".</dd>
+    <dt>
+      --boost-build=<i>path</i>
+    </dt>
+    <dd>
+      Override the path to the Boost Build sources. The Boost Build sources
+      default to environment variable "BOOST_BUILD", or "<i>boost-root</i>/tools/build/src",
+      in that order.
+    </dd>
+    <dt>
+      --prefix=<i>path</i>
+    </dt>
+    <dd>
+      Root path where to install to. Installed files will be copied into
+      sub-directories of this location. Defaults to environment variable
+      "INSTALL_PREFIX", or to environment variable "PREFIX", or the option as
+      specified, or "<i>regression-root</i>/stage" in that order.
+    </dd>
+    <dt>
+      --exec-prefix=<i>path</i>
+    </dt>
+    <dd>
+      Path where to install programs. Defaults to environment variable
+      "INSTALL_PREFIX_EXEC", or to environment variable "EPREFIX", or to the
+      option as specified, or to "<i>install-prefix</i>/bin" in that order.
+    </dd>
+  </dl>
+  <p>There is one developers local test reporting tool.</p>
 
   <ul>
-
-    <li><a href="src/process_jam_log.cpp">process_jam_log.cpp</a> -
-      Processes the bjam outputs, creating a file named test_log.xml for each
-      test encountered.</li>
-
-    <li><a href="compiler_status/src/compiler_status.cpp">Compiler Status</a>
-      - Generates HTML status tables from test_log.xml and other files. Simpler 
-    to use than Library Status, but less capable.</li>
-
     <li><a href="library_status/doc/library_status.html">Library Status</a>
       - Runs test programs for one or all boost libraries on your local
       installation and generates complete tables to show which combinations of
       libraries, compilers, compiler settings pass and fail at your local
-      installation. More capable than Compiler Status, but more complex to use.</li>
+      installation.</li>
   </ul>
   <hr />
 
-  <p><font size="2">Revised:
-  <!--webbot bot="Timestamp" S-Type="EDITED" S-Format="%d %B %Y" startspan -->01 April 2015<!--webbot bot="Timestamp" endspan i-checksum="28342" --></font></p>
-
-  <p><font size="2">Copyright Beman Dawes 2003.</font></p>
-
-  <p><font size="2">Copyright Rene Rivera 2007, 2015.</font></p>
+  <p>
+    <font size="2">Revised: <!--webbot bot="Timestamp" S-Type="EDITED" S-Format="%d %B %Y" startspan -->01
+    April 2015<!--webbot bot="Timestamp" endspan i-checksum="28342" --></font>
+  </p>
 
   <p>
-    <font size="2">Distributed under the Boost Software License, Version 1.0. (See copy at <a
-      href="http://www.boost.org/LICENSE_1_0.txt">www.boost.org/LICENSE_1_0.txt</a>)
+    <font size="2">Copyright Beman Dawes 2003.</font>
+  </p>
+
+  <p>
+    <font size="2">Copyright Rene Rivera 2007, 2015.</font>
+  </p>
+
+  <p>
+    <font size="2">Distributed under the Boost Software License, Version
+    1.0. (See copy at <a href="http://www.boost.org/LICENSE_1_0.txt">www.boost.org/LICENSE_1_0.txt</a>)
     </font>
   </p>
 </body>

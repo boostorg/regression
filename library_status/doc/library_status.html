@@ -3,79 +3,98 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <meta http-equiv="Content-Language" content="en-us" />
-  <meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<meta http-equiv="Content-Language" content="en-us" />
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
 
-  <title>Libary Status</title>
-  <style type="text/css">
+<title>Libary Status</title>
+<style type="text/css">
 /*<![CDATA[*/
-  span.c3 {color: #FF0000; font-style: italic}
-  a.c2 {font-style: italic}
-  td.c1 {font-style: italic}
-  /*]]>*/
-  </style>
+span.c3 {
+  color: #FF0000;
+  font-style: italic
+}
+
+a.c2 {
+  font-style: italic
+}
+
+td.c1 {
+  font-style: italic
+}
+/*]]>*/
+</style>
 </head>
 
 <body>
   <h1>Generating Library Status Tables</h1>
 
   <h3>Purpose</h3>
-  
-  <p>Any time one considers using a library as large and complex
-  as the Boost libraries, he must have a way of validating the the library
-  functions in his environment. This should be done when the library is
-  installed and anytime questions are raised regarding its applicabililty
-  and/or its usage.</p>
+
+  <p>Any time one considers using a library as large and complex as the
+    Boost libraries, he must have a way of validating the the library functions
+    in his environment. This should be done when the library is installed and
+    anytime questions are raised regarding its applicabililty and/or its usage.</p>
 
   <p>The procedures described here permit a user to run any combination of
-  tests on any or all libraries and generate a set of convenient tables which
-  show which libraries pass which tests under what conditions.</p>
+    tests on a library and generate a set of convenient tables which show which
+    tests under what conditions.</p>
 
   <h3>Preliminaries</h3>
-  
-  <p>Generating these tables requires a couple of utility
-  programs: <code>process_jam_log</code> and <code>library_status</code>.
-  These can be built by moving to the directory
-  <code>tools/regression/build</code> and invoking bjam. If all goes well
-  these utility programs will be found in the directory
-  <code>dist/bin</code>. From there they should be moved to a place in the
-  current path.</p>
+
+  <p>
+    Generating these tables requires a couple of utility programs:
+    <code>b2</code>
+    to run the tests themselves and
+    <code>library_status</code>
+    which processes the tests and builds the tables. To build
+    <code>b2</code>
+    consult the documentation for Boost Build. And to build
+    <code>library_status</code>
+    move to the directory
+    <code>
+      <i>regression-root</i>/build
+    </code>
+    and invoking
+    <code>b2</code>
+    . If all goes well the
+    <code>library_status</code>
+    executable can be found at
+    <code>
+      <i>regression-root</i>/stage/bin/library_status
+    </code>
+    .
+  </p>
 
   <h3>Running Tests for One Library</h3>
 
   <ol>
     <li>Start from your command line environment.</li>
 
-    <li>set the current directory to:../libs/&lt;library name&gt;/test</li>
+    <li>Set the current directory to: <i>boost-root</i>libs/&lt;library
+      name&gt;/test
+    </li>
 
-    <li>Invoke one of the following:
-
-      <ul>
-        <li><code>regression-root/library_status/src/library_test.sh (*nix)</code>.</li>
-
-        <li><code>regression-root\library_status\src\library_test.bat
-        (windows)</code>.</li>
-      </ul>
+    <li>Invoke <code>library_status</code>.
     </li>
 
     <li>This will display short help message describing the how to set the
-    command line arguments for the compilers and variants you want to appear
-    in the final table.</li>
+      command line arguments for the compilers and variants you want to appear
+      in the final table.</li>
 
-    <li>Setting these arguments requires rudimentary knowledge of bjam usage.
-    Hopefully, if you've arrived at this page you've gained the required
-    knowledge during the installation and library build process.</li>
+    <li>Setting these arguments requires rudimentary knowledge of bjam
+      usage. Hopefully, if you've arrived at this page you've gained the
+      required knowledge during the installation and library build process.</li>
 
-    <li>Rerun the abve command with the argument set accordingly.</li>
+    <li>Rerun the above command with the argument set accordingly.</li>
 
     <li>When the command terminates, there should be a file named
-    "library_status.html" in the current directory.</li>
+      "library_status.html" in the current directory.</li>
 
     <li>Display this file with any web browser.</li>
   </ol>
-  
+
   <p>There should appear a table similar to the following for the regex
-  library.</p>
+    library.</p>
 
   <table border="1" cellspacing="0" cellpadding="5">
     <tr>
@@ -111,15 +130,15 @@
 
       <td class="c1" align="right">Missing</td>
 
-      <td align="right"><a class="c2" href=
-      "links.html#C:-Boost134-bin.v2-libs-regex-test-bad_expression_test.test-msvc-7.1-debug-threading-multi">
-      Warn</a></td>
+      <td align="right"><a class="c2"
+        href="links.html#C:-Boost134-bin.v2-libs-regex-test-bad_expression_test.test-msvc-7.1-debug-threading-multi">
+          Warn</a></td>
 
       <td class="c1" align="right">Missing</td>
 
-      <td align="right"><a class="c2" href=
-      "links.html#C:-Boost134-bin.v2-libs-regex-test-bad_expression_test.test-msvc-7.1-release-threading-multi">
-      Warn</a></td>
+      <td align="right"><a class="c2"
+        href="links.html#C:-Boost134-bin.v2-libs-regex-test-bad_expression_test.test-msvc-7.1-release-threading-multi">
+          Warn</a></td>
     </tr>
 
     <tr>
@@ -127,15 +146,17 @@
 
       <td class="c1" align="right">Missing</td>
 
-      <td align="right"><a href=
-      "links.html#C:-Boost134-bin.v2-libs-regex-test-captures-msvc-7.1-debug-threading-multi">
-      <span class="c3">Fail</span></a></td>
+      <td align="right"><a
+        href="links.html#C:-Boost134-bin.v2-libs-regex-test-captures-msvc-7.1-debug-threading-multi">
+          <span class="c3">Fail</span>
+      </a></td>
 
       <td class="c1" align="right">Missing</td>
 
-      <td align="right"><a href=
-      "links.html#C:-Boost134-bin.v2-libs-regex-test-captures-msvc-7.1-release-threading-multi">
-      <span class="c3">Fail</span></a></td>
+      <td align="right"><a
+        href="links.html#C:-Boost134-bin.v2-libs-regex-test-captures-msvc-7.1-release-threading-multi">
+          <span class="c3">Fail</span>
+      </a></td>
     </tr>
 
     <tr>
@@ -143,15 +164,15 @@
 
       <td class="c1" align="right">Missing</td>
 
-      <td align="right"><a class="c2" href=
-      "links.html#C:-Boost134-bin.v2-libs-regex-test-captures_test.test-msvc-7.1-debug-threading-multi">
-      Warn</a></td>
+      <td align="right"><a class="c2"
+        href="links.html#C:-Boost134-bin.v2-libs-regex-test-captures_test.test-msvc-7.1-debug-threading-multi">
+          Warn</a></td>
 
       <td class="c1" align="right">Missing</td>
 
-      <td align="right"><a class="c2" href=
-      "links.html#C:-Boost134-bin.v2-libs-regex-test-captures_test.test-msvc-7.1-release-threading-multi">
-      Warn</a></td>
+      <td align="right"><a class="c2"
+        href="links.html#C:-Boost134-bin.v2-libs-regex-test-captures_test.test-msvc-7.1-release-threading-multi">
+          Warn</a></td>
     </tr>
 
     <tr>
@@ -183,15 +204,15 @@
 
       <td class="c1" align="right">Missing</td>
 
-      <td align="right"><a class="c2" href=
-      "links.html#C:-Boost134-bin.v2-libs-regex-test-object_cache_test.test-msvc-7.1-debug-threading-multi">
-      Warn</a></td>
+      <td align="right"><a class="c2"
+        href="links.html#C:-Boost134-bin.v2-libs-regex-test-object_cache_test.test-msvc-7.1-debug-threading-multi">
+          Warn</a></td>
 
       <td class="c1" align="right">Missing</td>
 
-      <td align="right"><a class="c2" href=
-      "links.html#C:-Boost134-bin.v2-libs-regex-test-object_cache_test.test-msvc-7.1-release-threading-multi">
-      Warn</a></td>
+      <td align="right"><a class="c2"
+        href="links.html#C:-Boost134-bin.v2-libs-regex-test-object_cache_test.test-msvc-7.1-release-threading-multi">
+          Warn</a></td>
     </tr>
 
     <tr>
@@ -199,15 +220,15 @@
 
       <td class="c1" align="right">Missing</td>
 
-      <td align="right"><a class="c2" href=
-      "links.html#C:-Boost134-bin.v2-libs-regex-test-posix_api_check.test-msvc-7.1-debug-threading-multi">
-      Warn</a></td>
+      <td align="right"><a class="c2"
+        href="links.html#C:-Boost134-bin.v2-libs-regex-test-posix_api_check.test-msvc-7.1-debug-threading-multi">
+          Warn</a></td>
 
       <td class="c1" align="right">Missing</td>
 
-      <td align="right"><a class="c2" href=
-      "links.html#C:-Boost134-bin.v2-libs-regex-test-posix_api_check.test-msvc-7.1-release-threading-multi">
-      Warn</a></td>
+      <td align="right"><a class="c2"
+        href="links.html#C:-Boost134-bin.v2-libs-regex-test-posix_api_check.test-msvc-7.1-release-threading-multi">
+          Warn</a></td>
     </tr>
 
     <tr>
@@ -227,15 +248,15 @@
 
       <td class="c1" align="right">Missing</td>
 
-      <td align="right"><a class="c2" href=
-      "links.html#C:-Boost134-bin.v2-libs-regex-test-recursion_test.test-msvc-7.1-debug-threading-multi">
-      Warn</a></td>
+      <td align="right"><a class="c2"
+        href="links.html#C:-Boost134-bin.v2-libs-regex-test-recursion_test.test-msvc-7.1-debug-threading-multi">
+          Warn</a></td>
 
       <td class="c1" align="right">Missing</td>
 
-      <td align="right"><a class="c2" href=
-      "links.html#C:-Boost134-bin.v2-libs-regex-test-recursion_test.test-msvc-7.1-release-threading-multi">
-      Warn</a></td>
+      <td align="right"><a class="c2"
+        href="links.html#C:-Boost134-bin.v2-libs-regex-test-recursion_test.test-msvc-7.1-release-threading-multi">
+          Warn</a></td>
     </tr>
 
     <tr>
@@ -243,15 +264,15 @@
 
       <td class="c1" align="right">Missing</td>
 
-      <td align="right"><a href=
-      "links.html#C:-Boost134-bin.v2-libs-regex-test-regex_config_info.test-msvc-7.1-debug-threading-multi">
-      Pass</a></td>
+      <td align="right"><a
+        href="links.html#C:-Boost134-bin.v2-libs-regex-test-regex_config_info.test-msvc-7.1-debug-threading-multi">
+          Pass</a></td>
 
       <td class="c1" align="right">Missing</td>
 
-      <td align="right"><a href=
-      "links.html#C:-Boost134-bin.v2-libs-regex-test-regex_config_info.test-msvc-7.1-release-threading-multi">
-      Pass</a></td>
+      <td align="right"><a
+        href="links.html#C:-Boost134-bin.v2-libs-regex-test-regex_config_info.test-msvc-7.1-release-threading-multi">
+          Pass</a></td>
     </tr>
 
     <tr>
@@ -259,29 +280,29 @@
 
       <td class="c1" align="right">Missing</td>
 
-      <td align="right"><a href=
-      "links.html#C:-Boost134-bin.v2-libs-regex-test-regex_dll_config_info.test-msvc-7.1-debug-threading-multi">
-      Pass</a></td>
+      <td align="right"><a
+        href="links.html#C:-Boost134-bin.v2-libs-regex-test-regex_dll_config_info.test-msvc-7.1-debug-threading-multi">
+          Pass</a></td>
 
       <td class="c1" align="right">Missing</td>
 
-      <td align="right"><a href=
-      "links.html#C:-Boost134-bin.v2-libs-regex-test-regex_dll_config_info.test-msvc-7.1-release-threading-multi">
-      Pass</a></td>
+      <td align="right"><a
+        href="links.html#C:-Boost134-bin.v2-libs-regex-test-regex_dll_config_info.test-msvc-7.1-release-threading-multi">
+          Pass</a></td>
     </tr>
 
     <tr>
       <td>regex_regress</td>
 
-      <td align="right"><a href=
-      "links.html#C:-Boost134-bin.v2-libs-regex-test-regex_regress.test-msvc-7.1-debug-link-static-threading-multi">
-      Pass</a><sup>*</sup></td>
+      <td align="right"><a
+        href="links.html#C:-Boost134-bin.v2-libs-regex-test-regex_regress.test-msvc-7.1-debug-link-static-threading-multi">
+          Pass</a><sup>*</sup></td>
 
       <td class="c1" align="right">Missing</td>
 
-      <td align="right"><a href=
-      "links.html#C:-Boost134-bin.v2-libs-regex-test-regex_regress.test-msvc-7.1-release-link-static-threading-multi">
-      Pass</a><sup>*</sup></td>
+      <td align="right"><a
+        href="links.html#C:-Boost134-bin.v2-libs-regex-test-regex_regress.test-msvc-7.1-release-link-static-threading-multi">
+          Pass</a><sup>*</sup></td>
 
       <td class="c1" align="right">Missing</td>
     </tr>
@@ -291,15 +312,15 @@
 
       <td class="c1" align="right">Missing</td>
 
-      <td align="right"><a href=
-      "links.html#C:-Boost134-bin.v2-libs-regex-test-regex_regress_dll.test-msvc-7.1-debug-threading-multi">
-      Pass</a><sup>*</sup></td>
+      <td align="right"><a
+        href="links.html#C:-Boost134-bin.v2-libs-regex-test-regex_regress_dll.test-msvc-7.1-debug-threading-multi">
+          Pass</a><sup>*</sup></td>
 
       <td class="c1" align="right">Missing</td>
 
-      <td align="right"><a href=
-      "links.html#C:-Boost134-bin.v2-libs-regex-test-regex_regress_dll.test-msvc-7.1-release-threading-multi">
-      Pass</a><sup>*</sup></td>
+      <td align="right"><a
+        href="links.html#C:-Boost134-bin.v2-libs-regex-test-regex_regress_dll.test-msvc-7.1-release-threading-multi">
+          Pass</a><sup>*</sup></td>
     </tr>
 
     <tr>
@@ -331,15 +352,15 @@
 
       <td class="c1" align="right">Missing</td>
 
-      <td align="right"><a class="c2" href=
-      "links.html#C:-Boost134-bin.v2-libs-regex-test-test_collate_info.test-msvc-7.1-debug-threading-multi">
-      Warn</a></td>
+      <td align="right"><a class="c2"
+        href="links.html#C:-Boost134-bin.v2-libs-regex-test-test_collate_info.test-msvc-7.1-debug-threading-multi">
+          Warn</a></td>
 
       <td class="c1" align="right">Missing</td>
 
-      <td align="right"><a class="c2" href=
-      "links.html#C:-Boost134-bin.v2-libs-regex-test-test_collate_info.test-msvc-7.1-release-threading-multi">
-      Warn</a></td>
+      <td align="right"><a class="c2"
+        href="links.html#C:-Boost134-bin.v2-libs-regex-test-test_collate_info.test-msvc-7.1-release-threading-multi">
+          Warn</a></td>
     </tr>
 
     <tr>
@@ -347,15 +368,15 @@
 
       <td class="c1" align="right">Missing</td>
 
-      <td align="right"><a class="c2" href=
-      "links.html#C:-Boost134-bin.v2-libs-regex-test-unicode_iterator_test.test-msvc-7.1-debug-threading-multi">
-      Warn</a></td>
+      <td align="right"><a class="c2"
+        href="links.html#C:-Boost134-bin.v2-libs-regex-test-unicode_iterator_test.test-msvc-7.1-debug-threading-multi">
+          Warn</a></td>
 
       <td class="c1" align="right">Missing</td>
 
-      <td align="right"><a class="c2" href=
-      "links.html#C:-Boost134-bin.v2-libs-regex-test-unicode_iterator_test.test-msvc-7.1-release-threading-multi">
-      Warn</a></td>
+      <td align="right"><a class="c2"
+        href="links.html#C:-Boost134-bin.v2-libs-regex-test-unicode_iterator_test.test-msvc-7.1-release-threading-multi">
+          Warn</a></td>
     </tr>
 
     <tr>
@@ -363,15 +384,15 @@
 
       <td class="c1" align="right">Missing</td>
 
-      <td align="right"><a class="c2" href=
-      "links.html#C:-Boost134-bin.v2-libs-regex-test-wide_posix_api_check_c.test-msvc-7.1-debug-threading-multi">
-      Warn</a></td>
+      <td align="right"><a class="c2"
+        href="links.html#C:-Boost134-bin.v2-libs-regex-test-wide_posix_api_check_c.test-msvc-7.1-debug-threading-multi">
+          Warn</a></td>
 
       <td class="c1" align="right">Missing</td>
 
-      <td align="right"><a class="c2" href=
-      "links.html#C:-Boost134-bin.v2-libs-regex-test-wide_posix_api_check_c.test-msvc-7.1-release-threading-multi">
-      Warn</a></td>
+      <td align="right"><a class="c2"
+        href="links.html#C:-Boost134-bin.v2-libs-regex-test-wide_posix_api_check_c.test-msvc-7.1-release-threading-multi">
+          Warn</a></td>
     </tr>
 
     <tr>
@@ -379,73 +400,75 @@
 
       <td class="c1" align="right">Missing</td>
 
-      <td align="right"><a class="c2" href=
-      "links.html#C:-Boost134-bin.v2-libs-regex-test-wide_posix_api_check_cpp.test-msvc-7.1-debug-threading-multi">
-      Warn</a></td>
+      <td align="right"><a class="c2"
+        href="links.html#C:-Boost134-bin.v2-libs-regex-test-wide_posix_api_check_cpp.test-msvc-7.1-debug-threading-multi">
+          Warn</a></td>
 
       <td class="c1" align="right">Missing</td>
 
-      <td align="right"><a class="c2" href=
-      "links.html#C:-Boost134-bin.v2-libs-regex-test-wide_posix_api_check_cpp.test-msvc-7.1-release-threading-multi">
-      Warn</a></td>
+      <td align="right"><a class="c2"
+        href="links.html#C:-Boost134-bin.v2-libs-regex-test-wide_posix_api_check_cpp.test-msvc-7.1-release-threading-multi">
+          Warn</a></td>
     </tr>
   </table>
 
   <p>This table was generated by invoking the following command line:</p>
 
-  <p><code>regression-root/library_status/src/library_test --toolset=msvc-7.1
-  variant=debug,release</code></p>
+  <p>
+    <code>
+      <i>regression-root</i>/stage/bin/library_status --b2 b2
+      --boost-root=../../.. toolset=msvc-7.1 variant=debug,release
+    </code>
+  </p>
 
   <p>from within the boost-root/libs/regex/test directory.</p>
 
-  <p>This table shows the regex test results for both debug and release
-  versions of the library. Also it displays the fact that one of the tests is
-  run specifically with the static linking/multi-threading versions of the
-  runtime libraries. The cells marked "Missing" correspond to tests that were
-  not run for some reason or another. This is usually because the
-  corresponding <code>Jamfile.v2</code> excludes this test for the given
-  combination of compiler and build attributes. In this example, all tests
-  were run with the same compiler. If additional compilers were used, they
-  would appear as more columns in the table.</p>
+  <p>
+    This table shows the regex test results for both debug and release versions
+    of the library. Also it displays the fact that one of the tests is run
+    specifically with the static linking/multi-threading versions of the runtime
+    libraries. The cells marked "Missing" correspond to tests that were not run
+    for some reason or another. This is usually because the corresponding
+    <code>Jamfile.v2</code>
+    excludes this test for the given combination of compiler and build
+    attributes. In this example, all tests were run with the same compiler. If
+    additional compilers were used, they would appear as more columns in the
+    table.
+  </p>
 
   <p>The table above is just an illustration so the links don't actually
-  point to anything. In the table you generated, the links will display a
-  page describing any errors, warnings or other available information about
-  the tests. If the test passes, usually, there is no additional information
-  and hence no link.</p>
+    point to anything. In the table you generated, the links will display a page
+    describing any errors, warnings or other available information about the
+    tests. If the test passes, usually, there is no additional information and
+    hence no link.</p>
 
-  <p>The tables are cumulative. That is, if you run one set of tests now and
-  tests with different attributes later, the table will contain all the
-  results to date. The test results are stored in
-  <code>../bin.v2/libs/test/&lt;library&gt;/...</code>. To reinitialize the
-  test results to empty, delete the corresponding files in this
-  directory.</p>
+  <p>
+    The tables are cumulative. That is, if you run one set of tests now and
+    tests with different attributes later, the table will contain all the
+    results to date. The test results are stored in
+    <code>../bin.v2/libs/test/&lt;library&gt;/...</code>
+    . To reinitialize the test results to empty, delete the corresponding files
+    in this directory.
+  </p>
 
-  <p>The procedure above assumes that the table are generated within the
-  directory <code>../libs/&lt;library&gt;/test</code>. This is the most
-  common case since this directory contains the <code>Jamfile.v2</code> as
-  well as the source code that is used by official boost testers. However,
-  this is just a convention. The table can be generated for other directories
-  within the libary. One possiblity would be to generate the table for all
-  the examples in <code>../libs/&lt;library&gt;/example</code>. Or one might
-  have a special directory of performance tests which take a long time to run
-  and hence are not suitable for running by official boost testers. Just
-  remember that library status table is generated in the directory from which
-  the <code>library_test</code> command is invoked.</p>
-
-  <h3>Running Tests for All Libraries</h3>
-  
-  <p>For those with *nix or cygwin
-  command line shells, there is shell script that can be run from the boost
-  root directory:</p>
-
-  <p><code>regression-root/library_status/src/library_test_all.sh</code></p>
-
-  <p>The command line arguments are the same as for running the test for one
-  library. This script creates all the html files in all the test directories
-  as well as an html page in the <code>status</code> directory named
-  <code>library_status_summary.html</code>. This can be used to browse
-  through all test results for all test in all libraries.</p>
+  <p>
+    The procedure above assumes that the table are generated within the
+    directory
+    <code>../libs/&lt;library&gt;/test</code>
+    . This is the most common case since this directory contains the
+    <code>Jamfile.v2</code>
+    as well as the source code that is used by official boost testers. However,
+    this is just a convention. The table can be generated for other directories
+    within the libary. One possiblity would be to generate the table for all the
+    examples in
+    <code>../libs/&lt;library&gt;/example</code>
+    . Or one might have a special directory of performance tests which take a
+    long time to run and hence are not suitable for running by official boost
+    testers. Just remember that library status table is generated in the
+    directory from which the
+    <code>library_test</code>
+    command is invoked.
+  </p>
   <hr />
 
 
@@ -453,10 +476,7 @@
   <p>Copyright 2007-2011 Robert Ramey.</p>
   <p>Copyright 2015 Rene Rivera.</p>
 
-  <p>Distributed under the Boost Software
-  License, Version 1.0. (See accompanying file LICENSE_1_0.txt or
-  http://www.boost.org/LICENSE_1_0.txt)</p>
-
-  <p>Revised $Date$</p>
+  <p>Distributed under the Boost Software License, Version 1.0. (See
+    accompanying file LICENSE_1_0.txt or http://www.boost.org/LICENSE_1_0.txt)</p>
 </body>
 </html>

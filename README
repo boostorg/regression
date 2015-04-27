@@ -13,7 +13,7 @@ clone the GitHub boostorg/regression repository to your local machine:
                  -- or --
     git clone https://github.com/boostorg/regression.git
 
-then view index.html with a web browser for more information, 
+Then view index.html with a web browser for more information, 
 including build instructions
 
 --------------------------
