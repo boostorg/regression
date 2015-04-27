@@ -35,7 +35,7 @@ namespace xml = boost::tiny_xml;
 
 #include <boost/iterator/transform_iterator.hpp>
 
-#include <cstdlib>  // for abort, exit
+#include <cstdlib>  // for abort, exit, system
 #include <string>
 #include <vector>
 #include <set>
@@ -48,6 +48,7 @@ namespace xml = boost::tiny_xml;
 #include <stdexcept>
 #include <cassert>
 #include <utility> // for pair
+#include <cstdio> // for tmpnam
 
 using std::string;
 
@@ -777,6 +778,8 @@ int library_status( const std::vector<std::string> & args )
         { ++args_i; status_file_path = fs::path( *args_i ); }
         else if ( *args_i == "--links-file" )
         { ++args_i; links_file_path = fs::path( *args_i ); }
+        else if ( *args_i == "--b2" )
+        { args_i = args_e; }
         else
         { std::cerr << "Unknown option: " << *args_i << "\n"; args_error = true ; }
     }
@@ -784,7 +787,7 @@ int library_status( const std::vector<std::string> & args )
     if ( args_error )
     {
         std::cerr <<
-            "Usage: library_status [options...]\n"
+            "Usage: library_status [options...] [--b2 args...]\n"
             "  boost-root is the path to the boost tree root directory.\n"
             "  status-file and links-file are paths to the output files.\n"
             "  options:\n"
@@ -797,6 +800,7 @@ int library_status( const std::vector<std::string> & args )
             "                        default library_status.html.\n"
             "    --links-file path   Path to output html file;\n"
             "                        default library_status_links.html.\n"
+            "    --b2 ...            Run b2 first with the rest of the args.\n"
             "Example: library_status --compiler gcc --locate-root /boost-root\n"
             "Note: Only the leaf of the links-file path is\n"
             "used in status-file HTML links. Thus for browsing, status-file,\n"
@@ -890,6 +894,28 @@ int library_status( const std::vector<std::string> & args )
     return 0;
 }
 
+int b2( const std::vector<std::string> & args )
+{
+    int result = 0;
+    std::string b2_command;
+    std::vector<std::string>::const_iterator args_i = args.begin();
+    std::vector<std::string>::const_iterator args_e = args.end();
+    while (args_i != args_e)
+    {
+        b2_command += "\"";
+        b2_command += *args_i;
+        b2_command += "\"";
+        b2_command += " ";
+        ++args_i;
+    }
+    if ( !b2_command.empty())
+    {
+        std::cout << "Running: " << b2_command << std::endl;
+        result = std::system(b2_command.c_str());
+    }
+    return result;
+}
+
 //  main  --------------------------------------------------------------------//
 
 #define BOOST_NO_CPP_MAIN_SUCCESS_MESSAGE
@@ -899,6 +925,8 @@ int cpp_main( int argc, char * argv[] ) // note name!
 {
     std::vector<std::string> process_jam_log_args;
     std::vector<std::string> library_status_args;
+    std::vector<std::string> b2_args;
+    std::string log_name;
     process_jam_log_args.push_back("process_jam_log");
     library_status_args.push_back("library_status");
     --argc; ++argv;
@@ -943,9 +971,47 @@ int cpp_main( int argc, char * argv[] ) // note name!
             process_jam_log_args.push_back(*argv);
             --argc; ++argv;
         }
+        else if (arg == "--b2")
+        {
+            --argc; ++argv;
+            while (argc > 0)
+            {
+                b2_args.push_back(*argv);
+                --argc; ++argv;
+            }
+            // When we run b2 ourselves we can put in the options
+            // to generate the log output and to read it in
+            // automatically, and clean up also.
+            for (int i = 0; i < process_jam_log_args.size(); ++i)
+            {
+                if (process_jam_log_args[i] == "--input-file")
+                {
+                    process_jam_log_args.erase(process_jam_log_args.begin()+i);
+                    process_jam_log_args.erase(process_jam_log_args.begin()+i);
+                    break;
+                }
+            }
+            for (int i = 0; i < b2_args.size(); ++i)
+            {
+                if (b2_args[i] == "-o")
+                {
+                	b2_args.erase(b2_args.begin()+i);
+                	b2_args.erase(b2_args.begin()+i);
+                    break;
+                }
+            }
+            log_name = std::tmpnam(nullptr);
+            log_name += "-library_status.log";
+            process_jam_log_args.push_back("--input-file");
+            process_jam_log_args.push_back(log_name);
+            b2_args.push_back("-o");
+            b2_args.push_back(log_name);
+        }
     }
     int result = 0;
+    if (!result) result = b2(b2_args);
     if (!result) result = process_jam_log(process_jam_log_args);
+    if (!log_name.empty()) fs::remove(log_name);
     if (!result) result = library_status(library_status_args);
     return result;
 }
