@@ -6,7 +6,7 @@
 
 set -e
 
-REGRESSION_BRANCH=reorg
+REGRESSION_BRANCH=develop
 
 log_time()
 {
