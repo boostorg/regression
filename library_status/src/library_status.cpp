@@ -36,6 +36,7 @@ namespace xml = boost::tiny_xml;
 #include <boost/iterator/transform_iterator.hpp>
 
 #include <cstdlib>  // for abort, exit, system
+#include <cstddef>  // for nullptr
 #include <string>
 #include <vector>
 #include <set>
@@ -1000,7 +1001,7 @@ int cpp_main( int argc, char * argv[] ) // note name!
                     break;
                 }
             }
-            log_name = std::tmpnam(nullptr);
+            log_name = std::tmpnam(0);
             log_name += "-library_status.log";
             process_jam_log_args.push_back("--input-file");
             process_jam_log_args.push_back(log_name);

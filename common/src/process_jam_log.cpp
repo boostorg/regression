@@ -672,7 +672,7 @@ int process_jam_log( const std::vector<std::string> & args )
         std::cout << "Abort: option --input-file requires a filename argument\n";
         std::exit(1);
       }
-      input = new std::ifstream( *args_i );
+      input = new std::ifstream( args_i->c_str() );
     }
     else if ( (*args_i)[1] == '-' )
     {
