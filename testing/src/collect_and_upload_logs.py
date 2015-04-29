@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 
 # Copyright (c) MetaCommunications, Inc. 2003-2007
 # Copyright Rene Rivera 2015

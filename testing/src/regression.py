@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 # Copyright MetaCommunications, Inc. 2003-2007
 # Copyright Rene Rivera 2007-2015
