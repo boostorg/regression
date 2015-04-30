@@ -61,6 +61,7 @@ default_filter_runners = {
         'CrystaX.*',
         'marshall-.*',
         'GLIS.*',
+        'jessicah-haiku.*',
         ]
     }
 
