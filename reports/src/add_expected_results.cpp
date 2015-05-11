@@ -195,6 +195,20 @@ void process_test_log(test_structure_t::test_log_t& test_log,
     test_log.status = status;
     test_log.is_new = is_new;
     test_log.category = category;
+
+    {
+        test_log.fail_info = test_structure_t::fail_none;
+
+        typedef boost::unordered_map<std::string, test_structure_t::target_t>::const_iterator iterator;
+        iterator it, end = test_log.targets.end();
+        if ( ( it = test_log.targets.find("compile") ) != end && !it->second.result ) {
+            test_log.fail_info = test_structure_t::fail_comp;
+        } else if ( ( it = test_log.targets.find("link") ) != end && !it->second.result ) {
+            test_log.fail_info = test_structure_t::fail_link;
+        } else if ( ( it = test_log.targets.find("run") ) != end && !it->second.result ) {
+            test_log.fail_info = test_structure_t::fail_run;
+        }
+    }
 }
 
 // requires: source is a Git branch name

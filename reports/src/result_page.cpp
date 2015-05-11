@@ -78,6 +78,18 @@ void insert_cell_link(html_writer& document, const std::string& result, const st
     }
 }
      
+std::string failure_link_name(test_structure_t::test_log_t const& log)
+{
+    if ( log.fail_info == test_structure_t::fail_comp )
+        return "comp";
+    else if ( log.fail_info == test_structure_t::fail_link )
+        return "link";
+    else if ( log.fail_info == test_structure_t::fail_run )
+        return "run";
+    else
+        return "fail";
+}
+
 // requires:
 void insert_cell_developer(html_writer& document,
                            const failures_markup_t& explicit_markup,
@@ -110,7 +122,7 @@ void insert_cell_developer(html_writer& document,
         }
         BOOST_FOREACH(test_log_group_t::value_type log, test_logs) {
             if(!log->result && !log->status) {
-                insert_cell_link(document, "fail", cell_link);
+                insert_cell_link(document, failure_link_name(*log), cell_link);
                 goto done;
             }
         }

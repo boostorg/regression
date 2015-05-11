@@ -58,6 +58,9 @@ struct expected_results_t {
 void load_expected_results(node_ptr root, expected_results_t& expected_results);
 
 struct test_structure_t {
+    enum fail_info_t {
+        fail_none, fail_comp, fail_link, fail_run
+    };
     struct target_t {
         std::string type;
         std::string timestamp;
@@ -75,6 +78,7 @@ struct test_structure_t {
         std::string target_directory;
         bool result;
         bool expected_result;
+        fail_info_t fail_info;
         std::string expected_reason;
         bool status;
         bool is_new;
