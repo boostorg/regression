@@ -487,7 +487,7 @@ table.summary-table td.library-name
 { 
     width: 60pt;
     text-align: center;
-    background-color: #FF7;
+    background-color: #FF5;
     color: black;
     border: 2px solid black; 
 }
@@ -535,7 +535,7 @@ table.summary-table td.library-name
 { 
     width: 60pt;
     text-align: center;
-    background-color: #DF0;
+    background-color: #DE6;
     color: black;
     border: 2px solid black; 
 }
@@ -547,7 +547,7 @@ table.summary-table td.library-name
 { 
     width: 60pt;
     text-align: center;
-    background-color: #DFF;
+    background-color: #BEE;
     color: black;
     border: 2px solid black; 
 }
@@ -559,7 +559,7 @@ table.summary-table td.library-name
 { 
     width: 60pt;
     text-align: center;
-    background-color: #FDD;
+    background-color: #FCC;
     color: black;
     border: 2px solid black; 
 }
