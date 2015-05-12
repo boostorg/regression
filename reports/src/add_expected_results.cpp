@@ -9,8 +9,10 @@
 #include "common.hpp"
 #include "xml.hpp"
 #include <string>
+#include <boost/algorithm/string/regex.hpp>
 #include <boost/foreach.hpp>
 #include <boost/functional/hash.hpp>
+#include <boost/utility/string_ref.hpp>
 
 using namespace boost::regression;
 
@@ -59,6 +61,23 @@ std::string get_toolset_name(const std::string& toolset, const expected_results_
 
 void add_note(test_structure_t::test_log_t& test_log, const std::string& text, const std::string& class_name = "auto-note") {
     test_log.notes.push_back("<span class=\"" + class_name + "\">" + text + "</span>");
+}
+
+template <typename String>
+bool find_string(String const& str, const char * str_to_find)
+{
+    return str.find(str_to_find) != String::npos;
+}
+
+template <typename String>
+bool find_regex(String const& str, const char * regex)
+{
+    return ! boost::empty(
+        boost::algorithm::find_regex(
+        str,
+        boost::basic_regex<char>(regex),
+        boost::match_not_dot_newline
+        ));
 }
 
 void process_test_log(test_structure_t::test_log_t& test_log,
@@ -203,6 +222,16 @@ void process_test_log(test_structure_t::test_log_t& test_log,
         iterator it, end = test_log.targets.end();
         if ( ( it = test_log.targets.find("compile") ) != end && !it->second.result ) {
             test_log.fail_info = test_structure_t::fail_comp;
+            
+            BOOST_ASSERT(it->second.contents);
+            boost::string_ref val(it->second.contents->value(), it->second.contents->value_size());
+            if ( find_regex(val, "([Ii]nternal error)|([Ii]nternal compiler error)|([Ss]egmentation fault)") ) {
+                test_log.fail_info = test_structure_t::fail_cerr;
+            } else if ( find_regex(val, "(second|seconds) time limit exceeded") ) {
+                test_log.fail_info = test_structure_t::fail_time;
+            } else if ( find_regex(val, "(File too big)|(/bigobj)") ) {
+                test_log.fail_info = test_structure_t::fail_file;
+            }
         } else if ( ( it = test_log.targets.find("link") ) != end && !it->second.result ) {
             test_log.fail_info = test_structure_t::fail_link;
         } else if ( ( it = test_log.targets.find("run") ) != end && !it->second.result ) {

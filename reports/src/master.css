@@ -480,6 +480,90 @@ table.summary-table td.library-name
     border: 2px solid black; 
 }
 
+  tr.library-row        td.library-fail-unexpected-new-other
+, tr.library-row-first  td.library-fail-unexpected-new-other
+, tr.library-row-last   td.library-fail-unexpected-new-other
+, tr.library-row-single td.library-fail-unexpected-new-other
+{ 
+    width: 60pt;
+    text-align: center;
+    background-color: #FF7;
+    color: black;
+    border: 2px solid black; 
+}
+
+  tr.library-row        td.library-fail-unexpected-new-run
+, tr.library-row-first  td.library-fail-unexpected-new-run
+, tr.library-row-last   td.library-fail-unexpected-new-run
+, tr.library-row-single td.library-fail-unexpected-new-run
+{ 
+    width: 60pt;
+    text-align: center;
+    background-color: #FF0;
+    color: black;
+    border: 2px solid black; 
+}
+
+  tr.library-row        td.library-fail-unexpected-new-link
+, tr.library-row-first  td.library-fail-unexpected-new-link
+, tr.library-row-last   td.library-fail-unexpected-new-link
+, tr.library-row-single td.library-fail-unexpected-new-link
+{ 
+    width: 60pt;
+    text-align: center;
+    background-color: #FE0;
+    color: black;
+    border: 2px solid black; 
+}
+
+  tr.library-row        td.library-fail-unexpected-new-comp
+, tr.library-row-first  td.library-fail-unexpected-new-comp
+, tr.library-row-last   td.library-fail-unexpected-new-comp
+, tr.library-row-single td.library-fail-unexpected-new-comp
+{ 
+    width: 60pt;
+    text-align: center;
+    background-color: #FD0;
+    color: black;
+    border: 2px solid black; 
+}
+
+  tr.library-row        td.library-fail-unexpected-new-time
+, tr.library-row-first  td.library-fail-unexpected-new-time
+, tr.library-row-last   td.library-fail-unexpected-new-time
+, tr.library-row-single td.library-fail-unexpected-new-time
+{ 
+    width: 60pt;
+    text-align: center;
+    background-color: #DF0;
+    color: black;
+    border: 2px solid black; 
+}
+
+  tr.library-row        td.library-fail-unexpected-new-file
+, tr.library-row-first  td.library-fail-unexpected-new-file
+, tr.library-row-last   td.library-fail-unexpected-new-file
+, tr.library-row-single td.library-fail-unexpected-new-file
+{ 
+    width: 60pt;
+    text-align: center;
+    background-color: #DFF;
+    color: black;
+    border: 2px solid black; 
+}
+
+  tr.library-row        td.library-fail-unexpected-new-cerr
+, tr.library-row-first  td.library-fail-unexpected-new-cerr
+, tr.library-row-last   td.library-fail-unexpected-new-cerr
+, tr.library-row-single td.library-fail-unexpected-new-cerr
+{ 
+    width: 60pt;
+    text-align: center;
+    background-color: #FDD;
+    color: black;
+    border: 2px solid black; 
+}
+
 /* Detailed */
 
 .library-conf-problem
