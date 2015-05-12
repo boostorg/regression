@@ -86,8 +86,39 @@ std::string failure_link_name(test_structure_t::test_log_t const& log)
         return "link";
     else if ( log.fail_info == test_structure_t::fail_run )
         return "run";
+    else if ( log.fail_info == test_structure_t::fail_time )
+        return "time";
+    else if ( log.fail_info == test_structure_t::fail_file )
+        return "file";
+    else if ( log.fail_info == test_structure_t::fail_cerr )
+        return "cerr";
     else
         return "fail";
+}
+
+std::string failure_class_name(test_structure_t::test_log_t const& log)
+{
+    if ( log.fail_info == test_structure_t::fail_comp )
+        return "library-fail-unexpected-new-comp";
+    else if ( log.fail_info == test_structure_t::fail_link )
+        return "library-fail-unexpected-new-link";
+    else if ( log.fail_info == test_structure_t::fail_run )
+        return "library-fail-unexpected-new-run";
+    else if ( log.fail_info == test_structure_t::fail_time )
+        return "library-fail-unexpected-new-time";
+    else if ( log.fail_info == test_structure_t::fail_file )
+        return "library-fail-unexpected-new-file";
+    else if ( log.fail_info == test_structure_t::fail_cerr )
+        return "library-fail-unexpected-new-cerr";
+    else
+        return "library-fail-unexpected-new-other";
+}
+
+void insert_cell_start_tag(html_writer& document,
+                           std::string const& class_,
+                           std::string const& test_name,
+                           std::string const& toolset) {
+    document << "<td class=\"" << class_ << "\" title=\"" << escape_xml(test_name) << "/" << escape_xml(toolset) << "\">\n";
 }
 
 // requires:
@@ -107,25 +138,31 @@ void insert_cell_developer(html_writer& document,
         std::string("") :
         log_file_path(explicit_markup, *test_logs.front(), runner, release_postfix(release));
 
-    document << "<td class=\"" << class_ << "\" title=\"" << escape_xml(test_name) << "/" << escape_xml(toolset) << "\">\n";
-
     if(is_unusable(explicit_markup, library, toolset)) {
+        insert_cell_start_tag(document, class_, test_name, toolset);
         insert_cell_link(document, "n/a", cell_link);
     } else if(test_logs.empty()) {
+        insert_cell_start_tag(document, class_, test_name, toolset);
         document << "&#160;&#160;&#160;&#160;\n";
     } else {
         BOOST_FOREACH(test_log_group_t::value_type log, test_logs) {
             if(!log->result && log->status) {
+                insert_cell_start_tag(document, class_, test_name, toolset);
                 insert_cell_link(document, (log->expected_reason != "")? "fail?" : "fail*", cell_link);
                 goto done;
             }
         }
         BOOST_FOREACH(test_log_group_t::value_type log, test_logs) {
             if(!log->result && !log->status) {
+                if ( class_ != "library-fail-unexpected-new" )
+                    insert_cell_start_tag(document, class_, test_name, toolset);
+                else
+                    insert_cell_start_tag(document, failure_class_name(*log), test_name, toolset);
                 insert_cell_link(document, failure_link_name(*log), cell_link);
                 goto done;
             }
         }
+        insert_cell_start_tag(document, class_, test_name, toolset);
         insert_cell_link(document, "pass", cell_link);
     }
 done:
