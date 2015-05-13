@@ -301,11 +301,53 @@ bool boost::regression::show_toolset(const failures_markup_t& explicit_markup, c
     return !release || explicit_markup.required_toolsets.find(toolset) != explicit_markup.required_toolsets.end();
 }
 
+std::string boost::regression::result_cell_name_new(test_structure_t::test_log_t const& log)
+{
+    if ( log.fail_info == test_structure_t::fail_comp )
+        return "comp";
+    else if ( log.fail_info == test_structure_t::fail_link )
+        return "link";
+    else if ( log.fail_info == test_structure_t::fail_run )
+        return "run";
+    else if ( log.fail_info == test_structure_t::fail_time )
+        return "time";
+    else if ( log.fail_info == test_structure_t::fail_file )
+        return "file";
+    else if ( log.fail_info == test_structure_t::fail_cerr )
+        return "cerr";
+    else
+        return "fail";
+}
+
+std::string boost::regression::result_cell_class_new(test_structure_t::fail_info_t fail_info)
+{
+    if ( fail_info == test_structure_t::fail_comp )
+        return "fail-unexpected-new-comp";
+    else if ( fail_info == test_structure_t::fail_link )
+        return "fail-unexpected-new-link";
+    else if ( fail_info == test_structure_t::fail_run )
+        return "fail-unexpected-new-run";
+    else if ( fail_info == test_structure_t::fail_time )
+        return "fail-unexpected-new-time";
+    else if ( fail_info == test_structure_t::fail_file )
+        return "fail-unexpected-new-file";
+    else if ( fail_info == test_structure_t::fail_cerr )
+        return "fail-unexpected-new-cerr";
+    else
+        return "fail-unexpected-new-other";
+}
+
+std::string boost::regression::result_cell_class_new(test_structure_t::test_log_t const& log)
+{
+    return result_cell_class_new(log.fail_info);
+}
+
 // safe: no assumptions, enumerated result
 std::string boost::regression::result_cell_class(const failures_markup_t& explicit_markup,
                                                  const std::string& library,
                                                  const std::string& toolset,
-                                                 const test_log_group_t& test_logs) {
+                                                 const test_log_group_t& test_logs,
+                                                 bool enable_specific) {
     if(is_unusable(explicit_markup, library, toolset)) {
         return "unusable";
     }
@@ -317,9 +359,26 @@ std::string boost::regression::result_cell_class(const failures_markup_t& explic
             return "fail-unexpected";
         }
     }
-    BOOST_FOREACH(test_log_group_t::value_type log, test_logs) {
-        if(!log->result && log->expected_result && log->is_new) {
-            return "fail-unexpected-new";
+    {
+        test_structure_t::fail_info_t most_significant_fail = test_structure_t::fail_none;
+        BOOST_FOREACH(test_log_group_t::value_type log, test_logs) {
+            if(!log->result && log->expected_result && log->is_new) {
+                if ( !enable_specific ) {
+                    return "fail-unexpected-new";
+                } else {
+                    // store the most significant error
+                    if ( log->fail_info > most_significant_fail ) {
+                        most_significant_fail = log->fail_info;
+                        // the failure can't be more significant
+                        if ( most_significant_fail == test_structure_t::fail_comp) {
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        if ( most_significant_fail != test_structure_t::fail_none) {
+            return result_cell_class_new(most_significant_fail);
         }
     }
     BOOST_FOREACH(test_log_group_t::value_type log, test_logs) {
@@ -348,7 +407,8 @@ std::string boost::regression::result_cell_class(const failures_markup_t& explic
 std::string boost::regression::result_cell_class(const failures_markup_t& explicit_markup,
                                                  const std::string& library,
                                                  const std::string& toolset,
-                                                 const test_structure_t::library_t& test_logs)
+                                                 const test_structure_t::library_t& test_logs,
+                                                 bool enable_specific)
 {
     test_log_group_t tmp;
     BOOST_FOREACH(test_structure_t::library_t::const_reference test_case, test_logs) {
@@ -356,7 +416,7 @@ std::string boost::regression::result_cell_class(const failures_markup_t& explic
             tmp.push_back(&log);
         }
     }
-    return result_cell_class(explicit_markup, library, toolset, tmp);
+    return result_cell_class(explicit_markup, library, toolset, tmp, enable_specific);
 }
 
 // requires: purpose must be well-formed html

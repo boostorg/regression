@@ -5,6 +5,7 @@
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
+#include <boost/algorithm/string/predicate.hpp>
 #include <boost/foreach.hpp>
 #include <boost/next_prior.hpp>
 #include "common.hpp"
@@ -17,6 +18,14 @@ using namespace boost::regression;
 
 namespace {
 
+void insert_cell_link(html_writer& document, const std::string& result, const std::string& library_page, bool release) {
+    document << "&#160;&#160;"
+                "<a href=\"" << escape_uri(library_page) << release_postfix(release) << ".html\" class=\"log-link\" target=\"_top\">" <<
+                result <<
+                "</a>"
+                "&#160;&#160;"; 
+}
+
 // report developer status
 // safe
 void insert_cell_developer(html_writer& document,
@@ -26,30 +35,36 @@ void insert_cell_developer(html_writer& document,
                            const test_structure_t::library_t& current_cell,
                            bool release) {
 
-    std::string class_ = "summary-" + result_cell_class(explicit_markup, library, toolset, current_cell);
+    std::string class_ = "summary-" + result_cell_class(explicit_markup, library, toolset, current_cell, true);
     
     std::string library_page = encode_path(library);
 
     document << "<td class=\"" << class_ << "\" title=\"" << escape_xml(library) << "/" << escape_xml(toolset) << "\">\n";
 
     if(class_ == "summary-unusable") {
-        document << "&#160;&#160;"
-                    "<a href=\"" << escape_uri(library_page) << release_postfix(release) << ".html\" class=\"log-link\" target=\"_top\">"
-                    "n/a"
-                    "</a>"
-                    "&#160;&#160;";
+        insert_cell_link(document, "n/a", library_page, release);
     } else if(class_ == "summary-missing") {
         document << "&#160;&#160;&#160;&#160;";
     } else if(class_ == "summary-fail-unexpected") {
         document << "<a href=\"" << escape_uri(library_page) << release_postfix(release) << ".html\" class=\"log-link\" target=\"_top\">"
                     "broken"
                     "</a>";
-    } else if(class_ == "summary-fail-unexpected-new") {
-        document << "&#160;&#160;"
-                    "<a href=\"" << escape_uri(library_page) << release_postfix(release) << ".html\" class=\"log-link\" target=\"_top\">"
-                    "fail"
-                    "</a>"
-                    "&#160;&#160;"; 
+    } else if(boost::algorithm::starts_with(class_, "summary-fail-unexpected-new")) {
+        if(boost::algorithm::ends_with(class_, "-comp")) {
+            insert_cell_link(document, "comp", library_page, release);
+        } else if(boost::algorithm::ends_with(class_, "-link")) {
+            insert_cell_link(document, "link", library_page, release);
+        } else if(boost::algorithm::ends_with(class_, "-run")) {
+            insert_cell_link(document, "run", library_page, release);
+        } else if(boost::algorithm::ends_with(class_, "-time")) {
+            insert_cell_link(document, "time", library_page, release);
+        } else if(boost::algorithm::ends_with(class_, "-cerr")) {
+            insert_cell_link(document, "cerr", library_page, release);
+        } else if(boost::algorithm::ends_with(class_, "-file")) {
+            insert_cell_link(document, "file", library_page, release);
+        } else { // summary-fail-unexpected-new, summary-fail-unexpected-new-other
+            insert_cell_link(document, "fail", library_page, release);
+        }
     } else {
         document << "&#160;&#160;OK&#160;&#160;";
     }

@@ -59,7 +59,8 @@ void load_expected_results(node_ptr root, expected_results_t& expected_results);
 
 struct test_structure_t {
     enum fail_info_t {
-        fail_none, fail_comp, fail_link, fail_run, fail_time, fail_file, fail_cerr
+        // NOTE keep the errors sorted by significance
+        fail_none, fail_file, fail_time, fail_cerr, fail_other, fail_run, fail_link, fail_comp
     };
     struct target_t {
         std::string type;

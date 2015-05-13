@@ -480,7 +480,12 @@ table.summary-table td.library-name
     border: 2px solid black; 
 }
 
-  tr.library-row        td.library-fail-unexpected-new-other
+  tr.summary-row        td.summary-fail-unexpected-new-other
+, tr.summary-row-first  td.summary-fail-unexpected-new-other
+, tr.summary-row-last   td.summary-fail-unexpected-new-other
+, tr.summary-row-single td.summary-fail-unexpected-new-other
+
+, tr.library-row        td.library-fail-unexpected-new-other
 , tr.library-row-first  td.library-fail-unexpected-new-other
 , tr.library-row-last   td.library-fail-unexpected-new-other
 , tr.library-row-single td.library-fail-unexpected-new-other
@@ -492,7 +497,12 @@ table.summary-table td.library-name
     border: 2px solid black; 
 }
 
-  tr.library-row        td.library-fail-unexpected-new-run
+  tr.summary-row        td.summary-fail-unexpected-new-run
+, tr.summary-row-first  td.summary-fail-unexpected-new-run
+, tr.summary-row-last   td.summary-fail-unexpected-new-run
+, tr.summary-row-single td.summary-fail-unexpected-new-run
+
+, tr.library-row        td.library-fail-unexpected-new-run
 , tr.library-row-first  td.library-fail-unexpected-new-run
 , tr.library-row-last   td.library-fail-unexpected-new-run
 , tr.library-row-single td.library-fail-unexpected-new-run
@@ -504,7 +514,12 @@ table.summary-table td.library-name
     border: 2px solid black; 
 }
 
-  tr.library-row        td.library-fail-unexpected-new-link
+  tr.summary-row        td.summary-fail-unexpected-new-link
+, tr.summary-row-first  td.summary-fail-unexpected-new-link
+, tr.summary-row-last   td.summary-fail-unexpected-new-link
+, tr.summary-row-single td.summary-fail-unexpected-new-link
+
+, tr.library-row        td.library-fail-unexpected-new-link
 , tr.library-row-first  td.library-fail-unexpected-new-link
 , tr.library-row-last   td.library-fail-unexpected-new-link
 , tr.library-row-single td.library-fail-unexpected-new-link
@@ -516,7 +531,12 @@ table.summary-table td.library-name
     border: 2px solid black; 
 }
 
-  tr.library-row        td.library-fail-unexpected-new-comp
+  tr.summary-row        td.summary-fail-unexpected-new-comp
+, tr.summary-row-first  td.summary-fail-unexpected-new-comp
+, tr.summary-row-last   td.summary-fail-unexpected-new-comp
+, tr.summary-row-single td.summary-fail-unexpected-new-comp
+
+, tr.library-row        td.library-fail-unexpected-new-comp
 , tr.library-row-first  td.library-fail-unexpected-new-comp
 , tr.library-row-last   td.library-fail-unexpected-new-comp
 , tr.library-row-single td.library-fail-unexpected-new-comp
@@ -528,7 +548,12 @@ table.summary-table td.library-name
     border: 2px solid black; 
 }
 
-  tr.library-row        td.library-fail-unexpected-new-time
+  tr.summary-row        td.summary-fail-unexpected-new-time
+, tr.summary-row-first  td.summary-fail-unexpected-new-time
+, tr.summary-row-last   td.summary-fail-unexpected-new-time
+, tr.summary-row-single td.summary-fail-unexpected-new-time
+
+, tr.library-row        td.library-fail-unexpected-new-time
 , tr.library-row-first  td.library-fail-unexpected-new-time
 , tr.library-row-last   td.library-fail-unexpected-new-time
 , tr.library-row-single td.library-fail-unexpected-new-time
@@ -540,7 +565,12 @@ table.summary-table td.library-name
     border: 2px solid black; 
 }
 
-  tr.library-row        td.library-fail-unexpected-new-file
+  tr.summary-row        td.summary-fail-unexpected-new-file
+, tr.summary-row-first  td.summary-fail-unexpected-new-file
+, tr.summary-row-last   td.summary-fail-unexpected-new-file
+, tr.summary-row-single td.summary-fail-unexpected-new-file
+
+, tr.library-row        td.library-fail-unexpected-new-file
 , tr.library-row-first  td.library-fail-unexpected-new-file
 , tr.library-row-last   td.library-fail-unexpected-new-file
 , tr.library-row-single td.library-fail-unexpected-new-file
@@ -552,7 +582,12 @@ table.summary-table td.library-name
     border: 2px solid black; 
 }
 
-  tr.library-row        td.library-fail-unexpected-new-cerr
+  tr.summary-row        td.summary-fail-unexpected-new-cerr
+, tr.summary-row-first  td.summary-fail-unexpected-new-cerr
+, tr.summary-row-last   td.summary-fail-unexpected-new-cerr
+, tr.summary-row-single td.summary-fail-unexpected-new-cerr
+
+, tr.library-row        td.library-fail-unexpected-new-cerr
 , tr.library-row-first  td.library-fail-unexpected-new-cerr
 , tr.library-row-last   td.library-fail-unexpected-new-cerr
 , tr.library-row-single td.library-fail-unexpected-new-cerr
