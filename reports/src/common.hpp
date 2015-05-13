@@ -88,15 +88,22 @@ void show_note(
     const failures_markup_t& explicit_markup);
 void show_notes(html_writer& document, const std::vector<test_structure_t::note_t>& notes, const failures_markup_t& explicit_markup);
 
-std::string result_cell_class(const failures_markup_t& explicit_markup,
-                              const std::string& library,
-                              const std::string& toolset,
-                              const test_log_group_t& test_logs);
+std::string result_cell_name_new(test_structure_t::test_log_t const& log);
+
+std::string result_cell_class_new(test_structure_t::fail_info_t file_info);
+std::string result_cell_class_new(test_structure_t::test_log_t const& log);
 
 std::string result_cell_class(const failures_markup_t& explicit_markup,
                               const std::string& library,
                               const std::string& toolset,
-                              const test_structure_t::library_t& test_logs);
+                              const test_log_group_t& test_logs,
+                              bool enable_specific = false);
+
+std::string result_cell_class(const failures_markup_t& explicit_markup,
+                              const std::string& library,
+                              const std::string& toolset,
+                              const test_structure_t::library_t& test_logs,
+                              bool enable_specific = false);
 
 std::string alternate_mode(const std::string& mode);
 std::string release_postfix(bool is_release);

@@ -214,10 +214,13 @@ void process_test_log(test_structure_t::test_log_t& test_log,
     test_log.status = status;
     test_log.is_new = is_new;
     test_log.category = category;
+    test_log.fail_info = test_structure_t::fail_none;
 
-    {
-        test_log.fail_info = test_structure_t::fail_none;
+    // if it is an unexpected failure, either regression or new
+    if (!actual_result && expected_result) {
+        test_log.fail_info = test_structure_t::fail_other;
 
+        // check the specific reason
         typedef boost::unordered_map<std::string, test_structure_t::target_t>::const_iterator iterator;
         iterator it, end = test_log.targets.end();
         if ( ( it = test_log.targets.find("compile") ) != end && !it->second.result ) {
