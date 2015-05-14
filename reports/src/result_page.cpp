@@ -110,7 +110,7 @@ void insert_cell_developer(html_writer& document,
         }
         BOOST_FOREACH(test_log_group_t::value_type log, test_logs) {
             if(!log->result && !log->status) {
-                insert_cell_link(document, result_cell_name_new(*log), cell_link);
+                insert_cell_link(document, result_cell_name_new(test_logs), cell_link);
                 goto done;
             }
         }
