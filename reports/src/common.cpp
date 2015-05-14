@@ -301,22 +301,41 @@ bool boost::regression::show_toolset(const failures_markup_t& explicit_markup, c
     return !release || explicit_markup.required_toolsets.find(toolset) != explicit_markup.required_toolsets.end();
 }
 
-std::string boost::regression::result_cell_name_new(test_structure_t::test_log_t const& log)
+std::string boost::regression::result_cell_name_new(test_structure_t::fail_info_t const& fail_info)
 {
-    if ( log.fail_info == test_structure_t::fail_comp )
+    if ( fail_info == test_structure_t::fail_comp )
         return "comp";
-    else if ( log.fail_info == test_structure_t::fail_link )
+    else if ( fail_info == test_structure_t::fail_link )
         return "link";
-    else if ( log.fail_info == test_structure_t::fail_run )
+    else if ( fail_info == test_structure_t::fail_run )
         return "run";
-    else if ( log.fail_info == test_structure_t::fail_time )
+    else if ( fail_info == test_structure_t::fail_time )
         return "time";
-    else if ( log.fail_info == test_structure_t::fail_file )
+    else if ( fail_info == test_structure_t::fail_file )
         return "file";
-    else if ( log.fail_info == test_structure_t::fail_cerr )
+    else if ( fail_info == test_structure_t::fail_cerr )
         return "cerr";
     else
         return "fail";
+}
+
+std::string boost::regression::result_cell_name_new(test_structure_t::test_log_t const& log)
+{
+    return boost::regression::result_cell_name_new(log.fail_info);
+}
+
+std::string boost::regression::result_cell_name_new(test_log_group_t const& logs)
+{
+    test_structure_t::fail_info_t most_significant_fail = test_structure_t::fail_none;
+    BOOST_FOREACH(test_log_group_t::value_type log, logs) {
+        if ( log->fail_info > most_significant_fail ) {
+            most_significant_fail = log->fail_info;
+            if ( most_significant_fail == test_structure_t::fail_comp ){
+                break;
+            }
+        }
+    }
+    return boost::regression::result_cell_name_new(most_significant_fail);
 }
 
 std::string boost::regression::result_cell_class_new(test_structure_t::fail_info_t fail_info)
