@@ -18,12 +18,13 @@ using namespace boost::regression;
 
 namespace {
 
-void insert_cell_link(html_writer& document, const std::string& result, const std::string& library_page, bool release) {
+void insert_cell_link(html_writer& document, const std::string& result, const std::string& library_page, bool release, std::string const& additional_classes = std::string()) {
     document << "&#160;&#160;"
-                "<a href=\"" << escape_uri(library_page) << release_postfix(release) << ".html\" class=\"log-link\" target=\"_top\">" <<
-                result <<
-                "</a>"
-                "&#160;&#160;"; 
+                "<a href=\"" << escape_uri(library_page) << release_postfix(release) << ".html\" class=\"log-link"
+             << (additional_classes.empty() ? "" : " ") << additional_classes << "\" target=\"_top\">"
+             << result
+             << "</a>"
+                "&#160;&#160;\n"; 
 }
 
 // report developer status
@@ -50,21 +51,30 @@ void insert_cell_developer(html_writer& document,
                     "broken"
                     "</a>";
     } else if(boost::algorithm::starts_with(class_, "summary-fail-unexpected-new")) {
+
+        int bar_width = 100 - (std::max)(percent_failures(current_cell), 5);
+
+        document << "<div class=\"summary-new-fail-wrapper\">\n"
+                 << "<span class=\"summary-new-fail-bar\" style=\"width:" << bar_width << "%;\"></span>\n";
+
         if(boost::algorithm::ends_with(class_, "-comp")) {
-            insert_cell_link(document, "comp", library_page, release);
+            insert_cell_link(document, "comp", library_page, release, "summary-new-fail-link");
         } else if(boost::algorithm::ends_with(class_, "-link")) {
-            insert_cell_link(document, "link", library_page, release);
+            insert_cell_link(document, "link", library_page, release, "summary-new-fail-link");
         } else if(boost::algorithm::ends_with(class_, "-run")) {
-            insert_cell_link(document, "run", library_page, release);
+            insert_cell_link(document, "run", library_page, release, "summary-new-fail-link");
         } else if(boost::algorithm::ends_with(class_, "-time")) {
-            insert_cell_link(document, "time", library_page, release);
+            insert_cell_link(document, "time", library_page, release, "summary-new-fail-link");
         } else if(boost::algorithm::ends_with(class_, "-cerr")) {
-            insert_cell_link(document, "cerr", library_page, release);
+            insert_cell_link(document, "cerr", library_page, release, "summary-new-fail-link");
         } else if(boost::algorithm::ends_with(class_, "-file")) {
-            insert_cell_link(document, "file", library_page, release);
+            insert_cell_link(document, "file", library_page, release, "summary-new-fail-link");
         } else { // summary-fail-unexpected-new, summary-fail-unexpected-new-other
-            insert_cell_link(document, "fail", library_page, release);
+            insert_cell_link(document, "fail", library_page, release, "summary-new-fail-link");
         }
+
+        document << "</div>\n";
+
     } else {
         document << "&#160;&#160;OK&#160;&#160;";
     }
