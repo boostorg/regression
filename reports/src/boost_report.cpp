@@ -111,10 +111,13 @@ int main(int argc, char* argv[]) {
         modes.push_back("developer");
         modes.push_back("user");
 
+        // NOTE: The ToC is generated in result_page(). In the currently used setup
+        // only the non-release result_page is generated. To be consistent with it,
+        // the non-release issues page is generated.
         if (reports.count("i") != 0) {
             std::cout << "Generating issues page" << std::endl;
             issues_list("developer", structure, markup,
-                        true, tag, now, warnings, "");
+                        false, tag, now, warnings, "");
         }
 
         BOOST_FOREACH(const std::string& mode, modes) {

@@ -370,11 +370,11 @@ void boost::regression::result_page(const test_structure_t& tests,
                    "    </div>\n";
         }
 
-        toc << "    <div class=\"toc-header-entry\">\n";
+        /*toc << "    <div class=\"toc-header-entry\">\n";
 
         insert_view_link(toc, "index", "toc-entry", release);
 
-        toc << "    </div>\n";
+        toc << "    </div>\n";*/
 
         toc << "    <hr/>\n";
 
