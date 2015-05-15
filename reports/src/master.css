@@ -599,6 +599,27 @@ table.summary-table td.library-name
     border: 2px solid black; 
 }
 
+div.summary-new-fail-wrapper
+{
+    position:relative;
+    width:100%;
+    height:100%;
+}
+
+span.summary-new-fail-bar
+{
+    position:absolute;
+    left:0;
+    height:100%;
+    background-color:lightgreen;
+}
+
+a.summary-new-fail-link
+{
+    position:relative;
+    z-index:1;
+}
+
 /* Detailed */
 
 .library-conf-problem

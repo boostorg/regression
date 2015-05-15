@@ -88,6 +88,8 @@ void show_note(
     const failures_markup_t& explicit_markup);
 void show_notes(html_writer& document, const std::vector<test_structure_t::note_t>& notes, const failures_markup_t& explicit_markup);
 
+int percent_failures(const test_structure_t::library_t& current_cell);
+
 std::string result_cell_name_new(test_structure_t::fail_info_t const& fail_info);
 std::string result_cell_name_new(test_structure_t::test_log_t const& log);
 std::string result_cell_name_new(test_log_group_t const& logs);

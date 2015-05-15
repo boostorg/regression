@@ -301,6 +301,22 @@ bool boost::regression::show_toolset(const failures_markup_t& explicit_markup, c
     return !release || explicit_markup.required_toolsets.find(toolset) != explicit_markup.required_toolsets.end();
 }
 
+int boost::regression::percent_failures(const test_structure_t::library_t& current_cell)
+{
+    int count = 0;
+    int failures = 0;
+    BOOST_FOREACH(test_structure_t::library_t::const_reference test_case, current_cell) {
+        BOOST_FOREACH(test_structure_t::test_case_t::const_reference log, test_case.second) {
+            if(!log.result && log.expected_result) {
+                ++failures;
+                break;
+            }                
+        }
+        ++count;
+    }
+    return (100 * failures) / count;
+}
+
 std::string boost::regression::result_cell_name_new(test_structure_t::fail_info_t const& fail_info)
 {
     if ( fail_info == test_structure_t::fail_comp )
