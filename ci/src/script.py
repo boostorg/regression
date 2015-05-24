@@ -206,7 +206,7 @@ class script:
             type='int' )
 
         #~ Defaults
-        self.toolset=None
+        self.toolset=os.getenv("TOOLSET")
         self.debug_level=0
         ( _opt_, self.actions ) = opt.parse_args(None,self)
         if not self.actions or self.actions == []:
@@ -301,3 +301,5 @@ class script:
             'sudo apt-get update -qq'])
         utils.checked_system([
             'sudo apt-get install -qq %s %s'%(info['package'], info['debugpackage'])])
+
+script()
