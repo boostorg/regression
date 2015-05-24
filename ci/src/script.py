@@ -55,14 +55,14 @@ class utils:
     @staticmethod
     def system( commands ):
         if sys.platform == 'win32':
-            log('\n'.join(commands))
+            utils.log('\n'.join(commands))
             f = open( 'tmp.cmd', 'w' )
             f.write( string.join( commands, '\n' ) )
             f.close()
             rc = os.system( 'tmp.cmd' )
             return rc
         else:
-            log(' && '.join(commands))
+            utils.log(' && '.join(commands))
             rc = os.system( ' && '.join( commands ) )
             return rc
     
@@ -111,12 +111,12 @@ class utils:
             try:
                 return f()
             except Exception, msg:
-                log( '%s failed with message "%s"' % ( f.__name__, msg ) )
+                utils.log( '%s failed with message "%s"' % ( f.__name__, msg ) )
                 if attempts == 0:
-                    log( 'Giving up.' )
+                    utils.log( 'Giving up.' )
                     raise
 
-                log( 'Retrying (%d more attempts).' % attempts )
+                utils.log( 'Retrying (%d more attempts).' % attempts )
                 time.sleep( sleep_secs )
 
     @staticmethod
@@ -143,7 +143,7 @@ class utils:
 
     @staticmethod
     def unpack_archive( archive_path ):
-        log( 'Unpacking archive ("%s")...' % archive_path )
+        utils.log( 'Unpacking archive ("%s")...' % archive_path )
 
         archive_name = os.path.basename( archive_path )
         extension = archive_name[ archive_name.find( '.' ) : ]
