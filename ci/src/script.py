@@ -187,7 +187,7 @@ class script:
             lambda m: m[8:].replace('_','-'),
             filter(
                 lambda m: m.startswith('command_'),
-                runner.__dict__.keys())
+                script.__dict__.keys())
             )
         commands.sort()
         commands = "commands: %s" % ', '.join(commands)
