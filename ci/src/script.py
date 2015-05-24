@@ -182,7 +182,7 @@ class utils:
 
 class script:
 
-    def __init__(self,root):
+    def __init__(self):
         commands = map(
             lambda m: m[8:].replace('_','-'),
             filter(
