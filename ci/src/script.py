@@ -246,7 +246,7 @@ class script:
         utils.unpack_archive("boost_bb.tar.gz")
         os.chdir(os.path.join(self.travis_build_dir, "build-develop"))
         utils.checked_system(["./bootstrap.sh"])
-        utils.checked_system(["./b2 install --prefix=/usr"])
+        utils.checked_system(["sudo ./b2 install --prefix=/usr"])
         #
         os.chdir(self.travis_build_dir)
 
