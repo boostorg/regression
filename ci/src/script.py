@@ -148,7 +148,7 @@ class utils:
         archive_name = os.path.basename( archive_path )
         extension = archive_name[ archive_name.find( '.' ) : ]
 
-        if extension in ( ".tar.gz", ".tar.bz2", ".tgz" ):
+        if extension in ( ".tar.gz", ".tar.bz2" ):
             import tarfile
             import stat
 
@@ -241,9 +241,9 @@ class script:
             lambda:
                 utils.web_get(
                     "https://github.com/boostorg/build/archive/develop.tar.gz",
-                    "boost_bb.tgz")
+                    "boost_bb.tar.gz")
             )
-        utils.unpack_archive("boost_bb.tgz")
+        utils.unpack_archive("boost_bb.targ.gz")
         os.chdir(os.path.join(self.travis_build_dir, "build-develop"))
         utils.checked_system(["./bootstrap.sh"])
         utils.checked_system(["./b2 install --prefix=/usr"])
