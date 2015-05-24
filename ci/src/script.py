@@ -243,7 +243,7 @@ class script:
                     "https://github.com/boostorg/build/archive/develop.tar.gz",
                     "boost_bb.tar.gz")
             )
-        utils.unpack_archive("boost_bb.targ.gz")
+        utils.unpack_archive("boost_bb.tar.gz")
         os.chdir(os.path.join(self.travis_build_dir, "build-develop"))
         utils.checked_system(["./bootstrap.sh"])
         utils.checked_system(["./b2 install --prefix=/usr"])
