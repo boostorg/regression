@@ -252,7 +252,8 @@ class script:
 
     def command_travis_before_script(self):
         os.chdir(self.travis_build_dir)
-        # echo "project ROOT : : : build-dir bin ;" > jamroot.jam
+        self.make_file(os.path.join(self.travis_build_dir, 'jamroot.jam'),
+            "project ROOT : : : build-dir bin ;")
         os.chdir(self.travis_build_dir)
 
     def command_travis_script(self):
@@ -301,5 +302,10 @@ class script:
             'sudo apt-get update -qq'])
         utils.checked_system([
             'sudo apt-get install -qq %s %s'%(info['package'], info['debugpackage'])])
+    
+    def make_file(self, filename, text):
+        f = open( filename, 'w' )
+        f.write( string.join( text, '\n' ) )
+        f.close()
 
 script()
