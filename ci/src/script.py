@@ -288,7 +288,7 @@ class script:
     def command_travis_script(self):
         os.chdir(os.path.join(self.travis_build_dir, "test"))
         utils.check_call(
-            **self.b2_cmd(self.toolset, "-a", "--verbose-test")
+            *self.b2_cmd(self.toolset, "-a", "--verbose-test")
             )
 
     def command_travis_after_success(self):
@@ -308,17 +308,13 @@ class script:
             if hasattr(self,action_m):
                 getattr(self,action_m)()
 
-    def b2_cmd( self, toolset, args = '', *rest ):
-        cmd = '"%(b2)s"' +\
-            ' --debug-configuration' +\
-            ' %(arg)s'
-        cmd %= {
-            'b2' : self.b2['name'],
-            'arg' : args }
+    def b2_cmd( self, toolset, *args ):
+        cmd = [self.b2['name'],'--debug-configuration']
+        cmd.extend(args)
 
         if toolset:
             import string
-            cmd += ' toolset=' + toolset
+            cmd.append('toolset=' + toolset)
 
         return cmd
     
