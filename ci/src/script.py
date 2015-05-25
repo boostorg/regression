@@ -16,6 +16,7 @@ import platform
 import string
 import sys
 import time
+import subprocess
 
 apt_info = {
     'clang-3.4' : {
@@ -50,6 +51,13 @@ apt_info = {
         },
     }
 
+class SystemCallError(Exception):
+    def __init__(self, command, result):
+        self.command = command
+        self.result = result
+    def __str__(self, *args, **kwargs):
+        return "'%s' ==> %s"%("' '".join(self.command), self.result)
+
 class utils:
     
     @staticmethod
@@ -72,6 +80,20 @@ class utils:
         if rc not in [ 0 ] + valid_return_codes:
             raise Exception( 'Command sequence "%s" failed with return code %d' % ( commands, rc ) )
         return rc
+    
+    @staticmethod
+    def call(*command):
+        utils.log( "Call: '%s'"%("' '".join(command)) )
+        result = subprocess.call(command)
+        if result != 0:
+            print "Failed: '%s' ERROR = %s"%("' '".join(command), result)
+        return result
+    
+    @staticmethod
+    def check_call(*command):
+        result = utils.call(*command)
+        if result != 0:
+            raise(SystemCallError(command, result))
     
     @staticmethod
     def makedirs( path ):
@@ -249,8 +271,8 @@ class script:
             )
         utils.unpack_archive("boost_bb.tar.gz")
         os.chdir(os.path.join(self.root_dir, "build-develop"))
-        utils.checked_system(["./bootstrap.sh"])
-        utils.checked_system(["sudo ./b2 install --prefix=/usr"])
+        utils.check_call("./bootstrap.sh")
+        utils.check_call("sudo","./b2","install","--prefix=/usr")
         #
         os.chdir(self.travis_build_dir)
 
@@ -265,9 +287,9 @@ class script:
 
     def command_travis_script(self):
         os.chdir(os.path.join(self.travis_build_dir, "test"))
-        utils.checked_system([
-            self.b2_cmd(self.toolset, "-a --verbose-test")
-            ])
+        utils.check_call(
+            **self.b2_cmd(self.toolset, "-a", "--verbose-test")
+            )
 
     def command_travis_after_success(self):
         pass
@@ -288,7 +310,7 @@ class script:
 
     def b2_cmd( self, toolset, args = '', *rest ):
         cmd = '"%(b2)s"' +\
-            ' "--debug-configuration"' +\
+            ' --debug-configuration' +\
             ' %(arg)s'
         cmd %= {
             'b2' : self.b2['name'],
@@ -303,12 +325,12 @@ class script:
     def travis_install_toolset(self, toolset):
         info = apt_info[toolset]
         for ppa in info['ppa']:
-            utils.checked_system([
-                'sudo add-apt-repository --yes %s'%(ppa)])
-        utils.checked_system([
-            'sudo apt-get update -qq'])
-        utils.checked_system([
-            'sudo apt-get install -qq %s %s'%(info['package'], info['debugpackage'])])
+            utils.check_call(
+                'sudo','add-apt-repository','--yes',ppa)
+        utils.check_call(
+            'sudo','apt-get','update','-qq')
+        utils.check_call(
+            'sudo','apt-get','install','-qq',info['package'],info['debugpackage'])
     
     def make_file(self, filename, text):
         f = open( filename, 'w' )
