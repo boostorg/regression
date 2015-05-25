@@ -283,7 +283,7 @@ class script:
             ' "--debug-configuration"' +\
             ' %(arg)s'
         cmd %= {
-            'b2' : self.b2,
+            'b2' : self.b2['name'],
             'arg' : args }
 
         if toolset:
