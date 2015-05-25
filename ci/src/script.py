@@ -23,31 +23,45 @@ apt_info = {
         'bin' : 'clang-3.4',
         'ppa' : ["ppa:h-rayflood/llvm"],
         'package' : 'clang-3.4',
-        'debugpackage' : 'libstdc++6-4.6-dbg'
+        'debugpackage' : 'libstdc++6-4.6-dbg',
+        'command' : 'clang++-3.4',
+        'toolset' : 'clang'
         },
     'clang-3.5' : {
         'bin' : 'clang-3.5',
         'ppa' : ["ppa:h-rayflood/llvm-upper", "ppa:h-rayflood/gcc-upper"],
         'package' : 'clang-3.5',
-        'debugpackage' : 'libstdc++6-4.6-dbg'
+        'debugpackage' : 'libstdc++6-4.6-dbg',
+        'command' : 'clang++-3.5',
+        'toolset' : 'clang'
+
         },
     'gcc-4.7' : {
         'bin' : 'gcc-4.7',
         'ppa' : ["ppa:ubuntu-toolchain-r/test"],
         'package' : 'g++-4.7',
-        'debugpackage' : 'libstdc++6-4.8-dbg'
+        'debugpackage' : 'libstdc++6-4.8-dbg',
+        'command' : 'g++-4.7',
+        'toolset' : 'gcc'
+
         },
     'gcc-4.8' : {
         'bin' : 'gcc-4.8',
         'ppa' : ["ppa:ubuntu-toolchain-r/test"],
         'package' : 'g++-4.8',
-        'debugpackage' : 'libstdc++6-4.8-dbg'
+        'debugpackage' : 'libstdc++6-4.8-dbg',
+        'command' : 'g++-4.8',
+        'toolset' : 'gcc'
+
         },
     'gcc-4.9' : {
         'bin' : 'gcc-4.9',
         'ppa' : ["ppa:ubuntu-toolchain-r/test"],
         'package' : 'g++-4.9',
-        'debugpackage' : 'libstdc++6-4.8-dbg'
+        'debugpackage' : 'libstdc++6-4.8-dbg',
+        'command' : 'g++-4.9',
+        'toolset' : 'gcc'
+
         },
     }
 
@@ -280,8 +294,13 @@ class script:
         # Create jamroot project file as it's not present
         # in individual libraries.
         os.chdir(self.root_dir)
-        self.make_file(os.path.join(self.travis_build_dir, 'jamroot.jam'),
+        self.make_file(os.path.join(self.root_dir, 'jamroot.jam'),
             "project ROOT : : : build-dir bin ;")
+        # Create config file for toolset.
+        self.make_file(os.path.join(self.root_dir, 'project-config.jam'),
+            "using %s : : %s ;"%(
+                apt_info[self.toolset]['toolset'],
+                apt_info[self.toolset]['command']))
         #
         os.chdir(self.travis_build_dir)
 
