@@ -219,6 +219,10 @@ class script:
         else:
             self.b2 = { 'name' : 'b2' }
         self.travis_build_dir = os.getenv("TRAVIS_BUILD_DIR")
+        if self.travis_build_dir:
+            self.root_dir = os.path.dirname(self.travis_build_dir)
+        else:
+            self.root_dir = os.getcwd()
 
         self.main()
 
@@ -232,11 +236,11 @@ class script:
 
     def command_travis_install(self):
         # Fetch & install toolset..
-        os.chdir(self.travis_build_dir)
+        os.chdir(self.root_dir)
         if self.toolset:
             self.travis_install_toolset(self.toolset)
         # Fetch & install BBv2..
-        os.chdir(self.travis_build_dir)
+        os.chdir(self.root_dir)
         utils.retry(
             lambda:
                 utils.web_get(
@@ -244,16 +248,19 @@ class script:
                     "boost_bb.tar.gz")
             )
         utils.unpack_archive("boost_bb.tar.gz")
-        os.chdir(os.path.join(self.travis_build_dir, "build-develop"))
+        os.chdir(os.path.join(self.root_dir, "build-develop"))
         utils.checked_system(["./bootstrap.sh"])
         utils.checked_system(["sudo ./b2 install --prefix=/usr"])
         #
         os.chdir(self.travis_build_dir)
 
     def command_travis_before_script(self):
-        os.chdir(self.travis_build_dir)
+        # Create jamroot project file as it's not present
+        # in individual libraries.
+        os.chdir(self.root_dir)
         self.make_file(os.path.join(self.travis_build_dir, 'jamroot.jam'),
             "project ROOT : : : build-dir bin ;")
+        #
         os.chdir(self.travis_build_dir)
 
     def command_travis_script(self):
