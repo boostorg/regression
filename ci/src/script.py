@@ -218,7 +218,7 @@ class utils:
             raise 'Do not know how to unpack archives with extension \"%s\"' % extension
     
     @staticmethod
-    def make_file(filename, text):
+    def make_file(filename, *text):
         f = codecs.open( filename, 'w', 'utf-8' )
         f.write( string.join( text, '\n' ) )
         f.close()
