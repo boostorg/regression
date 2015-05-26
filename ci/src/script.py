@@ -303,13 +303,11 @@ class script:
         os.chdir(self.root_dir)
         utils.make_file(os.path.join(self.root_dir, 'jamroot.jam'),
             "project ROOT : : : build-dir bin ;")
-        utils.call('cat', os.path.join(self.root_dir, 'jamroot.jam'))
         # Create config file for toolset.
         utils.make_file(os.path.join(self.root_dir, 'project-config.jam'),
             "using %s : : %s ;"%(
                 apt_info[self.toolset]['toolset'],
                 apt_info[self.toolset]['command']))
-        utils.call('cat', os.path.join(self.root_dir, 'project-config.jam'))
         #
         os.chdir(self.travis_build_dir)
 
