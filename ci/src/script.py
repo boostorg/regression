@@ -17,6 +17,7 @@ import string
 import sys
 import time
 import subprocess
+import codecs
 
 apt_info = {
     'clang-3.4' : {
@@ -215,6 +216,12 @@ class utils:
             z.close()
         else:
             raise 'Do not know how to unpack archives with extension \"%s\"' % extension
+    
+    @staticmethod
+    def make_file(filename, text):
+        f = codecs.open( filename, 'w', 'utf-8' )
+        f.write( string.join( text, '\n' ) )
+        f.close()
 
 class script:
 
@@ -294,10 +301,10 @@ class script:
         # Create jamroot project file as it's not present
         # in individual libraries.
         os.chdir(self.root_dir)
-        self.make_file(os.path.join(self.root_dir, 'jamroot.jam'),
+        utils.make_file(os.path.join(self.root_dir, 'jamroot.jam'),
             "project ROOT : : : build-dir bin ;")
         # Create config file for toolset.
-        self.make_file(os.path.join(self.root_dir, 'project-config.jam'),
+        utils.make_file(os.path.join(self.root_dir, 'project-config.jam'),
             "using %s : : %s ;"%(
                 apt_info[self.toolset]['toolset'],
                 apt_info[self.toolset]['command']))
@@ -346,10 +353,5 @@ class script:
             'sudo','apt-get','update','-qq')
         utils.check_call(
             'sudo','apt-get','install','-qq',info['package'],info['debugpackage'])
-    
-    def make_file(self, filename, text):
-        f = open( filename, 'w' )
-        f.write( string.join( text, '\n' ) )
-        f.close()
 
 script()
