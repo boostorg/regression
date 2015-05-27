@@ -21,7 +21,6 @@ import codecs
 
 toolset_info = {
     'clang-3.4' : {
-        'bin' : 'clang-3.4',
         'ppa' : ["ppa:h-rayflood/llvm"],
         'package' : 'clang-3.4',
         'debugpackage' : 'libstdc++6-4.6-dbg',
@@ -29,15 +28,20 @@ toolset_info = {
         'toolset' : 'clang'
         },
     'clang-3.5' : {
-        'bin' : 'clang-3.5',
         'ppa' : ["ppa:h-rayflood/llvm-upper", "ppa:h-rayflood/gcc-upper"],
         'package' : 'clang-3.5',
         'debugpackage' : 'libstdc++6-4.6-dbg',
         'command' : 'clang++-3.5',
         'toolset' : 'clang'
         },
+    'clang-3.6' : {
+        'ppa' : ["ppa:h-rayflood/llvm-upper", "ppa:h-rayflood/gcc-upper"],
+        'package' : 'clang-3.6',
+        'debugpackage' : 'libstdc++6-4.6-dbg',
+        'command' : 'clang++-3.6',
+        'toolset' : 'clang'
+        },
     'gcc-4.7' : {
-        'bin' : 'gcc-4.7',
         'ppa' : ["ppa:ubuntu-toolchain-r/test"],
         'package' : 'g++-4.7',
         'debugpackage' : 'libstdc++6-4.8-dbg',
@@ -53,13 +57,18 @@ toolset_info = {
         'toolset' : 'gcc'
         },
     'gcc-4.9' : {
-        'bin' : 'gcc-4.9',
         'ppa' : ["ppa:ubuntu-toolchain-r/test"],
         'package' : 'g++-4.9',
         'debugpackage' : 'libstdc++6-4.8-dbg',
         'command' : 'g++-4.9',
         'toolset' : 'gcc'
-
+        },
+    'gcc-5.1' : {
+        'ppa' : ["ppa:ubuntu-toolchain-r/test"],
+        'package' : 'g++-5',
+        'debugpackage' : 'libstdc++6-4.8-dbg',
+        'command' : 'g++-5',
+        'toolset' : 'gcc'
         },
     }
 
@@ -290,7 +299,9 @@ class script:
     def command_travis_script(self):
         os.chdir(os.path.join(self.travis_build_dir, "test"))
         utils.check_call(
-            *self.b2_cmd(self.toolset, "-a", "--verbose-test",
+            *self.b2_cmd(
+                toolset_info[self.toolset]['toolset'],
+                "-a", "--verbose-test",
                 self.target)
             )
 
