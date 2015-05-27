@@ -19,7 +19,7 @@ import time
 import subprocess
 import codecs
 
-apt_info = {
+toolset_info = {
     'clang-3.4' : {
         'bin' : 'clang-3.4',
         'ppa' : ["ppa:h-rayflood/llvm"],
@@ -35,7 +35,6 @@ apt_info = {
         'debugpackage' : 'libstdc++6-4.6-dbg',
         'command' : 'clang++-3.5',
         'toolset' : 'clang'
-
         },
     'gcc-4.7' : {
         'bin' : 'gcc-4.7',
@@ -44,7 +43,6 @@ apt_info = {
         'debugpackage' : 'libstdc++6-4.8-dbg',
         'command' : 'g++-4.7',
         'toolset' : 'gcc'
-
         },
     'gcc-4.8' : {
         'bin' : 'gcc-4.8',
@@ -53,7 +51,6 @@ apt_info = {
         'debugpackage' : 'libstdc++6-4.8-dbg',
         'command' : 'g++-4.8',
         'toolset' : 'gcc'
-
         },
     'gcc-4.9' : {
         'bin' : 'gcc-4.9',
@@ -74,27 +71,6 @@ class SystemCallError(Exception):
         return "'%s' ==> %s"%("' '".join(self.command), self.result)
 
 class utils:
-    
-    @staticmethod
-    def system( commands ):
-        if sys.platform == 'win32':
-            utils.log('\n'.join(commands))
-            f = open( 'tmp.cmd', 'w' )
-            f.write( string.join( commands, '\n' ) )
-            f.close()
-            rc = os.system( 'tmp.cmd' )
-            return rc
-        else:
-            utils.log(' && '.join(commands))
-            rc = os.system( ' && '.join( commands ) )
-            return rc
-    
-    @staticmethod
-    def checked_system( commands, valid_return_codes = [ 0 ] ):
-        rc = utils.system( commands ) 
-        if rc not in [ 0 ] + valid_return_codes:
-            raise Exception( 'Command sequence "%s" failed with return code %d' % ( commands, rc ) )
-        return rc
     
     @staticmethod
     def call(*command):
@@ -242,6 +218,8 @@ class script:
         #~ Base Options:
         opt.add_option( '--toolset',
             help="single toolset to test with" )
+        opt.add_option( '--target',
+            help="test target to build for testing, defaults to TARGET or 'minimal'")
 
         #~ Debug Options:
         opt.add_option( '--debug-level',
@@ -250,6 +228,7 @@ class script:
 
         #~ Defaults
         self.toolset=os.getenv("TOOLSET")
+        self.target=os.getenv('TARGET', 'minimal')
         self.debug_level=0
         ( _opt_, self.actions ) = opt.parse_args(None,self)
         if not self.actions or self.actions == []:
@@ -272,9 +251,6 @@ class script:
     #~ The various commands that make up the testing sequence...
 
     def command_info(self):
-        pass
-
-    def command_travis_before_install(self):
         pass
 
     def command_travis_install(self):
@@ -306,15 +282,16 @@ class script:
         # Create config file for toolset.
         utils.make_file(os.path.join(self.root_dir, 'project-config.jam'),
             "using %s : : %s ;"%(
-                apt_info[self.toolset]['toolset'],
-                apt_info[self.toolset]['command']))
+                toolset_info[self.toolset]['toolset'],
+                toolset_info[self.toolset]['command']))
         #
         os.chdir(self.travis_build_dir)
 
     def command_travis_script(self):
         os.chdir(os.path.join(self.travis_build_dir, "test"))
         utils.check_call(
-            *self.b2_cmd(self.toolset, "-a", "--verbose-test")
+            *self.b2_cmd(self.toolset, "-a", "--verbose-test",
+                self.target)
             )
 
     def command_travis_after_success(self):
@@ -344,8 +321,9 @@ class script:
 
         return cmd
     
+    # Installs specific toolset on Travis CI systems.
     def travis_install_toolset(self, toolset):
-        info = apt_info[toolset]
+        info = toolset_info[toolset]
         for ppa in info['ppa']:
             utils.check_call(
                 'sudo','add-apt-repository','--yes',ppa)
