@@ -26,28 +26,32 @@ toolset_info = {
         'package' : 'clang-3.4',
         'debugpackage' : 'libstdc++6-4.6-dbg',
         'command' : 'clang++-3.4',
-        'toolset' : 'clang'
+        'toolset' : 'clang',
+        'version' : ''
         },
     'clang-3.5' : {
         'ppa' : ["ppa:h-rayflood/llvm-upper", "ppa:h-rayflood/gcc-upper"],
         'package' : 'clang-3.5',
         'debugpackage' : 'libstdc++6-4.6-dbg',
         'command' : 'clang++-3.5',
-        'toolset' : 'clang'
+        'toolset' : 'clang',
+        'version' : ''
         },
     'clang-3.6' : {
         'ppa' : ["ppa:h-rayflood/llvm-upper", "ppa:h-rayflood/gcc-upper"],
         'package' : 'clang-3.6',
         'debugpackage' : 'libstdc++6-4.6-dbg',
         'command' : 'clang++-3.6',
-        'toolset' : 'clang'
+        'toolset' : 'clang',
+        'version' : ''
         },
     'gcc-4.7' : {
         'ppa' : ["ppa:ubuntu-toolchain-r/test"],
         'package' : 'g++-4.7',
         'debugpackage' : 'libstdc++6-4.8-dbg',
         'command' : 'g++-4.7',
-        'toolset' : 'gcc'
+        'toolset' : 'gcc',
+        'version' : ''
         },
     'gcc-4.8' : {
         'bin' : 'gcc-4.8',
@@ -55,41 +59,49 @@ toolset_info = {
         'package' : 'g++-4.8',
         'debugpackage' : 'libstdc++6-4.8-dbg',
         'command' : 'g++-4.8',
-        'toolset' : 'gcc'
+        'toolset' : 'gcc',
+        'version' : ''
         },
     'gcc-4.9' : {
         'ppa' : ["ppa:ubuntu-toolchain-r/test"],
         'package' : 'g++-4.9',
         'debugpackage' : 'libstdc++6-4.8-dbg',
         'command' : 'g++-4.9',
-        'toolset' : 'gcc'
+        'toolset' : 'gcc',
+        'version' : ''
         },
     'gcc-5.1' : {
         'ppa' : ["ppa:ubuntu-toolchain-r/test"],
         'package' : 'g++-5',
         'debugpackage' : 'libstdc++6-4.8-dbg',
         'command' : 'g++-5',
-        'toolset' : 'gcc'
+        'toolset' : 'gcc',
+        'version' : ''
         },
     'vs-2008' : {
-        'toolset' : 'msvc-8.0',
-        'command' : ''
+        'toolset' : 'msvc',
+        'command' : '',
+        'version' : '8.0'
         },
     'vs-2010' : {
-        'toolset' : 'msvc-10.0',
-        'command' : ''
+        'toolset' : 'msvc',
+        'command' : '',
+        'version' : '10.0'
         },
     'vs-2012' : {
-        'toolset' : 'msvc-12.0',
-        'command' : ''
+        'toolset' : 'msvc',
+        'command' : '',
+        'version' : '12.0'
         },
     'vs-2013' : {
-        'toolset' : 'msvc-13.0',
-        'command' : ''
+        'toolset' : 'msvc',
+        'command' : '',
+        'version' : '13.0'
         },
     'vs-2015' : {
-        'toolset' : 'msvc-15.0',
-        'command' : ''
+        'toolset' : 'msvc-',
+        'command' : '',
+        'version' : '15.0'
         },
     }
 
@@ -310,8 +322,9 @@ class script:
             "project ROOT : : : build-dir bin ;")
         # Create config file for toolset.
         utils.make_file(os.path.join(self.root_dir, 'project-config.jam'),
-            "using %s : : %s ;"%(
+            "using %s : %s : %s ;"%(
                 toolset_info[self.toolset]['toolset'],
+                toolset_info[self.toolset]['version'],
                 toolset_info[self.toolset]['command']))
         #
         os.chdir(self.build_dir)
