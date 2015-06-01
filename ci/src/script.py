@@ -18,6 +18,7 @@ import sys
 import time
 import subprocess
 import codecs
+import inspect
 
 toolset_info = {
     'clang-3.4' : {
@@ -69,6 +70,26 @@ toolset_info = {
         'debugpackage' : 'libstdc++6-4.8-dbg',
         'command' : 'g++-5',
         'toolset' : 'gcc'
+        },
+    'vs-2008' : {
+        'toolset' : 'msvc-8.0',
+        'command' : ''
+        },
+    'vs-2010' : {
+        'toolset' : 'msvc-10.0',
+        'command' : ''
+        },
+    'vs-2012' : {
+        'toolset' : 'msvc-12.0',
+        'command' : ''
+        },
+    'vs-2013' : {
+        'toolset' : 'msvc-13.0',
+        'command' : ''
+        },
+    'vs-2015' : {
+        'toolset' : 'msvc-15.0',
+        'command' : ''
         },
     }
 
@@ -210,14 +231,11 @@ class utils:
 
 class script:
 
-    def __init__(self):
-        commands = map(
-            lambda m: m[8:].replace('_','-'),
-            filter(
-                lambda m: m.startswith('command_'),
-                script.__dict__.keys())
-            )
-        commands.sort()
+    def __init__(self, build_dir = None):
+        commands = [];
+        for method in inspect.getmembers(self, predicate=inspect.ismethod):
+            if method[0].startswith('command_'):
+                commands.append(method[0][8:].replace('_','-'))
         commands = "commands: %s" % ', '.join(commands)
 
         opt = optparse.OptionParser(
@@ -249,24 +267,21 @@ class script:
             self.b2 = { 'name' : 'b2.exe' }
         else:
             self.b2 = { 'name' : 'b2' }
-        self.travis_build_dir = os.getenv("TRAVIS_BUILD_DIR")
-        if self.travis_build_dir:
-            self.root_dir = os.path.dirname(self.travis_build_dir)
+        self.build_dir = build_dir
+        if self.build_dir:
+            self.root_dir = os.path.dirname(self.build_dir)
         else:
+            self.build_dir = os.getcwd()
             self.root_dir = os.getcwd()
 
         self.main()
 
-    #~ The various commands that make up the testing sequence...
-
-    def command_info(self):
+    # Common test commands in the order they should be executed..
+    
+    def command_base_info(self):
         pass
-
-    def command_travis_install(self):
-        # Fetch & install toolset..
-        os.chdir(self.root_dir)
-        if self.toolset:
-            self.travis_install_toolset(self.toolset)
+    
+    def command_base_install(self):
         # Fetch & install BBv2..
         os.chdir(self.root_dir)
         utils.retry(
@@ -277,12 +292,12 @@ class script:
             )
         utils.unpack_archive("boost_bb.tar.gz")
         os.chdir(os.path.join(self.root_dir, "build-develop"))
-        utils.check_call("./bootstrap.sh")
-        utils.check_call("sudo","./b2","install","--prefix=/usr")
+        utils.check_call("./bootstrap.bat")
+        utils.check_call("sudo","./b2","install")
         #
-        os.chdir(self.travis_build_dir)
+        os.chdir(self.build_dir)
 
-    def command_travis_before_script(self):
+    def command_base_before_test(self):
         # Create jamroot project file as it's not present
         # in individual libraries.
         os.chdir(self.root_dir)
@@ -294,25 +309,16 @@ class script:
                 toolset_info[self.toolset]['toolset'],
                 toolset_info[self.toolset]['command']))
         #
-        os.chdir(self.travis_build_dir)
+        os.chdir(self.build_dir)
 
-    def command_travis_script(self):
-        os.chdir(os.path.join(self.travis_build_dir, "test"))
+    def command_base_test(self):
+        os.chdir(os.path.join(self.build_dir, "test"))
         utils.check_call(
             *self.b2_cmd(
                 toolset_info[self.toolset]['toolset'],
                 "-a", "--verbose-test",
                 self.target)
             )
-
-    def command_travis_after_success(self):
-        pass
-
-    def command_travis_after_failure(self):
-        pass
-
-    def command_travis_after_script(self):
-        pass
 
     #~ Utilities...
 
@@ -331,6 +337,37 @@ class script:
             cmd.append('toolset=' + toolset)
 
         return cmd
+
+class script_travis(script):
+
+    def __init__(self):
+        travis_build_dir = os.getenv("TRAVIS_BUILD_DIR")
+        script.__init__(self, build_dir=travis_build_dir)
+
+    # Travis-CI commands in the order they are executed..
+    
+    def command_install(self):
+        # Fetch & install toolset..
+        os.chdir(self.root_dir)
+        if self.toolset:
+            self.travis_install_toolset(self.toolset)
+        #
+        self.command_base_install()
+
+    def command_before_script(self):
+        self.command_base_before_test()
+
+    def command_script(self):
+        self.command_base_test()
+
+    def command_after_success(self):
+        pass
+
+    def command_after_failure(self):
+        pass
+
+    def command_after_script(self):
+        pass
     
     # Installs specific toolset on Travis CI systems.
     def travis_install_toolset(self, toolset):
@@ -343,4 +380,48 @@ class script:
         utils.check_call(
             'sudo','apt-get','install','-qq',info['package'],info['debugpackage'])
 
-script()
+class script_appveyor(script):
+    
+    def __init__(self):
+        appveyor_build_dir = os.getenv("APPVEYOR_BUILD_FOLDER")
+        script.__init__(self, build_dir=appveyor_build_dir)
+    
+    # Appveyor commands in the order they are executed..
+    
+    def command_install(self):
+        self.command_base_install()
+    
+    def command_before_build(self):
+        pass
+    
+    def command_build_script(self):
+        pass
+    
+    def command_after_build(self):
+        pass
+    
+    def command_before_test(self):
+        self.command_base_before_test()
+    
+    def command_test_script(self):
+        self.command_base_test()
+    
+    def command_after_test(self):
+        pass
+    
+    def command_on_success(self):
+        pass
+    
+    def command_on_failure(self):
+        pass
+    
+    def command_on_finish(self):
+        pass
+
+if os.getenv('APPVEYOR', False):
+    script_appveyor()
+elif os.getenv('TRAVIS', False):
+    script_travis()
+else:
+    script()
+
