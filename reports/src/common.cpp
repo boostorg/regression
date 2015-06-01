@@ -287,6 +287,17 @@ std::string boost::regression::log_file_path(
     }
 }
 
+std::string boost::regression::warnings_file_path(
+    const std::string& runner,
+    const std::string& toolset,
+    const std::string& library,
+    const std::string& test_name,
+    const std::string& release_postfix)
+{
+    return output_file_path(runner + "-" + library + "-" + toolset + "-warnings" + release_postfix)
+            + (test_name.empty() ? std::string("") : std::string("#") + test_name);
+}
+
 bool boost::regression::show_library(const failures_markup_t& explicit_markup, const std::string& library, bool release) {
     return !release || !is_library_beta(explicit_markup, library);
 }

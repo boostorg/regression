@@ -12,12 +12,12 @@
 #include <string>
 #include <vector>
 #include <iosfwd>
+#include <boost/date_time/posix_time/ptime.hpp>
+#include <boost/property_tree/detail/rapidxml.hpp>
+#include <boost/shared_ptr.hpp>
 #include <boost/unordered_map.hpp>
 #include <boost/unordered_set.hpp>
-#include <boost/property_tree/detail/rapidxml.hpp>
-#include <boost/date_time/posix_time/ptime.hpp>
 #include <boost/variant.hpp>
-#include <boost/shared_ptr.hpp>
 
 #include "html_writer.hpp"
 
@@ -80,6 +80,7 @@ struct test_structure_t {
         bool result;
         bool expected_result;
         fail_info_t fail_info;
+        bool pass_warning;
         std::string expected_reason;
         bool status;
         bool is_new;
@@ -126,6 +127,8 @@ bool check_attr(node_ptr element, const std::string& element1, const std::string
 node_ptr lookup_element(node_ptr element, const std::string& name);
 int count_element(node_ptr element, const std::string& name);
 std::string value_of(node_ptr element);
+
+void write_characters(html_writer& document, const std::string& s);
 
 std::string escape_xml(const std::string& s);
 void write_to_stream(html_writer& os, node_ptr node, bool trim=false);

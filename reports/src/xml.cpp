@@ -291,6 +291,12 @@ std::string escape_characters(const char* input, std::size_t size) {
 }
 }
 
+void boost::regression::write_characters(html_writer& document, const std::string& s)
+{
+    if(!s.empty())
+        ::write_characters(document, s.c_str(), s.size());
+}
+
 std::string boost::regression::escape_xml(const std::string& s) {
     return escape_characters(s.data(), s.size());
 }

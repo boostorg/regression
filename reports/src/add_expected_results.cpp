@@ -215,6 +215,7 @@ void process_test_log(test_structure_t::test_log_t& test_log,
     test_log.is_new = is_new;
     test_log.category = category;
     test_log.fail_info = test_structure_t::fail_none;
+    test_log.pass_warning = false;
 
     // if it is an unexpected failure, either regression or new
     if (!actual_result && expected_result) {
@@ -241,6 +242,16 @@ void process_test_log(test_structure_t::test_log_t& test_log,
             test_log.fail_info = test_structure_t::fail_link;
         } else if ( ( it = test_log.targets.find("run") ) != end && !it->second.result ) {
             test_log.fail_info = test_structure_t::fail_run;
+        }
+    } else if (actual_result) {
+        typedef boost::unordered_map<std::string, test_structure_t::target_t>::const_iterator iterator;
+        iterator it, end = test_log.targets.end();
+        if ( ( it = test_log.targets.find("compile") ) != end ) {
+            BOOST_ASSERT(it->second.contents);
+            boost::string_ref val(it->second.contents->value(), it->second.contents->value_size());
+            if ( find_regex(val, "warning") ) {
+                test_log.pass_warning = true;
+            }
         }
     }
 }

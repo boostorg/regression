@@ -331,6 +331,132 @@ void write_test_results_reference_file(const std::string& path,
                 "</html>\n";
 }
 
+void write_library_warnings_file(const std::string& path,
+                                 const std::string& runner_id,
+                                 const std::string& revision,
+                                 const boost::posix_time::ptime& timestamp,
+                                 const std::string& library_name,
+                                 const std::string& toolset_name,
+                                 const test_structure_t::library_t& library)
+{
+    html_writer document(path);
+
+    std::string component = runner_id + " - " + library_name + " / " + toolset_name;
+    int age = 0; // timestamp_difference(timestamp, run_date);
+
+    document << "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n"
+                "<html>\n";
+
+    document << "    <head>\n"
+                "        <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/>\n"
+                "        <link rel=\"stylesheet\" type=\"text/css\" href=\"../master.css\" title=\"master\" />\n"
+                "        <title>Warnings: " << escape_xml(component) << "</title>\n"
+                "    </head>\n";
+
+    document << "    <body>\n"
+                "        <div class=\"log-test-header\">\n"
+                "            <div class=\"log-test-title\">\n"
+                "                Warnings: " << escape_xml(component) << "\n"
+                "            </div>\n"
+                "            <div><span class=\"timestamp-" << age << "\">\n"
+                "                Rev " << revision << " /\n"
+                "                " << format_timestamp(timestamp) << "\n"
+                "            </span></div>\n"
+                "        </div>\n";
+
+    document << "        <div>\n";
+
+    boost::unordered_set<std::string> warning_lines;
+
+    BOOST_FOREACH(const test_structure_t::library_t::const_reference test_case, library) {
+        BOOST_FOREACH(const test_structure_t::test_log_t& test_log, test_case.second) {
+
+            if(test_log.pass_warning) {
+                if(const test_structure_t::target_t* compile = lookup_target(test_log, "compile")) {
+                    document << "            <div>\n";
+                    document << "                <a name=\"" << test_log.test_name << "\"></a>\n";
+                    document << "                <div class=\"log-compiler-output-title\">" << test_log.test_name << "</div>\n";
+                    document << "                <pre>\n";
+
+                    {
+                        std::string val(compile->contents->value(), compile->contents->value_size());
+                        std::istringstream iss(val);
+                        int already_reported_count = 0;
+                        do {
+                            std::string line;
+                            std::getline(iss, line);
+                            if(line.find("warning") != std::string::npos) {
+                                if(warning_lines.insert(line).second) {
+                                    write_characters(document, line);
+                                    document << "\n";
+                                } else {
+                                    already_reported_count++;
+                                }
+                            }
+                        } while ( iss.good() );
+
+                        if ( already_reported_count > 0 ) {
+                            document << "(" << already_reported_count << " warnings already reported)\n";
+                        }
+                    }
+                    document << "                </pre>\n";
+                    document << "            </div>\n";
+                }
+            }
+        }
+    }
+
+    document << "        </div>\n";
+    document << "    </body>\n";
+    document << "</html>\n";
+}
+
+
+void write_library_warnings_reference_file(const std::string& path,
+                                           const std::string& log_file_path,
+                                           const std::string& library_name,
+                                           const std::string& toolset_name,
+                                           const std::string& runner_id)
+{
+    std::string component = runner_id + " - " + library_name + " / " + toolset_name;
+
+    html_writer document(path);
+
+    document << "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Frameset//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd\">\n"
+                "<html>\n"
+                "    <head>\n"
+                "        <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/>\n"
+                "        <link rel=\"stylesheet\" type=\"text/css\" href=\"../master.css\" title=\"master\" />\n"
+                "        <title>Warnings: " << escape_xml(component) << "</title>\n"
+                "    </head>\n"
+                "    <frameset cols=\"190px,*\" frameborder=\"0\" framespacing=\"0\" border=\"0\">\n"
+                "        <frame name=\"tocframe\" src=\"../toc.html\" scrolling=\"auto\"/>\n"
+                "        <frame name=\"docframe\" src=\"../../" << escape_uri(log_file_path) << "\" scrolling=\"auto\"/>\n"
+                "    </frameset>\n"
+                "</html>\n";
+}
+
+void warnings_page(const std::string& runner_id,
+                   const std::string& revision,
+                   const boost::posix_time::ptime& timestamp,
+                   const std::string& library_name,
+                   const std::string& toolset_name,
+                   const test_structure_t::library_t& library)
+{
+    const char* postfixes[] = {"", "_release"};
+    const char* dirs[] = { "developer", "user" };
+
+    std::string log_path = warnings_file_path(runner_id, toolset_name, library_name);
+    write_library_warnings_file(log_path, runner_id, revision, timestamp, library_name, toolset_name, library);
+
+    BOOST_FOREACH(const std::string& release_postfix, postfixes) {
+        BOOST_FOREACH(const std::string& directory, dirs) {
+            std::string reference_file_path = directory + "/" + warnings_file_path(runner_id, toolset_name, library_name, "", release_postfix);
+            write_library_warnings_reference_file(reference_file_path, log_path, library_name, toolset_name, runner_id);
+        }
+    }
+}
+
 }
 
 // okay
@@ -340,6 +466,7 @@ void boost::regression::links_page(
 {
     BOOST_FOREACH(const test_structure_t::toolset_group_t::const_reference toolset, test_run.toolsets) {
         BOOST_FOREACH(const test_structure_t::toolset_t::const_reference library, toolset.second) {
+            bool is_pass_warning_found = false;
             BOOST_FOREACH(const test_structure_t::library_t::const_reference test_case, library.second) {
                 ::links_page(explicit_markup,
                              test_run.runner,
@@ -349,6 +476,23 @@ void boost::regression::links_page(
                              toolset.first,
                              test_case.first,
                              test_case.second);
+
+                if (!is_pass_warning_found) {
+                    BOOST_FOREACH(const test_structure_t::test_log_t& test_log, test_case.second) {
+                        if (test_log.pass_warning) {
+                            is_pass_warning_found = true;
+                        }
+                    }
+                }
+            }
+
+            if (is_pass_warning_found) {
+                ::warnings_page(test_run.runner,
+                                test_run.revision,
+                                test_run.timestamp,
+                                library.first,
+                                toolset.first,
+                                library.second);
             }
         }
     }
