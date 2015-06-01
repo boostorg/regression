@@ -263,6 +263,7 @@ class script:
         
         if sys.platform == 'win32':
             self.b2 = { 'name' : 'C:\\boost-build-engine\\bin\\b2.exe' }
+            os.putenv('BOOST_BUILD_PATH', 'C:\\boost-build\\share\\boost-build')
         elif sys.platform == 'cygwin':
             self.b2 = { 'name' : 'b2.exe' }
         else:
