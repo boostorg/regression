@@ -262,7 +262,7 @@ class script:
             self.actions = [ 'info' ]
         
         if sys.platform == 'win32':
-            self.b2 = { 'name' : 'C:\boost-build-engine\bin\b2.exe' }
+            self.b2 = { 'name' : 'C:\\boost-build-engine\\bin\\b2.exe' }
         elif sys.platform == 'cygwin':
             self.b2 = { 'name' : 'b2.exe' }
         else:
