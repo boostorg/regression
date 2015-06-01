@@ -389,6 +389,7 @@ class script_appveyor(script):
     def __init__(self):
         appveyor_build_dir = os.getenv("APPVEYOR_BUILD_FOLDER")
         script.__init__(self, build_dir=appveyor_build_dir)
+        self.b2['name'] = 'C:\boost-build-engine\bin\bjam.exe'
     
     # Appveyor commands in the order they are executed..
     
