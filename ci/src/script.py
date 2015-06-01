@@ -294,6 +294,7 @@ class script:
         os.chdir(os.path.join(self.root_dir, "build-develop"))
         if sys.platform == 'win32':
             utils.check_call('cmd.exe', '/C', os.path.join(self.root_dir, "build-develop", "bootstrap.bat"))
+            utils.check_call("b2","install")
         else:
             utils.check_call("./bootstrap.sh")
             utils.check_call("sudo","./b2","install")
