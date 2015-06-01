@@ -262,7 +262,7 @@ class script:
             self.actions = [ 'info' ]
         
         if sys.platform == 'win32':
-            self.b2 = { 'name' : 'b2.exe' }
+            self.b2 = { 'name' : 'C:\boost-build-engine\bin\b2.exe' }
         elif sys.platform == 'cygwin':
             self.b2 = { 'name' : 'b2.exe' }
         else:
@@ -389,7 +389,6 @@ class script_appveyor(script):
     def __init__(self):
         appveyor_build_dir = os.getenv("APPVEYOR_BUILD_FOLDER")
         script.__init__(self, build_dir=appveyor_build_dir)
-        self.b2['name'] = 'C:\boost-build-engine\bin\bjam.exe'
     
     # Appveyor commands in the order they are executed..
     
