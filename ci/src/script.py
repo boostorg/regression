@@ -104,7 +104,7 @@ class utils:
     
     @staticmethod
     def call(*command):
-        utils.log( "Call: '%s'"%("' '".join(command)) )
+        utils.log( "%s> '%s'"%(os.getcwd(), "' '".join(command)) )
         result = subprocess.call(command)
         if result != 0:
             print "Failed: '%s' ERROR = %s"%("' '".join(command), result)
@@ -292,7 +292,10 @@ class script:
             )
         utils.unpack_archive("boost_bb.tar.gz")
         os.chdir(os.path.join(self.root_dir, "build-develop"))
-        utils.check_call("./bootstrap.bat")
+        if sys.platform == 'win32':
+            utils.check_call("./bootstrap.bat")
+        else:
+            utils.check_call("./bootstrap.sh")
         utils.check_call("sudo","./b2","install")
         #
         os.chdir(self.build_dir)
