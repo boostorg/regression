@@ -293,10 +293,10 @@ class script:
         utils.unpack_archive("boost_bb.tar.gz")
         os.chdir(os.path.join(self.root_dir, "build-develop"))
         if sys.platform == 'win32':
-            utils.check_call("./bootstrap.bat")
+            utils.check_call('cmd.exe', '/C', "./bootstrap.bat")
         else:
             utils.check_call("./bootstrap.sh")
-        utils.check_call("sudo","./b2","install")
+            utils.check_call("sudo","./b2","install")
         #
         os.chdir(self.build_dir)
 
