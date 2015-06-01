@@ -114,6 +114,19 @@ void insert_cell_developer(html_writer& document,
                 goto done;
             }
         }
+
+        bool is_pass_warning_found = false;
+        BOOST_FOREACH(test_log_group_t::value_type log, test_logs) {
+            if ( log->pass_warning ){
+                is_pass_warning_found = true;
+                break;
+            }
+        }
+        if ( is_pass_warning_found ) {
+            // anchor doesn't work for iframes
+            cell_link = warnings_file_path(runner, toolset, library, ""/*test_logs.front()->test_name*/, release_postfix(release));
+        }
+
         insert_cell_link(document, "pass", cell_link);
     }
 done:

@@ -48,6 +48,13 @@ std::string log_file_path(
     const std::string& runner,
     const std::string& release_postfix = "");
 
+std::string warnings_file_path(
+    const std::string& runner,
+    const std::string& toolset,
+    const std::string& library,
+    const std::string& test_name = "",
+    const std::string& release_postfix = "");
+
 bool show_library(const failures_markup_t& explicit_markup, const std::string& library, bool release);
 bool show_output(const failures_markup_t& markup, const test_structure_t::test_log_t& test_log);
 bool show_toolset(const failures_markup_t& explicit_markup, const std::string& toolset, bool release);
