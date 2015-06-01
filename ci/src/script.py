@@ -81,7 +81,7 @@ toolset_info = {
     'vs-2008' : {
         'toolset' : 'msvc',
         'command' : '',
-        'version' : '8.0'
+        'version' : '9.0'
         },
     'vs-2010' : {
         'toolset' : 'msvc',
@@ -91,15 +91,15 @@ toolset_info = {
     'vs-2012' : {
         'toolset' : 'msvc',
         'command' : '',
-        'version' : '12.0'
+        'version' : '11.0'
         },
     'vs-2013' : {
         'toolset' : 'msvc',
         'command' : '',
-        'version' : '13.0'
+        'version' : '12.0'
         },
     'vs-2015' : {
-        'toolset' : 'msvc-',
+        'toolset' : 'msvc',
         'command' : '',
         'version' : '15.0'
         },
