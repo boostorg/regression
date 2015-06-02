@@ -66,10 +66,10 @@ typedef std::map<test_case_id_t, test_logs_by_run_t> test_logs_t;
 
 // requires: result contains no HTML special characters
 // requires: log_link must not contain a '/' derived from the input (This won't actually break anything, though)
-void insert_cell_link(html_writer& document, const std::string& result, const std::string& log_link) {
+void insert_cell_link(html_writer& document, const std::string& result, const std::string& log_link, const std::string& target = "_top") {
     if(log_link != "") {
         document << "&#160;&#160;"
-                    "<a href=\"" << escape_uri(log_link) << "\" class=\"log-link\" target=\"_top\">"
+                    "<a " << "href=\"" << escape_uri(log_link) << "\" class=\"log-link\" target=\"" << target << "\">"
                  << result <<
                     "</a>"
                     "&#160;&#160;";
@@ -102,12 +102,14 @@ void insert_cell_developer(html_writer& document,
     } else if(test_logs.empty()) {
         document << "&#160;&#160;&#160;&#160;\n";
     } else {
+        // known failure
         BOOST_FOREACH(test_log_group_t::value_type log, test_logs) {
             if(!log->result && log->status) {
                 insert_cell_link(document, (log->expected_reason != "")? "fail?" : "fail*", cell_link);
                 goto done;
             }
         }
+        // new failure
         BOOST_FOREACH(test_log_group_t::value_type log, test_logs) {
             if(!log->result && !log->status) {
                 insert_cell_link(document, result_cell_name_new(test_logs), cell_link);
@@ -115,19 +117,30 @@ void insert_cell_developer(html_writer& document,
             }
         }
 
+        // check if there are warnings
+        // or some failures (just in case)
         bool is_pass_warning_found = false;
+        bool is_not_pass = false;
         BOOST_FOREACH(test_log_group_t::value_type log, test_logs) {
-            if ( log->pass_warning ){
+            if ( !log->result || !log->status ) {
+                is_not_pass = true;
+            } else if ( log->pass_warning ) {
                 is_pass_warning_found = true;
                 break;
             }
         }
+
+        std::string target = "_top";
+        // if there are warnings generate the warnings link
         if ( is_pass_warning_found ) {
-            // anchor doesn't work for iframes
-            cell_link = warnings_file_path(runner, toolset, library, ""/*test_logs.front()->test_name*/, release_postfix(release));
+            cell_link = std::string("../")+warnings_file_path(runner, toolset, library, test_logs.front()->test_name, release_postfix(release));
+            target = "docframe";
+        // if there are no failures do not generate the link
+        } else if ( !is_not_pass ) {
+            cell_link = "";
         }
 
-        insert_cell_link(document, "pass", cell_link);
+        insert_cell_link(document, "pass", cell_link, target);
     }
 done:
     document << "</td>\n";

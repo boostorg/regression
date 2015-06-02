@@ -69,15 +69,28 @@ void links_page(const failures_markup_t& explicit_markup,
     if(test_logs.size() > 1) {
         // utils::log("  Processing variants");
 
-        std::string variants_file_path = output_file_path(runner_id + "-" + library_name + "-" + toolset_name + "-" + test_name + "-variants");
-
-        write_variants_file(explicit_markup, variants_file_path, test_logs, runner_id, revision, timestamp);
-
-        BOOST_FOREACH(const std::string& release_postfix, postfixes) {
-            BOOST_FOREACH(const std::string& directory, dirs) {
-                std::string variants__file_path = directory + "/" + (encode_path(runner_id + "-" + library_name + "-" + toolset_name + "-" + test_name + "-variants_" + release_postfix) + ".html");
-                write_variants_reference_file(variants__file_path, "../" + variants_file_path, release_postfix, test_logs, runner_id);
+        // check if there are some failures or warnings
+        bool should_generate_variants = false;
+        BOOST_FOREACH(test_structure_t::test_log_t const& log, test_logs) {
+            if ( !log.result || !log.status || log.pass_warning ) {
+                should_generate_variants = true;
             }
+        }
+
+        // generate variants page only if there are some failures or warnings
+        if ( should_generate_variants ) {
+
+            std::string variants_file_path = output_file_path(runner_id + "-" + library_name + "-" + toolset_name + "-" + test_name + "-variants");
+
+            write_variants_file(explicit_markup, variants_file_path, test_logs, runner_id, revision, timestamp);
+
+            BOOST_FOREACH(const std::string& release_postfix, postfixes) {
+                BOOST_FOREACH(const std::string& directory, dirs) {
+                    std::string variants__file_path = directory + "/" + (encode_path(runner_id + "-" + library_name + "-" + toolset_name + "-" + test_name + "-variants_" + release_postfix) + ".html");
+                    write_variants_reference_file(variants__file_path, "../" + variants_file_path, release_postfix, test_logs, runner_id);
+                }
+            }
+
         }
     }
 
@@ -366,41 +379,45 @@ void write_library_warnings_file(const std::string& path,
 
     document << "        <div>\n";
 
-    boost::unordered_set<std::string> warning_lines;
-
     BOOST_FOREACH(const test_structure_t::library_t::const_reference test_case, library) {
+
+        bool is_first = true;
         BOOST_FOREACH(const test_structure_t::test_log_t& test_log, test_case.second) {
 
             if(test_log.pass_warning) {
                 if(const test_structure_t::target_t* compile = lookup_target(test_log, "compile")) {
-                    document << "            <div>\n";
-                    document << "                <a name=\"" << test_log.test_name << "\"></a>\n";
-                    document << "                <div class=\"log-compiler-output-title\">" << test_log.test_name << "</div>\n";
-                    document << "                <pre>\n";
+                    if (is_first) {
+                        document << "            <div>\n";
+                        document << "                <a name=\"" << test_log.test_name << "\"></a>\n";
+                        document << "                <div class=\"log-compiler-output-title\">" << test_log.test_name << "</div>\n";
+                        is_first = false;
+                    }
+                    if ( test_case.second.size() > 1 ) {
+                        document << "                <p>\n";
+                        document << "                    <div>" << test_log.target_directory << "</div>\n";
+                    }
+                    document << "                    <pre>\n";
 
                     {
                         std::string val(compile->contents->value(), compile->contents->value_size());
                         std::istringstream iss(val);
-                        int already_reported_count = 0;
                         do {
                             std::string line;
                             std::getline(iss, line);
                             if(line.find("warning") != std::string::npos) {
-                                if(warning_lines.insert(line).second) {
-                                    write_characters(document, line);
-                                    document << "\n";
-                                } else {
-                                    already_reported_count++;
-                                }
+                                write_characters(document, line);
+                                document << "\n";
                             }
                         } while ( iss.good() );
-
-                        if ( already_reported_count > 0 ) {
-                            document << "(" << already_reported_count << " warnings already reported)\n";
-                        }
                     }
                     document << "                </pre>\n";
-                    document << "            </div>\n";
+
+                    if ( test_case.second.size() > 1 ) {
+                        document << "                </p>\n";
+                    }
+                    if (!is_first) {
+                        document << "            </div>\n";
+                    }
                 }
             }
         }

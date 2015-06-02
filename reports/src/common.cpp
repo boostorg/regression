@@ -232,6 +232,8 @@ std::string boost::regression::escape_uri(const std::string& path) {
             // We're intentionally allowing '/' to go through.
             // to escape it as well, use escape_literal_uri
             ch == '/' ||
+            // The same for '#' (anchor)
+            ch == '#' ||
             // FIXME: reserved characters
             ch == '+')
             result += ch;
