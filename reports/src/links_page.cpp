@@ -379,41 +379,45 @@ void write_library_warnings_file(const std::string& path,
 
     document << "        <div>\n";
 
-    boost::unordered_set<std::string> warning_lines;
-
     BOOST_FOREACH(const test_structure_t::library_t::const_reference test_case, library) {
+
+        bool is_first = true;
         BOOST_FOREACH(const test_structure_t::test_log_t& test_log, test_case.second) {
 
             if(test_log.pass_warning) {
                 if(const test_structure_t::target_t* compile = lookup_target(test_log, "compile")) {
-                    document << "            <div>\n";
-                    document << "                <a name=\"" << test_log.test_name << "\"></a>\n";
-                    document << "                <div class=\"log-compiler-output-title\">" << test_log.test_name << "</div>\n";
-                    document << "                <pre>\n";
+                    if (is_first) {
+                        document << "            <div>\n";
+                        document << "                <a name=\"" << test_log.test_name << "\"></a>\n";
+                        document << "                <div class=\"log-compiler-output-title\">" << test_log.test_name << "</div>\n";
+                        is_first = false;
+                    }
+                    if ( test_case.second.size() > 1 ) {
+                        document << "                <p>\n";
+                        document << "                    <div>" << test_log.target_directory << "</div>\n";
+                    }
+                    document << "                    <pre>\n";
 
                     {
                         std::string val(compile->contents->value(), compile->contents->value_size());
                         std::istringstream iss(val);
-                        int already_reported_count = 0;
                         do {
                             std::string line;
                             std::getline(iss, line);
                             if(line.find("warning") != std::string::npos) {
-                                if(warning_lines.insert(line).second) {
-                                    write_characters(document, line);
-                                    document << "\n";
-                                } else {
-                                    already_reported_count++;
-                                }
+                                write_characters(document, line);
+                                document << "\n";
                             }
                         } while ( iss.good() );
-
-                        if ( already_reported_count > 0 ) {
-                            document << "(" << already_reported_count << " warnings already reported)\n";
-                        }
                     }
                     document << "                </pre>\n";
-                    document << "            </div>\n";
+
+                    if ( test_case.second.size() > 1 ) {
+                        document << "                </p>\n";
+                    }
+                    if (!is_first) {
+                        document << "            </div>\n";
+                    }
                 }
             }
         }
