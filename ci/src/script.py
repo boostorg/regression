@@ -101,7 +101,7 @@ toolset_info = {
     'vs-2015' : {
         'toolset' : 'msvc',
         'command' : '',
-        'version' : '15.0'
+        'version' : '14.0'
         },
     }
 
