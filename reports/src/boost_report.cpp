@@ -97,6 +97,9 @@ int main(int argc, char* argv[]) {
                     add_expected_results(*test_run, markup, expected, tag);
                     std::cout << "Generating links pages" << std::endl;
                     // must be run before test_results is discarded
+                    // NOTE: it generates the test results for all of the combinations
+                    // of release/not-release and developer/user
+                    // TODO: one could generate only the links that are really needed
                     if(reports.count("l"))
                         links_page(markup, *test_run);
                 } catch(std::ios_base::failure& e) {

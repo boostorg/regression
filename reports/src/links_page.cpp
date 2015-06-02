@@ -69,15 +69,28 @@ void links_page(const failures_markup_t& explicit_markup,
     if(test_logs.size() > 1) {
         // utils::log("  Processing variants");
 
-        std::string variants_file_path = output_file_path(runner_id + "-" + library_name + "-" + toolset_name + "-" + test_name + "-variants");
-
-        write_variants_file(explicit_markup, variants_file_path, test_logs, runner_id, revision, timestamp);
-
-        BOOST_FOREACH(const std::string& release_postfix, postfixes) {
-            BOOST_FOREACH(const std::string& directory, dirs) {
-                std::string variants__file_path = directory + "/" + (encode_path(runner_id + "-" + library_name + "-" + toolset_name + "-" + test_name + "-variants_" + release_postfix) + ".html");
-                write_variants_reference_file(variants__file_path, "../" + variants_file_path, release_postfix, test_logs, runner_id);
+        // check if there are some failures or warnings
+        bool should_generate_variants = false;
+        BOOST_FOREACH(test_structure_t::test_log_t const& log, test_logs) {
+            if ( !log.result || !log.status || log.pass_warning ) {
+                should_generate_variants = true;
             }
+        }
+
+        // generate variants page only if there are some failures or warnings
+        if ( should_generate_variants ) {
+
+            std::string variants_file_path = output_file_path(runner_id + "-" + library_name + "-" + toolset_name + "-" + test_name + "-variants");
+
+            write_variants_file(explicit_markup, variants_file_path, test_logs, runner_id, revision, timestamp);
+
+            BOOST_FOREACH(const std::string& release_postfix, postfixes) {
+                BOOST_FOREACH(const std::string& directory, dirs) {
+                    std::string variants__file_path = directory + "/" + (encode_path(runner_id + "-" + library_name + "-" + toolset_name + "-" + test_name + "-variants_" + release_postfix) + ".html");
+                    write_variants_reference_file(variants__file_path, "../" + variants_file_path, release_postfix, test_logs, runner_id);
+                }
+            }
+
         }
     }
 

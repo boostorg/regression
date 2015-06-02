@@ -102,12 +102,14 @@ void insert_cell_developer(html_writer& document,
     } else if(test_logs.empty()) {
         document << "&#160;&#160;&#160;&#160;\n";
     } else {
+        // known failure
         BOOST_FOREACH(test_log_group_t::value_type log, test_logs) {
             if(!log->result && log->status) {
                 insert_cell_link(document, (log->expected_reason != "")? "fail?" : "fail*", cell_link);
                 goto done;
             }
         }
+        // new failure
         BOOST_FOREACH(test_log_group_t::value_type log, test_logs) {
             if(!log->result && !log->status) {
                 insert_cell_link(document, result_cell_name_new(test_logs), cell_link);
@@ -115,16 +117,26 @@ void insert_cell_developer(html_writer& document,
             }
         }
 
+        // check if there are warnings
+        // or some failures (just in case)
         bool is_pass_warning_found = false;
+        bool is_not_pass = false;
         BOOST_FOREACH(test_log_group_t::value_type log, test_logs) {
-            if ( log->pass_warning ){
+            if ( !log->result || !log->status ) {
+                is_not_pass = true;
+            } else if ( log->pass_warning ) {
                 is_pass_warning_found = true;
                 break;
             }
         }
+
+        // if there are warnings generate the warnings link
         if ( is_pass_warning_found ) {
             // anchor doesn't work for iframes
             cell_link = warnings_file_path(runner, toolset, library, ""/*test_logs.front()->test_name*/, release_postfix(release));
+        // if there are no failures do not generate the link
+        } else if ( !is_not_pass ) {
+            cell_link = "";
         }
 
         insert_cell_link(document, "pass", cell_link);
