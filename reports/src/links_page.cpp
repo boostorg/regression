@@ -72,7 +72,7 @@ void links_page(const failures_markup_t& explicit_markup,
         // check if there are some failures or warnings
         bool should_generate_variants = false;
         BOOST_FOREACH(test_structure_t::test_log_t const& log, test_logs) {
-            if ( !log.result || !log.status || log.pass_warning ) {
+            if ( log.pass_warning || show_output(explicit_markup, log) ) {
                 should_generate_variants = true;
             }
         }
