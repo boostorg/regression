@@ -40,7 +40,9 @@ void insert_cell_developer(html_writer& document,
     
     std::string library_page = encode_path(library);
 
-    document << "<td class=\"" << class_ << "\" title=\"" << escape_xml(library) << "/" << escape_xml(toolset) << "\">\n";
+    document << "<td class=\""
+             << (boost::starts_with(class_, "summary-success-expected") ? std::string("summary-success-expected") : class_)
+             << "\" title=\"" << escape_xml(library) << "/" << escape_xml(toolset) << "\">\n";
 
     if(class_ == "summary-unusable") {
         insert_cell_link(document, "n/a", library_page, release);
@@ -76,7 +78,12 @@ void insert_cell_developer(html_writer& document,
         document << "</div>\n";
 
     } else {
-        document << "&#160;&#160;OK&#160;&#160;";
+
+        if ( boost::algorithm::ends_with(class_, "warning") ) {
+            insert_cell_link(document, "OK", library_page, release);
+        } else {
+            document << "&#160;&#160;OK&#160;&#160;";
+        }
     }
     document << "</td>\n";
 }
