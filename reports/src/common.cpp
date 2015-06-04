@@ -445,6 +445,11 @@ std::string boost::regression::result_cell_class(const failures_markup_t& explic
         }
     }
     BOOST_FOREACH(test_log_group_t::value_type log, test_logs) {
+        if(log->result && log->expected_result && log->pass_warning) {
+            return "success-expected-warning";
+        }
+    }
+    BOOST_FOREACH(test_log_group_t::value_type log, test_logs) {
         if(log->result && log->expected_result) {
             return "success-expected";
         }

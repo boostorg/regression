@@ -121,23 +121,27 @@ void insert_cell_developer(html_writer& document,
         // or some failures (just in case)
         bool is_pass_warning_found = false;
         bool is_not_pass = false;
+        bool show_out = false;
         BOOST_FOREACH(test_log_group_t::value_type log, test_logs) {
-            if ( !log->result || !log->status ) {
+            if ( show_output(explicit_markup, *log) ) {
+                show_out = true;
+            } else if ( !log->result || !log->status ) {
                 is_not_pass = true;
             } else if ( log->pass_warning ) {
                 is_pass_warning_found = true;
-                break;
             }
         }
 
         std::string target = "_top";
-        // if there are warnings generate the warnings link
-        if ( is_pass_warning_found ) {
-            cell_link = std::string("../")+warnings_file_path(runner, toolset, library, test_logs.front()->test_name, release_postfix(release));
-            target = "docframe";
-        // if there are no failures do not generate the link
-        } else if ( !is_not_pass ) {
-            cell_link = "";
+        if (!show_out) {
+            // if there are warnings generate the warnings link
+            if ( is_pass_warning_found ) {
+                cell_link = std::string("../")+warnings_file_path(runner, toolset, library, test_logs.front()->test_name, release_postfix(release));
+                target = "docframe";
+            // if there are no failures do not generate the link
+            } else if ( !is_not_pass ) {
+                cell_link = "";
+            }
         }
 
         insert_cell_link(document, "pass", cell_link, target);
