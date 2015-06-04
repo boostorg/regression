@@ -492,9 +492,12 @@ table.summary-table td.library-name
 {
     width: 60pt;
     text-align: center;
-    background-color: #BE9;
+    background-color: #CE9;
     color: black;
-    border: 2px solid black;
+    border-left: 1px solid black;
+    border-right: 1px solid black;
+    border-top: 1px solid #785;
+    border-bottom: 1px solid #785;
 }
 
   tr.summary-row        td.summary-fail-unexpected-new-other
@@ -577,7 +580,7 @@ table.summary-table td.library-name
 { 
     width: 60pt;
     text-align: center;
-    background-color: #DE6;
+    background-color: #CDE;
     color: black;
     border: 2px solid black; 
 }
