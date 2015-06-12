@@ -243,7 +243,7 @@ class utils:
 
 class script:
 
-    def __init__(self, build_dir = None):
+    def __init__(self, build_dir = None, test_args = []):
         commands = [];
         for method in inspect.getmembers(self, predicate=inspect.ismethod):
             if method[0].startswith('command_'):
@@ -266,6 +266,7 @@ class script:
             type='int' )
 
         #~ Defaults
+        self.test_args = test_args
         self.toolset=os.getenv("TOOLSET")
         self.target=os.getenv('TARGET', 'minimal')
         self.debug_level=0
@@ -334,7 +335,8 @@ class script:
             *self.b2_cmd(
                 toolset_info[self.toolset]['toolset'],
                 "-a", "--verbose-test",
-                self.target)
+                self.target,
+                *self.test_args)
             )
 
     #~ Utilities...
@@ -401,7 +403,14 @@ class script_appveyor(script):
     
     def __init__(self):
         appveyor_build_dir = os.getenv("APPVEYOR_BUILD_FOLDER")
-        script.__init__(self, build_dir=appveyor_build_dir)
+        test_args = []
+        if os.getenv("PLATFORM"):
+            test_args.append("address-model=%s"%(os.getenv("PLATFORM")))
+        if os.getenv("CONFIGURATION"):
+            test_args.append("variant=%s"%(os.getenv("CONFIGURATION")))
+        script.__init__(self,
+            build_dir=appveyor_build_dir,
+            test_args=test_args)
     
     # Appveyor commands in the order they are executed..
     
