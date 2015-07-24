@@ -103,6 +103,11 @@ toolset_info = {
         'command' : '',
         'version' : '14.0'
         },
+    'xcode-6.1' : {
+        'command' : 'clang++',
+        'toolset' : 'clang',
+        'version' : ''
+        },
     }
 
 class SystemCallError(Exception):
@@ -391,13 +396,14 @@ class script_travis(script):
     # Installs specific toolset on Travis CI systems.
     def travis_install_toolset(self, toolset):
         info = toolset_info[toolset]
-        for ppa in info['ppa']:
+        if sys.platform.startswith('linux'):
+            for ppa in info['ppa']:
+                utils.check_call(
+                    'sudo','add-apt-repository','--yes',ppa)
             utils.check_call(
-                'sudo','add-apt-repository','--yes',ppa)
-        utils.check_call(
-            'sudo','apt-get','update','-qq')
-        utils.check_call(
-            'sudo','apt-get','install','-qq',info['package'],info['debugpackage'])
+                'sudo','apt-get','update','-qq')
+            utils.check_call(
+                'sudo','apt-get','install','-qq',info['package'],info['debugpackage'])
 
 class script_appveyor(script):
     
