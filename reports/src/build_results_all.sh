@@ -16,7 +16,7 @@ log_time()
 build_all()
 {
     log_time "Start of testing. [build_all]"
-	build_setup
+    build_setup
     update_tools
     build_results develop 2>&1 | tee boost-reports/develop.log
     build_results master 2>&1 | tee boost-reports/master.log
@@ -215,14 +215,23 @@ upload_results()
         7za a -tzip -mx=9 ../../${1}.zip * '-x!*.xml'
         cd "${cwd}"
     fi
-    mv ${1}.zip ${1}.zip.uploading
+    upload_ext=.zip.${USER}.uploading
+    mv ${1}.zip ${1}${upload_ext}
     rsync -vuz --rsh=ssh --stats \
-      ${1}.zip.uploading grafik@beta.boost.org:/${upload_dir}/incoming/
+      ${1}.zip.${USER}.uploading grafik@beta.boost.org:/${upload_dir}/incoming/
     ssh grafik@beta.boost.org \
-      cp --no-preserve=timestamps ${upload_dir}/incoming/${1}.zip.uploading ${upload_dir}/live/${1}.zip
-    mv ${1}.zip.uploading ${1}.zip
+      cp --no-preserve=timestamps ${upload_dir}/incoming/${1}${upload_ext} ${upload_dir}/live/${1}.zip
+    mv ${1}${upload_ext} ${1}.zip
     cd "${cwd}"
 }
 
-echo "=====-----=====-----=====-----=====-----=====-----=====-----=====-----" >> boost-reports-time.log
-build_all 2>&1 | tee boost-reports.log
+lockfile="boost_report_running.lock"
+if [ -f $lockfile ]
+then
+    echo "Boost Report run already in progress...exiting"
+else
+    echo `date` > $lockfile
+    echo "=====-----=====-----=====-----=====-----=====-----=====-----=====-----" >> boost-reports-time.log
+    build_all 2>&1 | tee boost-reports.log
+    rm $lockfile
+fi
