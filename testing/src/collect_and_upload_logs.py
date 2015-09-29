@@ -324,7 +324,7 @@ def compress_file( file_path, archive_path ):
     utils.log( 'Compressing "%s"...' % file_path )
 
     try:
-        z = zipfile.ZipFile( archive_path, 'w', zipfile.ZIP_DEFLATED )
+        z = zipfile.ZipFile( archive_path, 'w', zipfile.ZIP_DEFLATED, allowZip64=True )
         z.write( file_path, os.path.basename( file_path ) )
         z.close()
         utils.log( 'Done writing "%s".'% archive_path )
