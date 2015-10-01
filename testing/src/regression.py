@@ -280,7 +280,8 @@ class runner:
                 "|".join(lib for lib in self.libraries if lib != "build") + '"'
 
         # if no -m bjam option add -m64 (limit target to 64 kb of output)
-        if self.bjam_options.find('-m') == -1:
+        import re
+        if not [e for e in re.split('\s+', self.bjam_options) if e.startswith('-m')]:
             self.bjam_options += ' -m64'
 
         self.main()
