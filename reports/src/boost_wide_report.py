@@ -63,6 +63,7 @@ default_filter_runners = {
         'GLIS.*',
         'jessicah-haiku.*',
         'oracle-.*',
+        'igaztanaga.*',
         ]
     }
 
