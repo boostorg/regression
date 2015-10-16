@@ -273,6 +273,12 @@ class script:
         #~ Defaults
         self.test_args = test_args
         self.toolset=os.getenv("TOOLSET")
+        if not self.toolset:
+            # Travis-CI likes injecting a default, unspecified, run
+            # in the mix of testing. So we avoid doing anything in
+            # that case. And let them waste their resources as long
+            # as they don't want to fix their own bug.
+            return
         self.target=os.getenv('TARGET', 'minimal')
         self.debug_level=0
         ( _opt_, self.actions ) = opt.parse_args(None,self)
