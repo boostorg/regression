@@ -67,8 +67,8 @@ default_filter_runners = {
         ]
     }
 
-# How long results are considered , in seconds = 10 weeks
-result_decay_time_seconds = 60*60*24*7*10
+# How long results are considered , in seconds = 4 weeks
+result_decay_time_seconds = 60*60*24*7*4
 
 if __name__ == '__main__':
     run_dir = os.path.abspath( os.path.dirname( sys.argv[ 0 ] ) )
