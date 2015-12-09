@@ -159,9 +159,9 @@ void write_issues_list(const std::string& path,
         std::size_t failures = count_failures(library.second);
 
         document << "      <h2>\n";
-        document << "        <a name=\"" << escape_uri(library.first) << "\"/>\n";
         document << "        <a class=\"hover-link\" href=\"" << escape_uri(library_page)
-                 << release_postfix << ".html\" target=\"_top\">\n";
+                 << release_postfix << ".html\" target=\"_top\" name=\""
+                 << escape_uri(library.first) << "\">\n";
         document << "        " << escape_xml(library.first) << " (" << failures
                  << " failure" << (failures == 1? "":"s") << ")\n";
         document << "        </a>\n";
