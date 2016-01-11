@@ -1,6 +1,6 @@
 // zip.hpp
 //
-// Copyright (c) 2010, 2013
+// Copyright (c) 2010, 2013, 2016
 // Steven Watanabe
 //
 // Distributed under the Boost Software License, Version 1.0. (See
@@ -98,17 +98,18 @@ public:
         }
         void close() {
             central_directory_entry::set_crc32(&self->central_directory[offset], crc.checksum());
-            // These lines cause a warning.  Since the warning is legitimate,
-            // I'm leaving it.
-            central_directory_entry::set_compressed_size(&self->central_directory[offset], compressed_size);
-            central_directory_entry::set_uncompressed_size(&self->central_directory[offset], uncompressed_size);
+            // If these casts lose information, it will be fixed by adding zip64.
+            central_directory_entry::set_compressed_size(&self->central_directory[offset], static_cast<boost::uint32_t>(compressed_size));
+            central_directory_entry::set_uncompressed_size(&self->central_directory[offset], static_cast<boost::uint32_t>(uncompressed_size));
+
+            self->maybe_set_zip64_extended_information(&self->central_directory[offset], compressed_size, uncompressed_size, pos);
 
             boost::array<char, 12> buffer;
             data_descriptor::set_crc32(&buffer[0], crc.checksum());
             data_descriptor::set_compressed_size(&buffer[0], compressed_size);
             data_descriptor::set_uncompressed_size(&buffer[0], uncompressed_size);
             std::streamsize current_pos = self->output_file.tellp();
-            self->output_file.seekp(pos);
+            self->output_file.seekp(pos + local_file_header::crc32_offset);
             self->output_file.write(&buffer[0], 12);
             self->output_file.seekp(current_pos);
             self = 0;
@@ -119,8 +120,8 @@ public:
         file_handle& operator=(const file_handle&);
 
         boost::crc_32_type crc;
-        std::streamsize pos;
-        std::size_t offset;
+        std::streamsize pos; // the offset of the beginning of the local file header
+        std::size_t offset;  // the location of the central directory entry.
         std::streamsize compressed_size;
         std::streamsize uncompressed_size;
         zip_archive* self;
@@ -159,7 +160,7 @@ public:
         // The file_handle should not be open
         assert(handle->self == 0);
         
-        handle->pos = static_cast<std::streamsize>(output_file.tellp()) + local_file_header::crc32_offset;
+        handle->pos = static_cast<std::streamsize>(output_file.tellp());
         
         std::vector<char> header(30);
         local_file_header::set_signature(&header[0], local_file_header::signature);
@@ -201,50 +202,31 @@ public:
         ++num_files;
     }
 
-    void write_file(const std::string& path, const char* contents, std::size_t size) {
-        std::vector<char> header(30);
-        local_file_header::set_signature(&header[0], local_file_header::signature);
-        local_file_header::set_minimum_required_version(&header[0], 10);
-        local_file_header::set_flags(&header[0], 0);
-        local_file_header::set_compression_method(&header[0], compression_method::none);
-        
-        crc_32_type crc;
-        crc.process_bytes(contents, size);
-        local_file_header::set_crc32(&header[0], crc.checksum());
-        local_file_header::set_compressed_size(&header[0], size);
-        local_file_header::set_uncompressed_size(&header[0], size);
-        local_file_header::set_filename_size(&header[0], path.size());
-        // TODO: handle Zip64
-        header.insert(header.end(), path.begin(), path.end());
+    void maybe_set_zip64_extended_information(char * central_directory_entry_start, std::streamsize compressed_size, std::streamsize uncompressed_size, std::streamsize local_header_offset) {
+        if(compressed_size >= 0xFFFFFFFF || uncompressed_size >= 0xFFFFFFFF || local_header_offset >= 0xFFFFFFFF) {
+            set_zip64_extended_information(central_directory_entry_start, compressed_size, uncompressed_size, local_header_offset);
+        }
+    }
 
-        output_file.write(&header[0], header.size());
-        output_file.write(contents, size);
+    void set_zip64_extended_information(char * central_directory_entry_start, std::size_t compressed_size, std::size_t uncompressed_size, std::streamsize local_header_offset) {
+        boost::uint16_t extra_size = 32;
+        central_directory_entry::set_extra_size(central_directory_entry_start, extra_size);
+        // TODO: These fields are optional, we don't necessarily need to set all of them.
+        central_directory_entry::set_compressed_size(central_directory_entry_start, 0xFFFFFFFFu);
+        central_directory_entry::set_uncompressed_size(central_directory_entry_start, 0xFFFFFFFFu);
+        central_directory_entry::set_local_header_offset(central_directory_entry_start, 0xFFFFFFFFu);
+        central_directory_entry::set_file_start_disk(central_directory_entry_start, 0xFFFFu);
 
         std::size_t offset = central_directory.size();
-        central_directory.resize(offset + 46);
-        central_directory_entry::set_signature(&central_directory[offset], central_directory_entry::signature);
-        central_directory_entry::set_creator_version(&central_directory[offset], 10);
-        central_directory_entry::set_minimum_required_version(&central_directory[offset], 10);
-        central_directory_entry::set_flags(&central_directory[offset], 0);
-        central_directory_entry::set_compression_method(&central_directory[offset], compression_method::none);
-        // FIXME: find correct date and time
-        central_directory_entry::set_modification_time(&central_directory[offset], 0);
-        central_directory_entry::set_modification_date(&central_directory[offset], 0);
-        central_directory_entry::set_crc32(&central_directory[offset], crc.checksum());
-        central_directory_entry::set_compressed_size(&central_directory[offset], size);
-        central_directory_entry::set_uncompressed_size(&central_directory[offset], size);
-        central_directory_entry::set_filename_size(&central_directory[offset], path.size());
-        central_directory_entry::set_extra_size(&central_directory[offset], 0);
-        central_directory_entry::set_comment_size(&central_directory[offset], 0);
-        central_directory_entry::set_file_start_disk(&central_directory[offset], 0);
-        central_directory_entry::set_internal_attributes(&central_directory[offset], 0);
-        central_directory_entry::set_external_attributes(&central_directory[offset], 0);
-        central_directory_entry::set_local_header_offset(&central_directory[offset], current_offset);
-        central_directory.insert(central_directory.end(), path.begin(), path.end());
-        current_offset = current_offset + header.size() + size;
-
-        ++num_files;
+        central_directory.resize(offset + extra_size);
+        zip64_extended_information_field::set_header_id(&central_directory[offset], zip64_extended_information_field::header_id);
+        zip64_extended_information_field::set_size(&central_directory[offset], extra_size - 4);
+        zip64_extended_information_field::set_uncompressed_size(&central_directory[offset], uncompressed_size);
+        zip64_extended_information_field::set_compressed_size(&central_directory[offset], compressed_size);
+        zip64_extended_information_field::set_local_header_offset(&central_directory[offset], local_header_offset);
+        zip64_extended_information_field::set_file_start_disk(&central_directory[offset], 0);
     }
+
     void close() {
         output_file.write(&central_directory[0], central_directory.size());
         
@@ -334,6 +316,16 @@ private:
 
     // Not implemented Archive decryption header
     // Not implemented Archive extra data record
+
+    struct zip64_extended_information_field {
+        static const boost::uint16_t header_id = 1;
+        BOOST_ZIP_DEFINE_HEADER(header_id,           boost::uint16_t, 0);
+        BOOST_ZIP_DEFINE_HEADER(size,                boost::uint16_t, 2);
+        BOOST_ZIP_DEFINE_HEADER(uncompressed_size,   boost::uint64_t, 4);
+        BOOST_ZIP_DEFINE_HEADER(compressed_size,     boost::uint64_t, 12);
+        BOOST_ZIP_DEFINE_HEADER(local_header_offset, boost::uint64_t, 20);
+        BOOST_ZIP_DEFINE_HEADER(file_start_disk,     boost::uint32_t, 28);
+    };
 
     struct central_directory_entry {
         static const boost::uint32_t signature = 0x02014b50u;
