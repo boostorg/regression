@@ -215,10 +215,10 @@ upload_results()
         7za a -tzip -mx=9 ../../${1}.zip * '-x!*.xml'
         cd "${cwd}"
     fi
-    upload_ext=.zip.${USER}.uploading
+    upload_ext=.zip.${LOGNAME}.uploading
     mv ${1}.zip ${1}${upload_ext}
     rsync -vuz --rsh=ssh --stats \
-      ${1}.zip.${USER}.uploading grafik@beta.boost.org:/${upload_dir}/incoming/
+      ${1}.zip.${LOGNAME}.uploading grafik@beta.boost.org:/${upload_dir}/incoming/
     ssh grafik@beta.boost.org \
       cp --no-preserve=timestamps ${upload_dir}/incoming/${1}${upload_ext} ${upload_dir}/live/${1}.zip
     mv ${1}${upload_ext} ${1}.zip
