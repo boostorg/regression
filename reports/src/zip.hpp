@@ -258,7 +258,7 @@ public:
             end_of_central_directory::set_entries_on_disk(&end[0], 0xFFFFu);
             end_of_central_directory::set_total_entries(&end[0], 0xFFFFu);
             end_of_central_directory::set_directory_size(&end[0], central_directory.size());
-            end_of_central_directory::set_directory_offset(&end[0], current_offset);
+            end_of_central_directory::set_directory_offset(&end[0], 0xFFFFFFFFu);
             end_of_central_directory::set_comment_length(&end[0], 0);
             output_file.write(&end[0], end.size());
         } else {
