@@ -64,6 +64,7 @@ default_filter_runners = {
         'jessicah-haiku.*',
         'oracle-.*',
         'igaztanaga.*',
+        'intel-.*',
         ]
     }
 
