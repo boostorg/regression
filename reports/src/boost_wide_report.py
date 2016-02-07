@@ -65,6 +65,7 @@ default_filter_runners = {
         'oracle-.*',
         'igaztanaga.*',
         'intel-.*',
+        'Flast-.*',
         ]
     }
 
