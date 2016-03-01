@@ -651,7 +651,7 @@ int process_jam_log( const std::vector<std::string> & args )
         std::exit(1);
       }
       boost_root = fs::path( *args_i );
-      if ( !boost_root.is_complete() )
+      if ( !boost_root.has_root_path() )
         boost_root = ( fs::initial_path() / boost_root ).normalize();
     }
     else if ( *args_i == "--locate-root" )
@@ -701,7 +701,7 @@ int process_jam_log( const std::vector<std::string> & args )
   {
     locate_root = boost_root;
   }
-  else if ( !locate_root.is_complete() )
+  else if ( !locate_root.has_root_path() )
   {
     locate_root = ( fs::initial_path() / locate_root ).normalize();
   }
