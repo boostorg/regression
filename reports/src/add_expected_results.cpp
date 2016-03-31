@@ -229,7 +229,7 @@ void process_test_log(test_structure_t::test_log_t& test_log,
             
             BOOST_ASSERT(it->second.contents);
             boost::string_ref val(it->second.contents->value(), it->second.contents->value_size());
-            if ( find_regex(val, "([Ii]nternal error)|([Ii]nternal compiler error)|([Ss]egmentation fault)|(unable to execute command: Aborted)") ) {
+            if ( find_regex(val, "([Ii]nternal error)|((?i)Internal compiler error(?-i))|([Ss]egmentation fault)|(unable to execute command: Aborted)") ) {
                 test_log.fail_info = test_structure_t::fail_cerr;
             } else if ( find_regex(val, "second time limit exceeded") ) {
                 test_log.fail_info = test_structure_t::fail_time;
