@@ -403,8 +403,17 @@ namespace
       if ( itr != test2info.end() )
         info = itr->second;
 
+      // We allow the library name from the original test info dump to take
+      // precedence over the one from the action parsed library name. Note,
+      // that there are tests for which the library name from the info dump
+      // is empty as the source files in those might not be in the library
+      // source tree. For example, for system wide tests.
       if ( !info.file_path.empty() )
-        library_name = test_path_to_library_name( info.file_path );
+      {
+        string library_name_from_info( test_path_to_library_name( info.file_path ) );
+        if ( !library_name_from_info.empty() )
+          library_name = library_name_from_info;
+      }
 
       if ( info.type.empty() )
       {
