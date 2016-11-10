@@ -39,6 +39,33 @@ class script(script_common):
         # Some setup we need to redo for each invocation.
         self.boost_root = os.path.join(self.ci.work_dir,'boostorg','boost')
     
+    @property
+    def repo_path(self):
+        if not hasattr(self,'_repo_path'):
+            # Find the path for the submodule of the repo we are testing.
+            if self.repo != 'boost':
+                self._repo_path = None
+                with open(os.path.join(self.boost_root,'.gitmodules'),"rU") as f:
+                    path = None
+                    url = None
+                    for line in f:
+                        line = line.strip()
+                        if line.startswith("[submodule"):
+                            path = None
+                            url = None
+                        else:
+                            name = line.split("=")[0].strip()
+                            value = line.split("=")[1].strip()
+                            if name == "path":
+                                path = value
+                            elif name == "url":
+                                url = value
+                            if name and url and url.endswith("/%s.git"%(self.repo)):
+                                self._repo_path = path
+                if not self._repo_path:
+                    self._repo_path = "libs/%s"%(self.repo)
+        return self._repo_path
+    
     def command_install(self):
         script_common.command_install(self)
         # Fetch & install toolset..
@@ -58,26 +85,6 @@ class script(script_common):
         
         # Find the path for the submodule of the repo we are testing.
         if self.repo != 'boost':
-            self.repo_path = None
-            with open(os.path.join(self.boost_root,'.gitmodules'),"rU") as f:
-                path = None
-                url = None
-                for line in f:
-                    line = line.strip()
-                    if line.startswith("[submodule"):
-                        path = None
-                        url = None
-                    else:
-                        name = line.split("=")[0].strip()
-                        value = line.split("=")[1].strip()
-                        if name == "path":
-                            path = value
-                        elif name == "url":
-                            url = value
-                        if name and url and url.endswith("/%s.git"%(self.repo)):
-                            self.repo_path = path
-            if not self.repo_path:
-                self.repo_path = "libs/%s"%(self.repo)
             self.repo_dir = os.path.join(self.boost_root,self.repo_path)
             
         # Checkout the library commit we are testing.

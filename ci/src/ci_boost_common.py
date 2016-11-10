@@ -441,19 +441,19 @@ class script_common(object):
         else:
             return utils.check_call(*cmd)
     
-    def __getattr__(self, attr):
+    def __getattribute__(self, attr):
         '''
         Wraps attribute access to fabricate method calls that
         forward to the ci instance. This allows the ci to add and
         override script commands as needed.
         '''
         if attr.startswith('command_'):
-            ci_command = getattr(self.ci, attr)
+            ci_command = getattr(self.ci, attr) if hasattr(self.ci, attr) else None
             if ci_command:
                 def call(*args, **kwargs):
                     return ci_command(*args, **kwargs)
                 return call
-        return self.__dict__[attr]
+        return object.__getattribute__(self,attr)
 
     # Common test commands in the order they should be executed..
     
