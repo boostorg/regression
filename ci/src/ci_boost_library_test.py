@@ -34,6 +34,11 @@ class script(script_common):
         set_arg(kargs, 'variant', os.getenv("VARIANT","debug"))
         return kargs
     
+    def start(self):
+        script_common.start(self)
+        # Some setup we need to redo for each invocation.
+        self.boost_root = os.path.join(self.ci.work_dir,'boostorg','boost')
+    
     def command_install(self):
         script_common.command_install(self)
         # Fetch & install toolset..
@@ -45,12 +50,11 @@ class script(script_common):
         script_common.command_before_build(self)
         
         # Clone boost super-project.
-        self.boost_root = os.path.join(self.ci.work_dir,'boostorg','boost')
         if self.repo != 'boost':
             utils.git_clone('boost',self.branch,cwd=self.ci.work_dir)
         
-        # Clone testing tools.
-        utils.git_clone('regression','develop',cwd=self.ci.work_dir)
+        # Clone testing tools. Not needed, yet.
+        # utils.git_clone('regression','develop',cwd=self.ci.work_dir)
         
         # Find the path for the submodule of the repo we are testing.
         if self.repo != 'boost':
