@@ -449,26 +449,20 @@ class script_common(object):
     # Common test commands in the order they should be executed..
     
     def command_info(self):
-        if self.ci and hasattr(self.ci,'command_info'):
-            self.ci.command_info()
+        pass
     
     def command_install(self):
         utils.makedirs(self.build_dir)
         os.chdir(self.build_dir)
-        if self.ci and hasattr(self.ci,'command_install'):
-            self.ci.command_install()
     
     def command_install_toolset(self, toolset):
-        if self.ci and hasattr(self.ci,'command_install_toolset'):
-            self.ci.command_install_toolset()
+        pass
     
     def command_before_build(self):
-        if self.ci and hasattr(self.ci,'command_before_build'):
-            self.ci.command_before_build()
+        pass
 
     def command_build(self):
-        if self.ci and hasattr(self.ci,'command_build'):
-            self.ci.command_build()
+        pass
 
     def command_after_success(self):
         if self.ci and hasattr(self.ci,'command_after_success'):
