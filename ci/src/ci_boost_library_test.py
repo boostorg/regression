@@ -70,6 +70,7 @@ class script(script_common):
         script_common.command_install(self)
         # Fetch & install toolset..
         if self.toolset:
+            utils.log( "# Installing toolset: %s"%(self.toolset) )
             os.chdir(self.home_dir)
             self.command_install_toolset(self.toolset)
     
