@@ -400,7 +400,6 @@ class script_common(object):
         if not self.root_dir:
             self.root_dir = os.getcwd()
         self.build_dir = os.path.join(os.path.dirname(self.root_dir), "build")
-        self.home_dir = os.getenv("HOME")
         
         # API keys.
         self.bintray_key = os.getenv('BINTRAY_KEY')

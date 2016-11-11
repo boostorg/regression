@@ -71,7 +71,6 @@ class script(script_common):
         # Fetch & install toolset..
         utils.log( "Install toolset: %s"%(self.toolset) )
         if self.toolset:
-            os.chdir(self.home_dir)
             self.command_install_toolset(self.toolset)
     
     def command_before_build(self):
