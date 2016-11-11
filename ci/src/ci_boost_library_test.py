@@ -111,7 +111,7 @@ class script(script_common):
         # Bootstrap Boost Build engine.
         os.chdir(os.path.join(self.boost_root,"tools","build"))
         if sys.platform == 'win32':
-            utils.check_call("./bootstrap.bat")
+            utils.check_call(".\\bootstrap.bat")
             shutil.copy2("b2.exe", os.path.join(self.build_dir,"dist","bin","b2.exe"))
         else:
             utils.check_call("./bootstrap.sh")
