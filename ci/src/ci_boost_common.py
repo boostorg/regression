@@ -441,7 +441,7 @@ class script_common(object):
         else:
             return utils.check_call(*cmd)
     
-    def __getattribute__(self, attr):
+    def __getattr__(self, attr):
         '''
         Wraps attribute access to fabricate method calls that
         forward to the ci instance. This allows the ci to add and
@@ -451,9 +451,9 @@ class script_common(object):
             ci_command = getattr(self.ci, attr) if hasattr(self.ci, attr) else None
             if ci_command:
                 def call(*args, **kwargs):
-                    return ci_command(*args, **kwargs)
+                    ci_command(*args, **kwargs)
                 return call
-        return object.__getattribute__(self,attr)
+        raise AttributeError()
 
     # Common test commands in the order they should be executed..
     
@@ -563,7 +563,7 @@ class ci_travis(object):
         pass
     
     def command_install(self):
-        pass
+        self.script.command_install()
 
     def command_before_script(self):
         self.script.command_before_build()
@@ -572,7 +572,7 @@ class ci_travis(object):
         self.script.command_build()
 
     def command_after_success(self):
-        pass
+        self.script.command_after_success()
 
     def command_after_failure(self):
         pass
@@ -640,6 +640,7 @@ class ci_circleci(object):
         pass
     
     def command_test_pre(self):
+        self.script.command_install()
         self.script.command_before_build()
     
     def command_test_override(self):
@@ -670,11 +671,12 @@ class ci_appveyor(object):
     # these to forward to our common commands, if they are different.
     
     def command_install(self):
-        pass
+        self.script.command_install()
     
     def command_before_build(self):
         os.chdir(self.script.root_dir)
         utils.check_call("git","submodule","update","--quiet","--init","--recursive")
+        self.script.command_before_build()
     
     def command_build_script(self):
         self.script.command_build()
