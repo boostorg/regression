@@ -423,11 +423,16 @@ class script_common(object):
     def main(self):
         for action in self.actions:
             action_m = "command_"+action.replace('-','_')
-            if hasattr(self,action_m):
+            ci_command = getattr(self.ci, action_m, None)
+            ci_script = getattr(self, action_m, None)
+            if ci_command or ci_script:
                 utils.log( "### %s.."%(action) )
                 if os.path.exists(self.root_dir):
                     os.chdir(self.root_dir)
-                getattr(self,action_m)()
+                if ci_command:
+                    ci_command()
+                elif ci_script:
+                    ci_script()
     
     def b2( self, *args, **kargs ):
         cmd = ['b2','--debug-configuration', '-j%s'%(self.jobs)]
@@ -440,42 +445,34 @@ class script_common(object):
             return parallel_call(*cmd)
         else:
             return utils.check_call(*cmd)
-    
-    def __getattr__(self, attr):
-        '''
-        Wraps attribute access to fabricate method calls that
-        forward to the ci instance. This allows the ci to add and
-        override script commands as needed.
-        '''
-        if attr.startswith('command_'):
-            ci_command = getattr(self.ci, attr) if hasattr(self.ci, attr) else None
-            if ci_command:
-                def call(*args, **kwargs):
-                    ci_command(*args, **kwargs)
-                return call
-        raise AttributeError()
 
     # Common test commands in the order they should be executed..
     
     def command_info(self):
-        pass
+        if self.ci and hasattr(self.ci,'command_info'):
+            self.ci.command_info()
     
     def command_install(self):
         utils.makedirs(self.build_dir)
         os.chdir(self.build_dir)
+        if self.ci and hasattr(self.ci,'command_install'):
+            self.ci.command_install()
     
     def command_install_toolset(self, toolset):
         if self.ci and hasattr(self.ci,'command_install_toolset'):
             self.ci.command_install_toolset()
     
     def command_before_build(self):
-        pass
+        if self.ci and hasattr(self.ci,'command_before_build'):
+            self.ci.command_before_build()
 
     def command_build(self):
-        pass
+        if self.ci and hasattr(self.ci,'command_build'):
+            self.ci.command_build()
 
     def command_after_success(self):
-        pass
+        if self.ci and hasattr(self.ci,'command_after_success'):
+            self.ci.command_after_success()
 
 class ci_cli(object):
     '''
