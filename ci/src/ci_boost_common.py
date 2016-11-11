@@ -465,8 +465,7 @@ class script_common(object):
         pass
 
     def command_after_success(self):
-        if self.ci and hasattr(self.ci,'command_after_success'):
-            self.ci.command_after_success()
+        pass
 
 class ci_cli(object):
     '''
