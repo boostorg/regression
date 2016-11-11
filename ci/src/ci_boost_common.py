@@ -456,7 +456,8 @@ class script_common(object):
         os.chdir(self.build_dir)
     
     def command_install_toolset(self, toolset):
-        pass
+        if self.ci and hasattr(self.ci,'install_toolset'):
+            self.ci.install_toolset()
     
     def command_before_build(self):
         pass
