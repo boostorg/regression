@@ -457,7 +457,7 @@ class script_common(object):
     
     def command_install_toolset(self, toolset):
         if self.ci and hasattr(self.ci,'install_toolset'):
-            self.ci.install_toolset()
+            self.ci.install_toolset(toolset)
     
     def command_before_build(self):
         pass
