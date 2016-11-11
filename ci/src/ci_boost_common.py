@@ -642,7 +642,7 @@ class ci_appveyor(object):
     
     def __init__(self,script):
         self.script = script
-        self.work_dir = os.getenv("HOME")
+        self.work_dir = os.path.dirname(os.getenv("APPVEYOR_BUILD_FOLDER"))
     
     def init(self, opt, kargs):
         set_arg(kargs,'root_dir',os.getenv("APPVEYOR_BUILD_FOLDER"))
