@@ -468,12 +468,12 @@ class script_common(object):
             self.ci.command_install()
     
     def command_install_toolset(self, toolset):
-        if self.ci and hasattr(self.ci,'command_before_build'):
-            self.ci.command_before_build()
-    
-    def command_before_build(self):
         if self.ci and hasattr(self.ci,'command_install_toolset'):
             self.ci.command_install_toolset()
+    
+    def command_before_build(self):
+        if self.ci and hasattr(self.ci,'command_before_build'):
+            self.ci.command_before_build()
 
     def command_build(self):
         if self.ci and hasattr(self.ci,'command_build'):
