@@ -135,6 +135,16 @@ toolset_info = {
         'toolset' : 'clang',
         'version' : ''
         },
+    'xcode-7.3' : {
+        'command' : 'clang++',
+        'toolset' : 'clang',
+        'version' : ''
+        },
+    'xcode-8.0' : {
+        'command' : 'clang++',
+        'toolset' : 'clang',
+        'version' : ''
+        },
     }
 
 class SystemCallError(Exception):
