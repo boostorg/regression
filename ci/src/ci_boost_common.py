@@ -21,23 +21,20 @@ toolset_info = {
     'clang-3.4' : {
         'ppa' : ["ppa:h-rayflood/llvm"],
         'package' : 'clang-3.4',
-        'debugpackage' : 'libstdc++6-4.6-dbg',
         'command' : 'clang++-3.4',
         'toolset' : 'clang',
         'version' : ''
         },
     'clang-3.5' : {
-        'ppa' : ["ppa:h-rayflood/llvm-upper", "ppa:h-rayflood/gcc-upper"],
+        'ppa' : ["ppa:h-rayflood/llvm"],
         'package' : 'clang-3.5',
-        'debugpackage' : 'libstdc++6-4.6-dbg',
         'command' : 'clang++-3.5',
         'toolset' : 'clang',
         'version' : ''
         },
     'clang-3.6' : {
-        'ppa' : ["ppa:h-rayflood/llvm-upper", "ppa:h-rayflood/gcc-upper"],
+        'ppa' : ["ppa:h-rayflood/llvm"],
         'package' : 'clang-3.6',
-        'debugpackage' : 'libstdc++6-4.6-dbg',
         'command' : 'clang++-3.6',
         'toolset' : 'clang',
         'version' : ''
