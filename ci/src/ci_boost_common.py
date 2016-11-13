@@ -75,6 +75,14 @@ toolset_info = {
         'toolset' : 'gcc',
         'version' : ''
         },
+    'gcc-5' : {
+        'ppa' : ["ppa:ubuntu-toolchain-r/test"],
+        'package' : 'g++-5',
+        'debugpackage' : '',
+        'command' : 'g++-5',
+        'toolset' : 'gcc',
+        'version' : ''
+        },
     'vs-2008' : {
         'toolset' : 'msvc',
         'command' : '',
