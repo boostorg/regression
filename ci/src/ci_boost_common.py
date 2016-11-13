@@ -579,9 +579,9 @@ class ci_travis(object):
                         'sudo','add-apt-repository','--yes',ppa)
             if 'deb' in info:
                 utils.check_call(
-                    'sudo','echo "deb %s" >> /etc/apt/sources.list',' '.join(info['deb']))
+                    'sudo','echo "deb %s" >> /etc/apt/sources.list'%(' '.join(info['deb'])))
                 utils.check_call(
-                    'sudo','echo "deb-src %s" >> /etc/apt/sources.list',' '.join(info['deb']))
+                    'sudo','echo "deb-src %s" >> /etc/apt/sources.list'%(' '.join(info['deb'])))
             if 'apt-key' in info:
                 for key in info['apt-key']:
                     os.chdir(self.work_dir)
