@@ -45,7 +45,6 @@ toolset_info = {
     'gcc-4.7' : {
         'ppa' : ["ppa:ubuntu-toolchain-r/test"],
         'package' : 'g++-4.7',
-        'debugpackage' : 'libstdc++6-4.8-dbg',
         'command' : 'g++-4.7',
         'toolset' : 'gcc',
         'version' : ''
@@ -54,7 +53,6 @@ toolset_info = {
         'bin' : 'gcc-4.8',
         'ppa' : ["ppa:ubuntu-toolchain-r/test"],
         'package' : 'g++-4.8',
-        'debugpackage' : 'libstdc++6-4.8-dbg',
         'command' : 'g++-4.8',
         'toolset' : 'gcc',
         'version' : ''
@@ -62,7 +60,6 @@ toolset_info = {
     'gcc-4.9' : {
         'ppa' : ["ppa:ubuntu-toolchain-r/test"],
         'package' : 'g++-4.9',
-        'debugpackage' : 'libstdc++6-4.8-dbg',
         'command' : 'g++-4.9',
         'toolset' : 'gcc',
         'version' : ''
@@ -70,7 +67,6 @@ toolset_info = {
     'gcc-5.1' : {
         'ppa' : ["ppa:ubuntu-toolchain-r/test"],
         'package' : 'g++-5',
-        'debugpackage' : 'libstdc++6-4.8-dbg',
         'command' : 'g++-5',
         'toolset' : 'gcc',
         'version' : ''
@@ -79,6 +75,13 @@ toolset_info = {
         'ppa' : ["ppa:ubuntu-toolchain-r/test"],
         'package' : 'g++-5',
         'command' : 'g++-5',
+        'toolset' : 'gcc',
+        'version' : ''
+        },
+    'gcc-6' : {
+        'ppa' : ["ppa:ubuntu-toolchain-r/test"],
+        'package' : 'g++-6',
+        'command' : 'g++-6',
         'toolset' : 'gcc',
         'version' : ''
         },
