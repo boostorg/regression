@@ -78,7 +78,6 @@ toolset_info = {
     'gcc-5' : {
         'ppa' : ["ppa:ubuntu-toolchain-r/test"],
         'package' : 'gcc-5',
-        'debugpackage' : '',
         'command' : 'g++-5',
         'toolset' : 'gcc',
         'version' : ''
@@ -556,7 +555,10 @@ class ci_travis(object):
             utils.check_call(
                 'sudo','apt-get','update','-qq')
             utils.check_call(
-                'sudo','apt-get','install','-qq',info['package'],info['debugpackage'])
+                'sudo','apt-get','install','-qq',info['package'])
+            if 'debugpackage' in info and info['debugpackage']:
+                utils.check_call(
+                    'sudo','apt-get','install','-qq',info['debugpackage'])
 
     # Travis-CI commands in the order they are executed. We need
     # these to forward to our common commands, if they are different.
