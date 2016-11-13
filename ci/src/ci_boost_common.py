@@ -77,7 +77,7 @@ toolset_info = {
         },
     'gcc-5' : {
         'ppa' : ["ppa:ubuntu-toolchain-r/test"],
-        'package' : 'gcc-5',
+        'package' : 'g++-5',
         'command' : 'g++-5',
         'toolset' : 'gcc',
         'version' : ''
