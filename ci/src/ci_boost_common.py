@@ -42,6 +42,30 @@ toolset_info = {
         'toolset' : 'clang',
         'version' : ''
         },
+    'clang-3.7' : {
+        'deb' : ["http://apt.llvm.org/trusty/","llvm-toolchain-trusty-3.7","main"],
+        'apt-key' : ['http://apt.llvm.org/llvm-snapshot.gpg.key'],
+        'package' : 'clang-3.7',
+        'command' : 'clang++-3.7',
+        'toolset' : 'clang',
+        'version' : ''
+        },
+    'clang-3.8' : {
+        'deb' : ["http://apt.llvm.org/trusty/","llvm-toolchain-trusty-3.8","main"],
+        'apt-key' : ['http://apt.llvm.org/llvm-snapshot.gpg.key'],
+        'package' : 'clang-3.8',
+        'command' : 'clang++-3.8',
+        'toolset' : 'clang',
+        'version' : ''
+        },
+    'clang-3.9' : {
+        'deb' : ["http://apt.llvm.org/trusty/","llvm-toolchain-trusty-3.8","main"],
+        'apt-key' : ['http://apt.llvm.org/llvm-snapshot.gpg.key'],
+        'package' : 'clang-3.9',
+        'command' : 'clang++-3.9',
+        'toolset' : 'clang',
+        'version' : ''
+        },
     'gcc-4.7' : {
         'ppa' : ["ppa:ubuntu-toolchain-r/test"],
         'package' : 'g++-4.7',
@@ -552,9 +576,20 @@ class ci_travis(object):
         '''
         info = toolset_info[toolset]
         if sys.platform.startswith('linux'):
-            for ppa in info['ppa']:
+            if 'ppa' in info:
+                for ppa in info['ppa']:
+                    utils.check_call(
+                        'sudo','add-apt-repository','--yes',ppa)
+            if 'deb' in info:
                 utils.check_call(
-                    'sudo','add-apt-repository','--yes',ppa)
+                    'sudo','deb',*info['deb'])
+                utils.check_call(
+                    'sudo','deb-src',*info['deb'])
+            if 'apt-key' in info:
+                for key in info['apt-key']:
+                    os.chdir(self.work_dir)
+                    utils.check_call('wget',key,'-O','apt.key')
+                    utils.check_call('sudo','apt-key','add','apt.key')
             utils.check_call(
                 'sudo','apt-get','update','-qq')
             utils.check_call(
