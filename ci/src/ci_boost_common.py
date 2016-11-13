@@ -40,7 +40,7 @@ toolset_info = {
         'version' : ''
         },
     'clang-3.7' : {
-        #'deb' : ["http://apt.llvm.org/trusty/","llvm-toolchain-trusty-3.7","main"],
+        'deb' : ["http://apt.llvm.org/trusty/","llvm-toolchain-trusty-3.7","main"],
         'apt-key' : ['http://apt.llvm.org/llvm-snapshot.gpg.key'],
         'package' : 'clang-3.7',
         'command' : 'clang++-3.7',
@@ -48,7 +48,7 @@ toolset_info = {
         'version' : ''
         },
     'clang-3.8' : {
-        #'deb' : ["http://apt.llvm.org/trusty/","llvm-toolchain-trusty-3.8","main"],
+        'deb' : ["http://apt.llvm.org/trusty/","llvm-toolchain-trusty-3.8","main"],
         'apt-key' : ['http://apt.llvm.org/llvm-snapshot.gpg.key'],
         'package' : 'clang-3.8',
         'command' : 'clang++-3.8',
@@ -56,7 +56,7 @@ toolset_info = {
         'version' : ''
         },
     'clang-3.9' : {
-        #'deb' : ["http://apt.llvm.org/trusty/","llvm-toolchain-trusty-3.8","main"],
+        'deb' : ["http://apt.llvm.org/trusty/","llvm-toolchain-trusty-3.8","main"],
         'apt-key' : ['http://apt.llvm.org/llvm-snapshot.gpg.key'],
         'package' : 'clang-3.9',
         'command' : 'clang++-3.9',
@@ -579,9 +579,9 @@ class ci_travis(object):
                         'sudo','add-apt-repository','--yes',ppa)
             if 'deb' in info:
                 utils.check_call(
-                    'sudo','deb',*info['deb'])
+                    'sudo','echo "deb %s" >> /etc/apt/sources.list',' '.join(info['deb']))
                 utils.check_call(
-                    'sudo','deb-src',*info['deb'])
+                    'sudo','echo "deb-src %s" >> /etc/apt/sources.list',' '.join(info['deb']))
             if 'apt-key' in info:
                 for key in info['apt-key']:
                     os.chdir(self.work_dir)
