@@ -588,7 +588,7 @@ class ci_travis(object):
                 utils.make_file('sources.list',
                     "deb %s"%(' '.join(info['deb'])),
                     "deb-src %s"%(' '.join(info['deb'])))
-                utils.check_call('sudo','bash -C cat sources.list >> /etc/apt/sources.list')
+                utils.check_call('sudo','bash','-C','cat','sources.list','>>','/etc/apt/sources.list')
             if 'apt-key' in info:
                 for key in info['apt-key']:
                     utils.check_call('wget',key,'-O','apt.key')
