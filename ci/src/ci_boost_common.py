@@ -56,7 +56,7 @@ toolset_info = {
         'version' : ''
         },
     'clang-3.9' : {
-        'deb' : ["http://apt.llvm.org/trusty/","llvm-toolchain-trusty-3.8","main"],
+        'deb' : ["http://apt.llvm.org/trusty/","llvm-toolchain-trusty-3.9","main"],
         'apt-key' : ['http://apt.llvm.org/llvm-snapshot.gpg.key'],
         'package' : 'clang-3.9',
         'command' : 'clang++-3.9',
