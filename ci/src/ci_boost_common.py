@@ -328,6 +328,12 @@ class utils:
         f.close()
     
     @staticmethod
+    def append_file(filename, *text):
+        f = codecs.open( filename, 'a', 'utf-8' )
+        f.write( string.join( text, '\n' ) )
+        f.close()
+    
+    @staticmethod
     def mem_info():
         if sys.platform == "darwin":
             utils.call("top","-l","1","-s","0","-n","0")
@@ -573,18 +579,17 @@ class ci_travis(object):
         '''
         info = toolset_info[toolset]
         if sys.platform.startswith('linux'):
+            os.chdir(self.work_dir)
             if 'ppa' in info:
                 for ppa in info['ppa']:
                     utils.check_call(
                         'sudo','add-apt-repository','--yes',ppa)
             if 'deb' in info:
-                utils.check_call(
-                    'sudo','echo "deb %s" >> /etc/apt/sources.list'%(' '.join(info['deb'])))
-                utils.check_call(
-                    'sudo','echo "deb-src %s" >> /etc/apt/sources.list'%(' '.join(info['deb'])))
+                utils.append_file('/etc/apt/sources.list',
+                    "deb %s"%(' '.join(info['deb'])),
+                    "deb-src %s"%(' '.join(info['deb'])))
             if 'apt-key' in info:
                 for key in info['apt-key']:
-                    os.chdir(self.work_dir)
                     utils.check_call('wget',key,'-O','apt.key')
                     utils.check_call('sudo','apt-key','add','apt.key')
             utils.check_call(
