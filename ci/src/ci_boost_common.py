@@ -585,7 +585,7 @@ class ci_travis(object):
                     utils.check_call(
                         'sudo','add-apt-repository','--yes',ppa)
             if 'deb' in info:
-                utils.write_file('sources.list',
+                utils.make_file('sources.list',
                     "deb %s"%(' '.join(info['deb'])),
                     "deb-src %s"%(' '.join(info['deb'])))
                 utils.check_call('sudo','bash -C cat sources.list >> /etc/apt/sources.list')
