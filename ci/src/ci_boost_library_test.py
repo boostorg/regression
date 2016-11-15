@@ -141,7 +141,8 @@ class script(script_common):
                 '' if not toolset_to_test else 'toolset=%s'%(toolset_to_test),
                 '' if not self.address_model else 'address-model=%s'%(self.address_model),
                 'variant=%s'%(self.variant),
-                '--test-type=%s'%(self.target)
+                '--test-type=%s'%(self.target),
+                '--verbose-test'
                 )
 
 main(script)
