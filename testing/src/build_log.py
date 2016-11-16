@@ -394,12 +394,12 @@ class BuildConsoleSummaryReport(object):
 
 class Main(object):
     
-    def __init__(self):
+    def __init__(self,args=None):
         op = optparse.OptionParser(
             usage="%prog [options] input+")
         op.add_option( '--output',
             help="type of output to generate" )
-        ( opt, inputs ) = op.parse_args()
+        ( opt, inputs ) = op.parse_args(args)
         bop = BuildOutputProcessor(inputs)
         output = None
         if opt.output == 'console':
