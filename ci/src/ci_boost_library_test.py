@@ -11,6 +11,8 @@ import shutil
 import sys
 from ci_boost_common import toolset_info, main, utils, script_common, ci_cli, set_arg
 
+__dirname__ = os.path.dirname(os.path.realpath(__file__))
+
 class script(script_common):
     '''
     Main script to test a Boost C++ Library.
@@ -72,6 +74,10 @@ class script(script_common):
         utils.log( "Install toolset: %s"%(self.toolset) )
         if self.toolset:
             self.command_install_toolset(self.toolset)
+        # Fetch the build log processor..
+        utils.web_get(
+            'https://raw.githubusercontent.com/boostorg/regression/develop/testing/src/build_log.py',
+            os.path.join(__dirname__, 'build_log.py'))
     
     def command_before_build(self):
         script_common.command_before_build(self)
@@ -144,5 +150,10 @@ class script(script_common):
                 '--test-type=%s'%(self.target),
                 '--verbose-test'
                 )
+            
+            import build_log
+            build_log.Main([
+                '--output=console',
+                os.path.join(self.build_dir,'regression.xml')])
 
 main(script)
