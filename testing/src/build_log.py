@@ -130,7 +130,7 @@ class BuildOutputProcessor(BuildOutputXMLParsing):
         test_target = self.get_child_data(test_node,tag='target',strip=True)
         ## print ">>> %s %s" %(test_name,test_target)
         self.test[test_name] = {
-            'library' : test_name.split('/')[0:-1],
+            'library' : "/".join(test_name.split('/')[0:-1]),
             'test-name' : test_name.split('/')[-1],
             'test-type' : test_node.getAttribute('type').lower(),
             'test-program' : self.get_child_data(test_node,tag='source',strip=True),
@@ -198,7 +198,7 @@ class BuildOutputProcessor(BuildOutputXMLParsing):
                 #~ regular build actions and don't need to show up in the
                 #~ regression results.
                 if not test:
-                    print "??? [%s] %s %s :: %s" %(action_type,name,target,test)
+                    ##print "??? [%s] %s %s :: %s" %(action_type,name,target,test)
                     return None
                 ##print "+++ [%s] %s %s :: %s" %(action_type,name,target,test)
                 #~ Collect some basic info about the action.
@@ -341,36 +341,40 @@ class BuildConsoleSummaryReport(object):
             test = self.bop.test[k]
             if len(test['actions']) > 0:
                 self.summary_info['total'] += 1
-                succeed = test['result'] == 'succeed'
+                ##print ">>>> {0}".format(test['test-name'])
+                if 'result' in test:
+                    succeed = test['result'] == 'succeed'
+                else:
+                    succeed = test['actions'][-1]['result'] == 'succeed'
                 if succeed:
                     self.summary_info['success'] += 1
                 else:
-                    self.failed.append(test)
+                    self.summary_info['failed'].append(test)
                 if succeed:
                     self.ok_print("[PASS] {0}",k)
                 else:
                     self.fail_print("[FAIL] {0}",k)
                 for action in test['actions']:
-                    self.print_action(action)
+                    self.print_action(succeed, action)
     
-    def print_action(self, action):
+    def print_action(self, test_succeed, action):
         '''
         Print the detailed info of failed or always print tests.
         '''
         #self.info_print(">>> {0}",action.keys())
-        if action['result'] == 'fail' or action['info']['always_show_run_output']:
+        if not test_succeed or action['info']['always_show_run_output']:
             output = action['output'].strip()
             if output != "":
                 p = self.fail_print if action['result'] == 'fail' else self.p_print
                 self.info_print("\n({0}) {1}",action['info']['name'],action['info']['path'])
-                p("\n{0}\n{1}",action['command'].strip(),output)
+                p("\n{0}\n\n{1}",action['command'].strip(),output)
     
     def print_summary(self):
         self.header_print("\nTesting summary..\n")
         self.p_print("Total: {0}",self.summary_info['total'])
-        self.p_print("Success: {0}",self.summary_info['total'])
+        self.p_print("Success: {0}",self.summary_info['success'])
         if self.failed:
-            self.fail_print("Failed: {0}",self.summary_info['total'])
+            self.fail_print("Failed: {0}",len(self.summary_info['failed']))
             for test in self.summary_info['failed']:
                 self.fail_print("  {0}/{1}",test['library'],test['test-name'])
     
