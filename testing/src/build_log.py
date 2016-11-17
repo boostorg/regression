@@ -328,15 +328,18 @@ class BuildConsoleSummaryReport(object):
             'success' : 0,
             'failed' : [],
             }
+        self.header_print("======================================================================")
         self.print_test_log()
         self.print_summary()
+        self.header_print("======================================================================")
     
     @property
     def failed(self):
         return len(self.summary_info['failed']) > 0
     
     def print_test_log(self):
-        self.header_print("\nTests run..\n")
+        self.header_print("Tests run..")
+        self.header_print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
         for k in sorted(self.bop.test.keys()):
             test = self.bop.test[k]
             if len(test['actions']) > 0:
@@ -366,11 +369,18 @@ class BuildConsoleSummaryReport(object):
             output = action['output'].strip()
             if output != "":
                 p = self.fail_print if action['result'] == 'fail' else self.p_print
-                self.info_print("\n({0}) {1}",action['info']['name'],action['info']['path'])
-                p("\n{0}\n\n{1}",action['command'].strip(),output)
+                self.info_print("")
+                self.info_print("({0}) {1}",action['info']['name'],action['info']['path'])
+                p("")
+                p("{0}",action['command'].strip())
+                p("")
+                for line in output.splitlines():
+                    p("{0}",line)
     
     def print_summary(self):
-        self.header_print("\nTesting summary..\n")
+        self.header_print("")
+        self.header_print("Testing summary..")
+        self.header_print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
         self.p_print("Total: {0}",self.summary_info['total'])
         self.p_print("Success: {0}",self.summary_info['success'])
         if self.failed:
