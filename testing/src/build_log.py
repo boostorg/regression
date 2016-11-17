@@ -406,8 +406,9 @@ class Main(object):
             output = BuildConsoleSummaryReport(bop, opt)
         if output:
             output.generate()
-            if output.failed:
-                exit(-1)
+            self.failed = output.failed
 
 if __name__ == '__main__':
-    Main()
+    m = Main()
+    if m.failed:
+        exit(-1)
