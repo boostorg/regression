@@ -312,11 +312,11 @@ class BuildOutputProcessor(BuildOutputXMLParsing):
 
 class BuildConsoleSummaryReport(object):
     
-    HEADER = '\033[95m'
-    INFO = '\033[94m'
-    OK = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
+    HEADER = '\033[35m\033[1m'
+    INFO = '\033[34m'
+    OK = '\033[32m'
+    WARNING = '\033[33m'
+    FAIL = '\033[31m'
     ENDC = '\033[0m'
     
     def __init__(self, bop, opt):
