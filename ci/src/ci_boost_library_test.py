@@ -151,9 +151,15 @@ class script(script_common):
                 '--verbose-test'
                 )
             
+            # Generate a readable test report.
             import build_log
-            build_log.Main([
+            log_main = build_log.Main([
                 '--output=console',
                 os.path.join(self.build_dir,'regression.xml')])
+            # And exit with an error if the report contains failures.
+            # This lets the CI notice the error and report a failed build.
+            # And hence trigger the failure machinery, like sending emails.
+            if log_main.failed:
+                exit(-1)
 
 main(script)
