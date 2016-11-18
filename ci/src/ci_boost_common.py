@@ -479,7 +479,7 @@ class script_common(object):
                     ci_command()
                 elif ci_script:
                     ci_script()
-    
+        
     def b2( self, *args, **kargs ):
         cmd = ['b2','--debug-configuration', '-j%s'%(self.jobs)]
         cmd.extend(args)
@@ -511,6 +511,9 @@ class script_common(object):
     def command_build(self):
         pass
 
+    def command_before_cache(self):
+        pass
+
     def command_after_success(self):
         pass
 
@@ -539,6 +542,7 @@ class ci_cli(object):
                 os.environ["PATH"] = doxygen_path+':'+os.environ['PATH']
         self.script = script
         self.work_dir = os.getcwd()
+        self.exit_result = 0
     
     def init(self, opt, kargs):
         kargs['actions'] = [
@@ -546,16 +550,24 @@ class ci_cli(object):
             'install',
             'before_build',
             'build',
+            'before_cache',
+            'finish'
             ]
         opt.add_option( '--repo',
             help="Boost repo short name we are testing with, and hence the repo we clone.")
         set_arg(kargs,'repo','boost')
         return kargs
     
+    def finish(self, result):
+        self.exit_result = result
+    
     def command_clone(self):
         self.script.root_dir = os.path.join(self.work_dir,'boostorg',self.script.repo)
         self.script.build_dir = os.path.join(os.path.dirname(self.script.root_dir), "build")
         utils.git_clone(self.script.repo, self.script.branch, self.script.commit, self.work_dir)
+    
+    def command_finish(self):
+        exit(self.exit_result)
 
 class ci_travis(object):
     '''
@@ -572,6 +584,9 @@ class ci_travis(object):
         set_arg(kargs,'commit', os.getenv("TRAVIS_COMMIT"))
         set_arg(kargs,'repo', os.getenv("TRAVIS_REPO_SLUG").split("/")[1])
         return kargs
+    
+    def finish(self, result):
+        exit(result)
     
     def install_toolset(self, toolset):
         '''
@@ -616,6 +631,9 @@ class ci_travis(object):
     def command_script(self):
         self.script.command_build()
 
+    def command_before_cache(self):
+        self.script.command_before_cache()
+
     def command_after_success(self):
         self.script.command_after_success()
 
@@ -646,6 +664,9 @@ class ci_circleci(object):
         set_arg(kargs,'commit', os.getenv("CIRCLE_SHA1"))
         set_arg(kargs,'repo', os.getenv("CIRCLE_PROJECT_REPONAME").split("/")[1])
         return kargs
+    
+    def finish(self, result):
+        exit(result)
     
     def command_machine_post(self):
         # Apt update for the pckages installs we'll do later.
@@ -693,6 +714,7 @@ class ci_circleci(object):
         # running the after_success we do it here as the build step
         # will halt accordingly.
         self.script.command_build()
+        self.script.command_before_cache()
         self.script.command_after_success()
     
     def command_test_post(self):
@@ -713,6 +735,9 @@ class ci_appveyor(object):
         set_arg(kargs,'variant',os.getenv("CONFIGURATION","debug"))
         return kargs
     
+    def finish(self, result):
+        exit(result)
+    
     # Appveyor commands in the order they are executed. We need
     # these to forward to our common commands, if they are different.
     
@@ -728,7 +753,7 @@ class ci_appveyor(object):
         self.script.command_build()
     
     def command_after_build(self):
-        pass
+        self.script.command_before_cache()
     
     def command_before_test(self):
         pass

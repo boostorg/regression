@@ -160,6 +160,14 @@ class script(script_common):
             # This lets the CI notice the error and report a failed build.
             # And hence trigger the failure machinery, like sending emails.
             if log_main.failed:
-                exit(-1)
+                self.ci.finish(-1)
+
+    def command_before_cache(self):
+        script_common.command_before_cache(self)
+        os.chdir(self.boost_root)
+        utils.check_call("git","clean","-dfqx")
+        utils.check_call("git","submodule","foreach","git","clean","-dfqx")
+        utils.check_call("git","status","-bs")
+        utils.check_call("git","submodule","foreach","git","status","-bs")
 
 main(script)
