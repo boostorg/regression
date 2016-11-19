@@ -379,7 +379,13 @@ class utils:
             utils.check_call("git","pull","--quiet","--no-recurse-submodules","--depth=50")
         if commit:
             utils.check_call("git","checkout","-qf",commit)
-        utils.check_call("git","submodule","update","--quiet","--init","--recursive")
+        if os.path.exists(os.path.join('.git','modules')):
+            if sys.platform == 'win32':
+                utils.check_call('dir',os.path.join('.git','modules'))
+            else:
+                utils.check_call('ls','-la',os.path.join('.git','modules'))
+        utils.check_call("git","submodule","--quiet","update","--quiet","--init","--recursive")
+        utils.check_call("git","submodule","--quiet","foreach","git","fetch")
         return root_dir
 
 class parallel_call(threading.Thread):
