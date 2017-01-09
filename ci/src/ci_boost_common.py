@@ -376,7 +376,7 @@ class utils:
             os.chdir(root_dir)
         else:
             os.chdir(root_dir)
-            utils.check_call("git","pull","--quiet","--no-recurse-submodules","--depth=50")
+            utils.check_call("git","pull","--quiet","--no-recurse-submodules")
         if commit:
             utils.check_call("git","checkout","-qf",commit)
         if os.path.exists(os.path.join('.git','modules')):
