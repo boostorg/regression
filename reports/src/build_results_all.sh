@@ -218,8 +218,8 @@ upload_results()
     upload_ext=.zip.${LOGNAME}.uploading
     mv ${1}.zip ${1}${upload_ext}
     rsync -vuz --rsh=ssh --stats \
-      ${1}.zip.${LOGNAME}.uploading grafik@beta.boost.org:/${upload_dir}/incoming/
-    ssh grafik@beta.boost.org \
+      ${1}.zip.${LOGNAME}.uploading grafik@wwww.boost.org:/${upload_dir}/incoming/
+    ssh grafik@wwww.boost.org \
       cp --no-preserve=timestamps ${upload_dir}/incoming/${1}${upload_ext} ${upload_dir}/live/${1}.zip
     mv ${1}${upload_ext} ${1}.zip
     cd "${cwd}"
