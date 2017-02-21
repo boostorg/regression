@@ -217,7 +217,7 @@ upload_results()
     fi
     upload_ext=.zip.${LOGNAME}.uploading
     mv ${1}.zip ${1}${upload_ext}
-    rsync -vuz --rsh=ssh --stats \
+    rsync -vuz "--rsh=ssh -l grafik" --stats \
       ${1}.zip.${LOGNAME}.uploading grafik@www.boost.org:/${upload_dir}/incoming/
     ssh grafik@wwww.boost.org \
       cp --no-preserve=timestamps ${upload_dir}/incoming/${1}${upload_ext} ${upload_dir}/live/${1}.zip
