@@ -286,12 +286,12 @@ class unzip_action( action ):
 def ftp_task( site, site_path , destination, filter_runners = None ):
     __log__ = 1
     utils.log( '' )
-    utils.log( 'ftp_task: "ftp://%s/%s" -> %s' % ( site, site_path, destination ) )
+    utils.log( 'ftp_task: "ftp://%s/%s" -> %s' % ( '??', '??', destination ) )
 
-    utils.log( '    logging on ftp site %s' % site )
+    utils.log( '    logging on ftp site %s' % '??' )
     f = ftplib.FTP( site )
     f.login()
-    utils.log( '    cwd to "%s"' % site_path )
+    utils.log( '    cwd to "%s"' % '??' )
     f.cwd( site_path )
 
     source_content = list_ftp( f, filter_runners )
