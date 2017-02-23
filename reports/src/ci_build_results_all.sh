@@ -206,21 +206,13 @@ upload_results()
     cd boost-reports
     upload_dir=/home/grafik/www.boost.org/testing
     
-    if [ -f ${1}/report.zip ]; then
-        mv ${1}/report.zip ${1}.zip
-    else
-        cd ${1}/all
-        rm -f ../../${1}.zip*
-        #~ zip -q -r -9 ../../${1} * -x '*.xml'
-        7za a -tzip -mx=9 ../../${1}.zip * '-x!*.xml'
-        cd "${cwd}"
-    fi
-    upload_ext=.zip.${LOGNAME}.uploading
+    mv ${1}/report.zip ${1}.zip
+    upload_ext=.zip.${LOGNAME}
     mv ${1}.zip ${1}${upload_ext}
     rsync -vuz "--rsh=ssh -l grafik" --stats \
-      ${1}.zip.${LOGNAME}.uploading grafik@www.boost.org:/${upload_dir}/incoming/
+      ${1}${upload_ext} grafik@www.boost.org:/${upload_dir}/incoming/
     ssh grafik@www.boost.org \
-      cp --no-preserve=timestamps ${upload_dir}/incoming/${1}${upload_ext} ${upload_dir}/live/${1}.zip
+      mv ${upload_dir}/incoming/${1}${upload_ext} ${upload_dir}/live/${1}.zip
     mv ${1}${upload_ext} ${1}.zip
     cd "${cwd}"
 }
