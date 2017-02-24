@@ -18,11 +18,16 @@ build_all()
     log_time "Start of testing. [build_all]"
     build_setup
     update_tools
-    build_results develop 2>&1 | tee boost-reports/develop.log
-    build_results master 2>&1 | tee boost-reports/master.log
-    upload_results develop
-    upload_results master
+    build_one develop &
+    build_one master &
+    wait
     log_time "End of testing. [build_all]"
+}
+
+build_one()
+{
+    build_results "${1}" 2>&1 | tee boost-reports/"${1}".log
+    upload_results "${1}"
 }
 
 git_update()
