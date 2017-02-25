@@ -10,7 +10,8 @@ machine:
 
 test:
   pre:
-    - mkdir -p "${HOME}/testing-reports"
+    - mkdir -p "${HOME}/testing-reports":
+        parallel: true
   override:
     - cd "${HOME}/testing-reports" && exec "${HOME}/${CIRCLE_PROJECT_REPONAME}/reports/src/ci_build_results_all.sh":
         parallel: true
