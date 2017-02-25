@@ -6,5 +6,5 @@
 
 test:
   override:
-    - exec ci_build_results_all.sh:
+    - exec "${HOME}/${CIRCLE_PROJECT_REPONAME}/ci_build_results_all.sh":
         parallel: true
