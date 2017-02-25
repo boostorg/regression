@@ -1,0 +1,10 @@
+# Use, modification, and distribution are
+# subject to the Boost Software License, Version 1.0. (See accompanying
+# file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+#
+# Copyright Rene Rivera 2017.
+
+test:
+  override:
+    - exec ci_build_results_all.sh:
+        parallel: true
