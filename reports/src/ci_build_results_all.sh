@@ -18,7 +18,8 @@ build_all()
     log_time "Start of testing. [build_all]"
     build_setup
     update_tools
-    case ${CIRCLE_NODE_INDEX} in
+    echo "CIRCLE_NODE_INDEX = [${CIRCLE_NODE_INDEX}]"
+    case "${CIRCLE_NODE_INDEX}" in
         0)
             build_one develop
             ;;
@@ -35,6 +36,7 @@ build_all()
 
 build_one()
 {
+    echo "Building results for branch: ${1}"
     build_results "${1}" 2>&1 | tee boost-reports/"${1}".log
     upload_results "${1}"
 }
