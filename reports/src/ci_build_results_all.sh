@@ -18,7 +18,6 @@ build_all()
     log_time "Start of testing. [build_all]"
     build_setup
     update_tools
-    echo "CIRCLE_NODE_INDEX = [${CIRCLE_NODE_INDEX}]"
     case "${CIRCLE_NODE_INDEX}" in
         0)
             build_one develop
