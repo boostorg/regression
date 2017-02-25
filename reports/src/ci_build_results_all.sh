@@ -18,9 +18,8 @@ build_all()
     log_time "Start of testing. [build_all]"
     build_setup
     update_tools
-    build_one develop &
-    build_one master &
-    wait
+    build_one develop
+    build_one master
     log_time "End of testing. [build_all]"
 }
 
