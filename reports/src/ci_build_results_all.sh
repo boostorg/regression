@@ -21,7 +21,6 @@ build_all()
     case ${CIRCLE_NODE_INDEX} in
         0) build_one develop ;;
         1) build_one master ;;
-        *) build_one develop ; build_one master ;;
     esac
     log_time "End of testing. [build_all]"
 }
