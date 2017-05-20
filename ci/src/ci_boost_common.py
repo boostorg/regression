@@ -441,6 +441,7 @@ class script_common(object):
         set_arg(kargs,'repo',None)
         set_arg(kargs,'root_dir',None)
         set_arg(kargs,'actions',None)
+        set_arg(kargs,'pull_request', None)
 
         #~ Defaults
         for (k,v) in kargs.iteritems():
@@ -589,6 +590,7 @@ class ci_travis(object):
         set_arg(kargs,'branch', os.getenv("TRAVIS_BRANCH"))
         set_arg(kargs,'commit', os.getenv("TRAVIS_COMMIT"))
         set_arg(kargs,'repo', os.getenv("TRAVIS_REPO_SLUG").split("/")[1])
+        set_arg(kargs,'pull_request', os.getenv('TRAVIS_PULL_REQUEST'))
         return kargs
     
     def finish(self, result):
@@ -669,6 +671,7 @@ class ci_circleci(object):
         set_arg(kargs,'branch', os.getenv("CIRCLE_BRANCH"))
         set_arg(kargs,'commit', os.getenv("CIRCLE_SHA1"))
         set_arg(kargs,'repo', os.getenv("CIRCLE_PROJECT_REPONAME").split("/")[1])
+        set_arg(kargs,'pull_request', os.getenv('CIRCLE_PR_NUMBER'))
         return kargs
     
     def finish(self, result):
@@ -739,6 +742,7 @@ class ci_appveyor(object):
         set_arg(kargs,'repo',os.getenv("APPVEYOR_REPO_NAME").split("/")[1])
         set_arg(kargs,'address_model',os.getenv("PLATFORM",None))
         set_arg(kargs,'variant',os.getenv("CONFIGURATION","debug"))
+        set_arg(kargs,'pull_request', os.getenv('APPVEYOR_PULL_REQUEST_NUMBER'))
         return kargs
     
     def finish(self, result):

@@ -96,7 +96,12 @@ class script(script_common):
         # Checkout the library commit we are testing.
         if self.repo != 'boost' and self.commit:
             os.chdir(self.repo_dir)
-            utils.check_call("git","checkout","-qf",self.commit)
+            if not self.pull_request:
+                utils.check_call("git","checkout","-qf",self.commit)
+            else:
+                utils.check_call("git","fetch","origin","-q",
+                    "+refs/pull/{}/merge".format(self.pull_request))
+                utils.check_call("git","checkout","-qf","FETCH_HEAD")
         
         # Create config file for toolset.
         if not isinstance(self.ci, ci_cli):
