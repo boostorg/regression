@@ -419,7 +419,10 @@ class utils:
                 utils.check_call('dir',os.path.join('.git','modules'))
             else:
                 utils.check_call('ls','-la',os.path.join('.git','modules'))
-        utils.check_call("git","submodule","--quiet","update","--quiet","--init","--recursive")
+        # Using depth on submoulde is a got 2.0 onward option. Hence for
+        # Traivs this means using a trusty Linux image.
+        utils.check_call("git","submodule","--quiet","update",
+            "--quiet","--init","--recursive","--depth=50")
         utils.check_call("git","submodule","--quiet","foreach","git","fetch")
         return root_dir
 
