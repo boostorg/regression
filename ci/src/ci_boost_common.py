@@ -590,7 +590,9 @@ class ci_travis(object):
         set_arg(kargs,'branch', os.getenv("TRAVIS_BRANCH"))
         set_arg(kargs,'commit', os.getenv("TRAVIS_COMMIT"))
         set_arg(kargs,'repo', os.getenv("TRAVIS_REPO_SLUG").split("/")[1])
-        set_arg(kargs,'pull_request', os.getenv('TRAVIS_PULL_REQUEST'))
+        set_arg(kargs,'pull_request',
+            os.getenv('TRAVIS_PULL_REQUEST') \
+                if os.getenv('TRAVIS_PULL_REQUEST') != 'false' else None)
         return kargs
     
     def finish(self, result):
