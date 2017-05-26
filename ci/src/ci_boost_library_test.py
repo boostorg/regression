@@ -84,24 +84,35 @@ class script(script_common):
         
         # Clone boost super-project.
         if self.repo != 'boost':
-            utils.git_clone('boost',self.branch,cwd=self.ci.work_dir)
-        
-        # Clone testing tools. Not needed, yet.
-        # utils.git_clone('regression','develop',cwd=self.ci.work_dir)
+            utils.git_clone('boost',self.branch,cwd=self.ci.work_dir,no_submodules=True)
+            utils.check_call("git","submodule","update","--quiet","--init","tools/build")
+            utils.check_call("git","submodule","update","--quiet","--init","tools/boostdep")
+            # The global jamfiles require config as they trigger build config checks.
+            utils.check_call("git","submodule","update","--quiet","--init","libs/config")
         
         # Find the path for the submodule of the repo we are testing.
         if self.repo != 'boost':
             self.repo_dir = os.path.join(self.boost_root,self.repo_path)
             
-        # Checkout the library commit we are testing.
-        if self.repo != 'boost' and self.commit:
-            os.chdir(self.repo_dir)
-            if not self.pull_request:
-                utils.check_call("git","checkout","-qf",self.commit)
-            else:
-                utils.check_call("git","fetch","origin","-q",
-                    "+refs/pull/{}/merge".format(self.pull_request))
-                utils.check_call("git","checkout","-qf","FETCH_HEAD")
+        if self.repo != 'boost':
+            utils.check_call("git","submodule","update","--quiet","--init",self.repo_path)
+            if self.commit:
+                # Checkout the library commit we are testing.
+                os.chdir(self.repo_dir)
+                if not self.pull_request:
+                    utils.check_call("git","checkout","-qf",self.commit)
+                else:
+                    utils.check_call("git","fetch","origin","-q",
+                        "+refs/pull/{}/merge".format(self.pull_request))
+                    utils.check_call("git","checkout","-qf","FETCH_HEAD")
+        
+        # Fetch the dependencies for the library we are testing.
+        if self.repo != 'boost':
+            os.chdir(self.boost_root)
+            utils.check_call(
+                sys.executable,
+                'tools/boostdep/depinst/depinst.py',
+                self.repo)
         
         # Create config file for toolset.
         if not isinstance(self.ci, ci_cli):

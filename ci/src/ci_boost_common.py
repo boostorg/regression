@@ -393,7 +393,7 @@ class utils:
         return boost_version
     
     @staticmethod
-    def git_clone(sub_repo, branch, commit = None, cwd = None):
+    def git_clone(sub_repo, branch, commit = None, cwd = None, no_submodules = False):
         '''
         This clone mimicks the way Travis-CI clones a project's repo. So far
         Travis-CI is the most limiting in the sense of only fetching partial
@@ -404,14 +404,16 @@ class utils:
         root_dir = os.path.join(cwd,'boostorg',sub_repo)
         if not os.path.exists(os.path.join(root_dir,'.git')):
             utils.check_call("git","clone",
-                "--depth=50",
+                "--depth=1",
                 "--branch=%s"%(branch),
                 "https://github.com/boostorg/%s.git"%(sub_repo),
                 root_dir)
             os.chdir(root_dir)
         else:
             os.chdir(root_dir)
-            utils.check_call("git","pull","--quiet","--no-recurse-submodules")
+            utils.check_call("git","pull",
+                "--depth=1",
+                "--quiet","--no-recurse-submodules")
         if commit:
             utils.check_call("git","checkout","-qf",commit)
         if os.path.exists(os.path.join('.git','modules')):
@@ -419,13 +421,11 @@ class utils:
                 utils.check_call('dir',os.path.join('.git','modules'))
             else:
                 utils.check_call('ls','-la',os.path.join('.git','modules'))
-        # Using depth on submoulde is a got 2.0 onward option. Hence for
-        # Traivs this means using a trusty Linux image.
-        utils.check_call("git","submodule","--quiet","update",
-            "--quiet","--init","--recursive",
-            # "--depth=50"
-            )
-        utils.check_call("git","submodule","--quiet","foreach","git","fetch")
+        if not no_submodules:
+            utils.check_call("git","submodule","--quiet","update",
+                "--quiet","--init","--recursive",
+                )
+            utils.check_call("git","submodule","--quiet","foreach","git","fetch")
         return root_dir
 
 class parallel_call(threading.Thread):
