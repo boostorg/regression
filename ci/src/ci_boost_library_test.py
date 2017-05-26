@@ -117,10 +117,16 @@ class script(script_common):
         # Create config file for toolset.
         if not isinstance(self.ci, ci_cli):
             utils.make_file(os.path.join(self.boost_root, 'project-config.jam'),
-                "using %s : %s : %s ;"%(
-                    toolset_info[self.toolset]['toolset'],
-                    toolset_info[self.toolset]['version'],
-                    toolset_info[self.toolset]['command']))
+                """
+using %(toolset)s : %(version)s : %(command)s ;
+using python : %(pyversion)s : "%(python)s" ;
+"""%{
+                'toolset':toolset_info[self.toolset]['toolset'],
+                'version':toolset_info[self.toolset]['version'],
+                'command':toolset_info[self.toolset]['command'],
+                'pyversion':"%s.%s"%(sys.version_info[0],sys.version_info[1]),
+                'python':sys.executable
+                })
 
     def command_build(self):
         script_common.command_build(self)
