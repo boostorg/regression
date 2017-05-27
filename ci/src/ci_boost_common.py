@@ -123,17 +123,12 @@ toolset_info = {
         },
     'mingw-5' : {
         'toolset' : 'gcc',
-        'command' : 'C:/MinGW/bin/g++.exe',
-        'version' : ''
-        },
-    'mingw64-5' : {
-        'toolset' : 'gcc',
-        'command' : 'C:/mingw-w64/i686-5.3.0-posix-dwarf-rt_v4-rev0/mingw64/bin/g++.exe',
+        'command' : 'C:\\MinGW\\bin\\g++.exe',
         'version' : ''
         },
     'mingw64-6' : {
         'toolset' : 'gcc',
-        'command' : 'C:/mingw-w64/x86_64-6.3.0-posix-seh-rt_v5-rev1/mingw64/bin/g++.exe',
+        'command' : 'C:\\mingw-w64\\x86_64-6.3.0-posix-seh-rt_v5-rev1\\mingw64\\bin\\g++.exe',
         'version' : ''
         },
     'vs-2008' : {
