@@ -412,7 +412,7 @@ class utils:
         else:
             os.chdir(root_dir)
             utils.check_call("git","pull",
-                "--depth=1",
+                # "--depth=1", # Can't do depth as we get merge errors.
                 "--quiet","--no-recurse-submodules")
         if commit:
             utils.check_call("git","checkout","-qf",commit)
