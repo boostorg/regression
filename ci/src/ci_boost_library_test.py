@@ -139,7 +139,15 @@ using python : %(pyversion)s : "%(python)s" ;
         
         # Set up tools.
         utils.makedirs(os.path.join(self.build_dir,'dist','bin'))
-        os.environ['PATH'] = os.path.join(self.build_dir,'dist','bin')+os.pathsep+os.environ['PATH']
+        if not isinstance(self.ci, ci_cli) and toolset_info[self.toolset]['command']:
+            os.environ['PATH'] = os.pathsep.join([
+                os.path.dirname(toolset_info[self.toolset]['command']),
+                os.path.join(self.build_dir,'dist','bin'),
+                os.environ['PATH']])
+        else:
+            os.environ['PATH'] = os.pathsep.join([
+                os.path.join(self.build_dir,'dist','bin'),
+                os.environ['PATH']])
         os.environ['BOOST_BUILD_PATH'] = self.build_dir
         
         # Bootstrap Boost Build engine.
