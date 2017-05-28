@@ -125,7 +125,7 @@ using python : %(pyversion)s : "%(python)s" ;
                 'version':toolset_info[self.toolset]['version'],
                 'command':toolset_info[self.toolset]['command'],
                 'pyversion':"%s.%s"%(sys.version_info[0],sys.version_info[1]),
-                'python':sys.executable
+                'python':sys.executable.replace("\\","\\\\")
                 })
 
     def command_build(self):
