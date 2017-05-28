@@ -368,15 +368,14 @@ class utils:
     
     @staticmethod
     def make_file(filename, *text):
-        f = codecs.open( filename, 'w', 'utf-8' )
-        f.write( string.join( text, '\n' ) )
-        f.close()
+        text = string.join( text, '\n' )
+        with codecs.open( filename, 'w', 'utf-8' ) as f:
+            f.write( text )
     
     @staticmethod
     def append_file(filename, *text):
-        f = codecs.open( filename, 'a', 'utf-8' )
-        f.write( string.join( text, '\n' ) )
-        f.close()
+        with codecs.open( filename, 'a', 'utf-8' ) as f:
+            f.write( string.join( text, '\n' ) )
     
     @staticmethod
     def mem_info():

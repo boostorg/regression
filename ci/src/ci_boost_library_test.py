@@ -34,6 +34,7 @@ class script(script_common):
         set_arg(kargs, 'target', os.getenv('TARGET', 'minimal'))
         set_arg(kargs, 'address_model', os.getenv("ADDRESS_MODEL",None))
         set_arg(kargs, 'variant', os.getenv("VARIANT","debug"))
+        set_arg(kargs, 'cxxflags', os.getenv("CXXFLAGS",None))
         return kargs
     
     def start(self):
@@ -116,14 +117,19 @@ class script(script_common):
         
         # Create config file for toolset.
         if not isinstance(self.ci, ci_cli):
+            cxxflags = None
+            if self.cxxflags:
+                cxxflags = self.cxxflags.split()
+                cxxflags = " <cxxflags>".join(cxxflags)
             utils.make_file(os.path.join(self.boost_root, 'project-config.jam'),
                 """
-using %(toolset)s : %(version)s : %(command)s ;
+using %(toolset)s : %(version)s : %(command)s : %(cxxflags)s ;
 using python : %(pyversion)s : "%(python)s" ;
 """%{
                 'toolset':toolset_info[self.toolset]['toolset'],
                 'version':toolset_info[self.toolset]['version'],
                 'command':toolset_info[self.toolset]['command'],
+                'cxxflags':"<cxxflags>"+cxxflags if cxxflags else "",
                 'pyversion':"%s.%s"%(sys.version_info[0],sys.version_info[1]),
                 'python':sys.executable.replace("\\","\\\\")
                 })
