@@ -375,7 +375,7 @@ class BuildConsoleSummaryReport(object):
                 p("{0}",action['command'].strip())
                 p("")
                 for line in output.splitlines():
-                    p("{0}",line)
+                    p("{0}",line.encode('utf-8'))
     
     def print_summary(self):
         self.header_print("")
