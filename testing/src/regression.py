@@ -22,7 +22,6 @@ git_info = {
         'git' : 'https://github.com/boostorg/build.git',
         'dir' : 'boost_bb',
         'subdir' : '',
-        'branch' : 'develop',
         },
     'regression' : {
         'git' : 'https://github.com/boostorg/regression.git',
@@ -312,7 +311,7 @@ class runner:
         self.log( 'Getting Boost.Build v2...' )
         self.git_checkout(
             git_info['build'],
-            git_info['build']['branch'])
+            self.git_branch())
         #~ Get the regression tools and utilities...
         self.log( 'Getting regression tools and utilities...' )
         self.git_checkout(
