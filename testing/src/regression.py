@@ -772,8 +772,8 @@ class runner:
             'arg' : args }
 
         if toolsets:
-            import string
-            cmd += ' toolset=' + toolsets
+            for toolset in toolsets.split( ',' ):
+                cmd += ' toolset=' + toolset
 
         return cmd
 
