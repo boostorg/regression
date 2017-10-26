@@ -10,6 +10,7 @@ REGRESSION_BRANCH=develop
 
 log_time()
 {
+    echo `date` "::" $1
     echo `date` "::" $1 >> boost-reports-time.log
 }
 
@@ -53,7 +54,7 @@ git_update()
         git init "${1}"
         cd "${1}"
         git remote add --no-tags -t "${2}" origin "${3}"
-        git fetch --depth=1
+        git fetch
         git checkout "${2}"
     fi
     cd "${cwd}"
@@ -192,6 +193,7 @@ build_results()
     cd "${1}"
     root=`pwd`
     boost=${cwd}/boost-reports/boost_root
+    (cd ${boost} && git checkout origin/${1} -- status/explicit-failures-markup.xml)
     report_info
     python "${cwd}/boost-reports/boost_regression/reports/src/boost_wide_report.py" \
         --locate-root="${root}" \
