@@ -43,6 +43,7 @@ build_one()
 
 git_update()
 {
+    echo git_update "${1}" "${2}" "${3}"
     cwd=`pwd`
     if [ -d "${1}" ]; then
         cd "${1}"
@@ -50,18 +51,14 @@ git_update()
         git pull --recurse-submodules
         git checkout "${2}"
     else
-        mkdir -p "${1}"
-        git init "${1}"
-        cd "${1}"
-        git remote add --no-tags -t "${2}" origin "${3}"
-        git fetch
-        git checkout "${2}"
+        git clone -b "${2}" "${3}" "${1}"
     fi
     cd "${cwd}"
 }
 
 git_submodule_update()
 {
+    echo git_submodule_update "${1}" "${2}"
     cwd=`pwd`
     cd "${1}"
     git submodule update --init "${2}"
