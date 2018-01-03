@@ -81,6 +81,7 @@ build_setup()
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/concept_check
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/config
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/container
+    git_submodule_update "${cwd}/boost-reports/boost_root" libs/container_hash
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/core
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/crc
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/date_time
