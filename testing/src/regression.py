@@ -668,13 +668,16 @@ class runner:
                 time.sleep( sleep_secs )
 
     def http_get( self, source_url, destination_file ):
-        import urllib
+        try:
+            from urllib.request import urlopen
+        except ImportError:
+            from urllib import urlopen
 
         proxies = None
         if hasattr(self,'proxy') and self.proxy is not None:
             proxies = { 'https' : self.proxy }
 
-        src = urllib.urlopen( source_url, proxies = proxies )
+        src = urlopen( source_url, proxies = proxies )
 
         f = open( destination_file, 'wb' )
         while True:
