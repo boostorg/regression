@@ -47,7 +47,7 @@ git_branch = {
     }
 
 class utils:
-    
+
     @staticmethod
     def system( commands ):
         if sys.platform == 'win32':
@@ -59,20 +59,20 @@ class utils:
         else:
             rc = os.system( '&&'.join( commands ) )
             return rc
-    
-        
+
+
     @staticmethod
     def checked_system( commands, valid_return_codes = [ 0 ] ):
-        rc = utils.system( commands ) 
+        rc = utils.system( commands )
         if rc not in [ 0 ] + valid_return_codes:
             raise Exception( 'Command sequence "%s" failed with return code %d' % ( commands, rc ) )
         return rc
-    
+
     @staticmethod
     def makedirs( path ):
         if not os.path.exists( path ):
             os.makedirs( path )
-    
+
     @staticmethod
     def log_level():
        frames = inspect.stack()
@@ -81,7 +81,7 @@ class utils:
            if i[0].f_locals.has_key( '__log__' ):
                level = level + i[0].f_locals[ '__log__' ]
        return level
-    
+
     @staticmethod
     def log( message ):
         sys.stderr.write( '# ' + '    ' * utils.log_level() +  message + '\n' )
@@ -209,7 +209,7 @@ class runner:
 
         #~ Initialize option dependent values.
         self.regression_root = root
-        
+
         #~ Boost paths.
         self.boost_root = os.path.join( self.regression_root, 'boost_root' )
         self.regression_results = os.path.join( self.regression_root, 'results' )
@@ -217,16 +217,16 @@ class runner:
             self.regression_log = os.path.join( self.regression_results, 'bjam.log' )
         else:
             self.regression_log = os.path.join( self.regression_results, 'bjam.xml' )
-        
+
         #~ Boost Build paths.
         self.tools_bb_root = os.path.join( self.regression_root,'boost_bb' )
         self.tools_bb_root = os.path.join( self.tools_bb_root, 'src')
         self.tools_bjam_root = os.path.join( self.regression_root,'boost_bb', 'src', 'engine' )
-        
+
         #~ Regression tools paths.
         self.tools_regression_root = os.path.join( self.regression_root,'boost_regression' )
         self.xsl_reports_dir = os.path.join( self.tools_regression_root, 'xsl_reports' )
-        
+
         self.timestamp_path = os.path.join( self.regression_root, 'timestamp' )
         if sys.platform == 'win32':
             self.patch_boost = 'patch_boost.bat'
@@ -444,7 +444,7 @@ class runner:
 
         source = 'tarball'
         revision = self.git_revision(self.boost_root)
-        
+
         # Generate expanded comment file that has extra status
         # information. In particular the revisions of all the git
         # repos in the test tree.
@@ -611,8 +611,8 @@ class runner:
 
         import re
         re_keyword_value = re.compile( r'^\$\w+:\s+(.*)\s+\$$' )
-        print '\n\tRevision: %s' % re_keyword_value.match( revision ).group( 1 )
-        print '\tLast modified on: %s\n' % re_keyword_value.match( modified ).group( 1 )
+        print('\n\tRevision: %s' % re_keyword_value.match( revision ).group( 1 ))
+        print('\tLast modified on: %s\n' % re_keyword_value.match( modified ).group( 1 ))
 
     #~ Utilities...
 
@@ -879,7 +879,7 @@ class runner:
             return git_branch[self.tag]
         else:
             return self.tag
-    
+
     def git_revision(self, root):
         result = ''
         if self.use_git:
@@ -1007,5 +1007,3 @@ class runner:
                 glob.glob( os.path.join( self.regression_root, 'boost[-_]*' ) )
                 if os.path.isdir( x )
             ]
-
-

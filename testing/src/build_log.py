@@ -389,22 +389,22 @@ class BuildConsoleSummaryReport(object):
                 self.fail_print("  {0}/{1}",test['library'],test['test-name'])
     
     def p_print(self, format, *args, **kargs):
-        print format.format(*args,**kargs)
+        print(format.format(*args,**kargs))
     
     def info_print(self, format, *args, **kargs):
-        print self.INFO+format.format(*args,**kargs)+self.ENDC
+        print(self.INFO+format.format(*args,**kargs)+self.ENDC)
     
     def header_print(self, format, *args, **kargs):
-        print self.HEADER+format.format(*args,**kargs)+self.ENDC
+        print(self.HEADER+format.format(*args,**kargs)+self.ENDC)
     
     def ok_print(self, format, *args, **kargs):
-        print self.OK+format.format(*args,**kargs)+self.ENDC
+        print(self.OK+format.format(*args,**kargs)+self.ENDC)
     
     def warn_print(self, format, *args, **kargs):
-        print self.WARNING+format.format(*args,**kargs)+self.ENDC
+        print(self.WARNING+format.format(*args,**kargs)+self.ENDC)
     
     def fail_print(self, format, *args, **kargs):
-        print self.FAIL+format.format(*args,**kargs)+self.ENDC
+        print(self.FAIL+format.format(*args,**kargs)+self.ENDC)
 
 class Main(object):
     

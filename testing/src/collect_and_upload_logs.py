@@ -555,8 +555,8 @@ commands = {
     }
 
 def usage():
-    print 'Usage: %s [command] [options]' % os.path.basename( sys.argv[0] )
-    print    '''
+    print('Usage: %s [command] [options]' % os.path.basename( sys.argv[0] ))
+    print(    '''
 Commands:
 \t%s
 
@@ -582,7 +582,7 @@ Options:
 \t--dart-server   The dart server to send results to.
 \t--ftp           The ftp URL to upload results to.
 ''' % '\n\t'.join( commands.keys() )
-
+)
     
 def main():
     if len(sys.argv) > 1 and sys.argv[1] in commands:
