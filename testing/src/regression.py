@@ -660,7 +660,7 @@ class runner:
         for attempts in range( max_attempts, -1, -1 ):
             try:
                 return f()
-            except Exception, msg:
+            except Exception as msg:
                 self.log( '%s failed with message "%s"' % ( f.__name__, msg ) )
                 if attempts == 0:
                     self.log( 'Giving up.' )
@@ -805,7 +805,7 @@ class runner:
             z.write( file_path, os.path.basename( file_path ) )
             z.close()
             utils.log( 'Done writing "%s".'% archive_path )
-        except Exception, msg:
+        except Exception as msg:
             utils.log( 'Warning: Compressing falied (%s)' % msg )
             utils.log( '         Trying to compress using a platform-specific tool...' )
             try:
