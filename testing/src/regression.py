@@ -669,15 +669,15 @@ class runner:
 
     def http_get( self, source_url, destination_file ):
         try:
-            from urllib.request import urlopen
+            from urllib.request import urlopen, Request
         except ImportError:
-            from urllib import urlopen
+            from urllib2 import urlopen, Request
 
-        proxies = None
+        req = Request(source_url)
         if hasattr(self,'proxy') and self.proxy is not None:
-            proxies = { 'https' : self.proxy }
+            req.set_proxy('https', self.proxy)
 
-        src = urlopen( source_url, proxies = proxies )
+        src = urlopen( req )
 
         f = open( destination_file, 'wb' )
         while True:
