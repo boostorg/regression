@@ -11,9 +11,9 @@ import os.path
 import shutil
 import sys
 try:
-    from urllib.request import FancyURLOpener
+    from urllib.request import FancyURLopener
 except ImportError:
-    from urllib import FancyURLOpener
+    from urllib import FancyURLopener
 
 #~ Using --skip-script-download is useful to avoid repeated downloading of
 #~ the regression scripts when doing the regression commands individually.
