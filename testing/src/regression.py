@@ -13,7 +13,6 @@ import optparse
 import os
 import os.path
 import platform
-import string
 import sys
 import time
 
@@ -52,7 +51,7 @@ class utils:
     def system( commands ):
         if sys.platform == 'win32':
             f = open( 'tmp.cmd', 'w' )
-            f.write( string.join( commands, '\n' ) )
+            f.write( "".join( commands, '\n' ) )
             f.close()
             rc = os.system( 'tmp.cmd' )
             return rc
@@ -547,10 +546,9 @@ class runner:
 
     def command_regression(self):
         import socket
-        import string
         try:
             mail_subject = 'Boost regression for %s on %s' % ( self.tag,
-                string.split(socket.gethostname(), '.')[0] )
+                socket.gethostname().split('.')[0] )
             start_time = time.localtime()
             if self.mail:
                 self.log( 'Sending start notification to "%s"' % self.mail )
@@ -696,7 +694,7 @@ class runner:
 
         if toolset is None:
             if self.toolsets is not None:
-                toolset = string.split( self.toolsets, ',' )[0]
+                toolset = self.toolsets.split(',' )[0]
             else:
                 toolset = tool[ 'default_toolset' ]
                 self.log( 'Warning: No bootstrap toolset for "%s" was specified.' % tool[ 'name' ] )
@@ -719,6 +717,12 @@ class runner:
         self.log( '%s succesfully built in "%s" location' % ( tool[ 'name' ], tool[ 'build_path' ] ) )
 
     def tool_path( self, name_or_spec ):
+        # Python 2 and 3 compatible
+        try:
+            basestring
+        except NameError:
+            basestring = str
+
         if isinstance( name_or_spec, basestring ):
             return os.path.join( self.regression_root, name_or_spec )
 
@@ -785,7 +789,7 @@ class runner:
             password = None
         else:
             server_name = self.smtp_login.split( '@' )[-1]
-            ( user_name, password ) = string.split( self.smtp_login.split( '@' )[0], ':' )
+            ( user_name, password ) = self.smtp_login.split( '@' )[0].split(':')
 
         log( '    Sending mail through "%s"...' % server_name )
         smtp_server = smtplib.SMTP( server_name )
