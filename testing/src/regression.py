@@ -77,7 +77,7 @@ class utils:
        frames = inspect.stack()
        level = 0
        for i in frames[ 3: ]:
-           if i[0].f_locals.has_key( '__log__' ):
+           if '__log__' in i[0].f_locals:
                level = level + i[0].f_locals[ '__log__' ]
        return level
 
@@ -752,7 +752,7 @@ class runner:
         else:
             cmd = './build.sh %s' % self.bjam_toolset
         env_setup_key = 'BJAM_ENVIRONMENT_SETUP'
-        if os.environ.has_key( env_setup_key ):
+        if env_setup_key in os.environ:
             return '%s & %s' % ( os.environ[env_setup_key], cmd )
         return cmd
 
