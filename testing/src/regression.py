@@ -710,7 +710,7 @@ class runner:
         else:
             raise 'Could not find "%s" source directory "%s"' % ( tool[ 'name' ], tool[ 'source_dir' ] )
 
-        if not tool.has_key( 'build_path' ):
+        if not 'build_path' in tool:
             tool[ 'build_path' ] = self.tool_path( tool )
 
         if not os.path.exists( tool[ 'build_path' ] ):
@@ -725,7 +725,7 @@ class runner:
         if os.path.exists( name_or_spec[ 'path' ] ):
             return name_or_spec[ 'path' ]
 
-        if name_or_spec.has_key( 'build_path' ):
+        if 'build_path' in name_or_spec:
             return name_or_spec[ 'build_path' ]
 
         build_dir = name_or_spec[ 'build_dir' ]
@@ -875,7 +875,7 @@ class runner:
         self.git_checkout(git_info['boost'], self.git_branch(), clean)
 
     def git_branch(self):
-        if git_branch.has_key(self.tag):
+        if self.tag in git_branch:
             return git_branch[self.tag]
         else:
             return self.tag
