@@ -791,17 +791,9 @@ int process_jam_log( const std::vector<std::string> & args )
 
     // these actions represent both the start of a new action
     // and the end of a failed action
-    else if ( line_start.find( "C++-action" ) != string::npos
-      || line_start.find( "vc-C++" ) != string::npos
-      || line_start.find( "C-action" ) != string::npos
-      || line_start.find( "Cc-action" ) != string::npos
-      || line_start.find( "vc-Cc" ) != string::npos
-      || line_start.find( ".compile.") != string::npos
-      || line_start.find( "compile-") != string::npos
-      || line_start.find( "-compile") != string::npos
-      || line_start.find( "Link-action" ) != string::npos
-      || line_start.find( "vc-Link" ) != string::npos
-      || line_start.find( "Archive-action" ) != string::npos
+    else if ( line_start.find( ".compile.") != string::npos
+      || line_start.find( "compile-c-c++") != string::npos // msvc
+      || line_start.find( "compile-fortran") != string::npos // xlf
       || line_start.find( ".archive") != string::npos
       || ( line_start.find( ".link") != string::npos &&
            // .linkonce is present in gcc linker messages about
@@ -817,10 +809,7 @@ int process_jam_log( const std::vector<std::string> & args )
         //~ return 1;
       //~ }
 
-      string action( ( line_start.find( "Link-action" ) != string::npos
-            || line_start.find( "vc-Link" ) != string::npos
-            || line_start.find( "Archive-action" ) != string::npos
-            || line_start.find( ".archive") != string::npos
+      string action( ( line_start.find( ".archive") != string::npos
             || line_start.find( ".link") != string::npos
             )
           ? "link" : "compile"
