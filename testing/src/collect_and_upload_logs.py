@@ -328,7 +328,7 @@ def compress_file( file_path, archive_path ):
         z.write( file_path, os.path.basename( file_path ) )
         z.close()
         utils.log( 'Done writing "%s".'% archive_path )
-    except Exception, msg:
+    except Exception as msg:
         utils.log( 'Warning: Compressing falied (%s)' % msg )
         utils.log( '         Trying to compress using a platform-specific tool...' )
         try: import zip_cmd
