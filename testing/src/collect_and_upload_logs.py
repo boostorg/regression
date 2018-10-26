@@ -41,7 +41,7 @@ class utils:
        frames = inspect.stack()
        level = 0
        for i in frames[ 3: ]:
-           if i[0].f_locals.has_key( '__log__' ):
+           if '__log__' in i[0].f_locals:
                level = level + i[0].f_locals[ '__log__' ]
        return level
 
@@ -58,7 +58,7 @@ class utils:
         ( option_pairs, rest_args ) = getopt.getopt( args, '', args_spec )
         map( lambda x: options.__setitem__( x[0], x[1] ), option_pairs )
 
-        if ( options.has_key( '--help' ) or len( options.keys() ) == defaults_num ):
+        if ( '--help' in options or len( options.keys() ) == defaults_num ):
             usage()
             sys.exit( 1 )
 
@@ -192,7 +192,7 @@ def publish_test_logs(
                         test['test-name'] = 'unknown'
                     if not test['toolset'] or test['toolset'] == '':
                         test['toolset'] = 'unknown'
-                    if not dart_dom.has_key(test['toolset']):
+                    if not test['toolset'] in dart_dom:
                         dart_dom[test['toolset']] = xml.dom.minidom.parseString(
 '''<?xml version="1.0" encoding="UTF-8"?>
 <DartSubmission version="2.0" createdby="collect_and_upload_logs.py">
@@ -556,7 +556,7 @@ def accept_args( args ):
         , 'ftp_proxy'       : options[ '--ftp-proxy' ]
         , 'http_proxy'      : options[ '--proxy' ]
         , 'debug_level'     : int(options[ '--debug-level' ])
-        , 'send_bjam_log'   : options.has_key( '--send-bjam-log' )
+        , 'send_bjam_log'   : '--send-bjam-log' in options
         , 'dart_server'     : options[ '--dart-server' ]
         , 'revision'        : options[ '--revision' ]
         , 'ftp'             : options[ '--ftp' ]
