@@ -17,13 +17,19 @@ try:
     import xmlrpc.client as xmlrpclib
 except ImportError:
     import xmlrpclib
-import httplib
+try:
+    import http.client as httplib
+except ImportError:
+    import httplib
 
 import os.path
 import string
 import sys
 import re
-import urlparse
+try:
+    import urllib.parse as urlparse
+except ImportError:
+    import urlparse
 import getopt
 import inspect
 
@@ -142,7 +148,7 @@ class xmlrpcProxyTransport(xmlrpclib.Transport):
         self.proxy = proxy
     def make_connection(self, host):
         self.realhost = host
-        return httplib.HTTP(self.proxy)
+        return httplib.HTTPConnection(self.proxy)
     def send_request(self, connection, handler, request_body):
         connection.putrequest('POST','http://%s%s' % (self.realhost,handler))
     def send_host(self, connection, host):
