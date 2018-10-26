@@ -84,7 +84,13 @@ def chr_or_question_mark( c ):
     else:
         return '?'
 
-char_translation_table = string.maketrans(
+
+if sys.version_info[0] == 3:
+    maketrans = str.maketrans
+else:
+    maketrans = string.maketrans
+
+char_translation_table = maketrans(
       ''.join( map( chr, range(0, 256) ) )
     , ''.join( map( chr_or_question_mark, range(0, 256) ) )
     )
@@ -98,7 +104,7 @@ def process_xml_file( input_file, output_file ):
     f.close()
 
     for i in range( 0, len(xml)):
-        xml[i] = string.translate( xml[i], char_translation_table )
+        xml[i] = xml[i].translate( char_translation_table )
 
     output_file.writelines( xml )
 
