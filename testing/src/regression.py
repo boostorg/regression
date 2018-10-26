@@ -637,11 +637,12 @@ class runner:
     def rmtree(self,path):
         if os.path.exists( path ):
             import shutil
-            from builtins import str
+            if sys.version_info[0] == 3:
+                unicode = str
             #~ shutil.rmtree( unicode( path ) )
             if sys.platform == 'win32':
                 os.system( 'del /f /s /q "%s" >nul 2>&1' % path )
-                shutil.rmtree( str( path ) )
+                shutil.rmtree( unicode( path ) )
             else:
                 os.system( 'rm -f -r "%s"' % path )
 
