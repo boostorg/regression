@@ -13,7 +13,10 @@ import ftplib
 import time
 import stat
 import xml.dom.minidom
-import xmlrpclib
+try:
+    import xmlrpc.client as xmlrpclib
+except ImportError:
+    import xmlrpclib
 import httplib
 
 import os.path
