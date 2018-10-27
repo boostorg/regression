@@ -120,7 +120,8 @@ def collect_test_logs( input_dirs, test_results_writer ):
     utils.log( 'Collecting test logs ...' )
     for input_dir in input_dirs:
         utils.log( 'Walking directory "%s" ...' % input_dir )
-        os.path.walk( input_dir, process_test_log_files, test_results_writer )
+        for name, dirs, files in os.walk( input_dir ):
+            process_test_log_files(test_results_writer, name, files)
 
 dart_status_from_result = {
     'succeed': 'passed',
@@ -237,7 +238,8 @@ def publish_test_logs(
 
     for input_dir in input_dirs:
         utils.log( 'Walking directory "%s" ...' % input_dir )
-        os.path.walk( input_dir, _publish_test_log_files_, None )
+        for name, dirs, files in os.path.walk( input_dir ):
+            _publish_test_log_files_( None, name, files)
     if dart_server:
         try:
             rpc_transport = None
