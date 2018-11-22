@@ -712,7 +712,14 @@ int process_jam_log( const std::vector<std::string> & args )
   }
   else if ( !locate_root.has_root_path() )
   {
-    locate_root = ( fs::initial_path() / locate_root ).normalize();
+    // path.normalize() encodes to dot terinated path if trailing non-root slash is present.
+    //   path{"/foo/"}.normalize() //=> /foo/.
+    // In this case, stringized path is 2 chars longer than non dot terminated path, and it
+    // may fail to construct correct path in target_directory(). To avoid this behaviour
+    // make file path form once, and get normalized parent path.
+    //
+    // https://www.boost.org/libs/filesystem/doc/reference.html#path-iterators
+    locate_root = ( fs::initial_path() / locate_root / "entry" ).normalize().parent_path();
   }
 
   if ( input == 0 )
