@@ -284,6 +284,25 @@ class unzip_action( action ):
             utils.log( '  Skipping "%s" due to errors (%s)' % ( self.source_, msg ) )
 
 
+class FtpFileProgress( object ):
+    def __init__(self, filename, mode='wb'):
+        self.f = open( filename, mode )
+        self.bytes_processed = 0
+        self.last_output = 0
+        self.output_size = 100000
+
+    def write(self, file_bytes):
+        self.f.write(file_bytes)
+        self.bytes_processed += len(file_bytes)
+
+        if self.bytes_processed > self.last_output + self.output_size:
+            sys.stdout.write('.')
+            self.last_output += self.output_size
+
+    def close(self):
+        self.f.close()
+    
+
 def ftp_task( site, site_path , destination, filter_runners = None ):
     __log__ = 1
     utils.log( '' )
@@ -303,7 +322,7 @@ def ftp_task( site, site_path , destination, filter_runners = None ):
     def synchronize():
         for source in d[0]:
             utils.log( 'Copying "%s"' % source )
-            result = open( os.path.join( destination, source ), 'wb' )
+            result = FtpFileProgress( os.path.join( destination, source ), 'wb')
             f.retrbinary( 'RETR %s' % source, result.write )
             result.close()
             mod_date = find_by_name( source_content, source ).date
