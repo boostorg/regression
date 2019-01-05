@@ -289,7 +289,7 @@ class FtpFileProgress( object ):
         self.f = open( filename, mode )
         self.bytes_processed = 0
         self.last_output = 0
-        self.output_size = 100000
+        self.output_size = 1000000
 
     def write(self, file_bytes):
         self.f.write(file_bytes)
