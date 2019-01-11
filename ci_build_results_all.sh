@@ -92,6 +92,7 @@ build_setup()
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/format
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/function
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/functional
+    git_submodule_update "${cwd}/boost-reports/boost_root" libs/headers
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/integer
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/io
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/iostreams
@@ -120,6 +121,7 @@ build_setup()
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/utility
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/variant
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/wave
+    git_submodule_update "${cwd}/boost-reports/boost_root" tools/boost_install
     git_submodule_update "${cwd}/boost-reports/boost_root" tools/inspect
     log_time "Git; boost_regression [build_setup]"
     git_update "${cwd}/boost-reports/boost_regression" ${REGRESSION_BRANCH} 'https://github.com/boostorg/regression.git'
