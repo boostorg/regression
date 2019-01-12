@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: alpine:3.7
+      - image: ubuntu:xenial
     parallelism: 2
     steps:
       - checkout
