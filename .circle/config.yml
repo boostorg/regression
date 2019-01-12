@@ -5,4 +5,5 @@ jobs:
       - image: alpine:3.7
     parallelism: 2
     steps:
+      - checkout
       - run: source ./ci_build_results_all.sh
