@@ -1,0 +1,8 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: alpine:3.7
+    parallelism: 2
+    steps:
+      - run: source ./ci_build_results_all.sh
