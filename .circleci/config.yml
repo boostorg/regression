@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: ubuntu:xenial
+      - image: conanio/gcc5
     parallelism: 2
     steps:
       - checkout
