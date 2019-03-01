@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: conanio/gcc5
+      - image: gcc:5
     parallelism: 2
     steps:
       - checkout
