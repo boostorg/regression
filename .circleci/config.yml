@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: gcc:5
+      - image: djarek/boost_regression_docker
     parallelism: 2
     steps:
       - checkout
