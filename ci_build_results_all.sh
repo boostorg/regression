@@ -217,7 +217,7 @@ upload_results()
     mv ${1}/report.zip ${1}.zip
     upload_ext=.zip.${LOGNAME}
     mv ${1}.zip ${1}${upload_ext}
-    rsync -vuz "--rsh=ssh -l grafik" --stats \
+    rsync -vuz "--rsh=ssh -o StrictHostKeyChecking=no -l grafik" --stats \
       ${1}${upload_ext} grafik@www.boost.org:/${upload_dir}/incoming/
     ssh grafik@www.boost.org \
       mv ${upload_dir}/incoming/${1}${upload_ext} ${upload_dir}/live/${1}.zip
