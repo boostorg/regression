@@ -850,9 +850,10 @@ class runner:
                 self.git_command( 'checkout', branch)
                 self.git_command( 'submodule', 'update', '--init' )
                 if clean:
-                    self.git_command( 'submodule foreach', 'git reset --quiet --hard ; git clean -fxd')
                     self.git_command( 'reset', '--hard' )
                     self.git_command( 'clean', '-fxd')
+                    # After clean to restore headers removed by git-for-windows.
+                    self.git_command( 'submodule foreach', 'git reset --quiet --hard ; git clean -fxd')
                     # self.git_command( 'status' )
             else:
                 self.git_command(
