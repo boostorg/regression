@@ -249,7 +249,7 @@ void process_test_log(test_structure_t::test_log_t& test_log,
         if ( ( it = test_log.targets.find("compile") ) != end ) {
             BOOST_ASSERT(it->second.contents);
             boost::string_ref val(it->second.contents->value(), it->second.contents->value_size());
-            if ( find_regex(val, "warning") ) {
+            if ( find_regex(val, "\\bwarning\\b") ) {
                 test_log.pass_warning = true;
             }
         }
