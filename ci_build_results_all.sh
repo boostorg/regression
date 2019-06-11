@@ -136,6 +136,7 @@ update_tools()
     cwd=`pwd`
     cd "${cwd}/boost-reports/boost_bb"
     ./bootstrap.sh
+    ./b2 headers
     cd "${cwd}/boost-reports/boost_regression/reports/build"
     "${cwd}/boost-reports/boost_bb/b2" \
         "--boost-build=${cwd}/boost-reports/boost_bb/src" \
