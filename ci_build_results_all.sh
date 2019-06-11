@@ -141,7 +141,7 @@ update_tools()
         "--boost-build=${cwd}/boost-reports/boost_bb/src" \
         headers
     cd "${cwd}/boost-reports/boost_regression/reports/build"
-    "${cwd}/boost-reports/boost_bb/b2" \
+    "${cwd}/boost-reports/boost_bb/b2 -j1" \
         "--boost-build=${cwd}/boost-reports/boost_bb/src" \
         "--boost-root=${cwd}/boost-reports/boost_root" install
     cd "${cwd}"
