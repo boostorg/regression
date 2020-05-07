@@ -11,7 +11,7 @@ exe process_jam_log
     ;
 explicit process_jam_log ;
 
-alias install : exec ;
+alias install : exec scripts ;
 install exec
     :
     process_jam_log/<variant>release
@@ -20,3 +20,13 @@ install exec
     <location>$(INSTALL_PREFIX_EXEC)
     ;
 explicit install exec ;
+
+install scripts
+    :
+    ../src/regression.py
+    ../src/collect_and_upload_logs.py
+    ../src/process_jam_log.py
+    :
+    <location>$(INSTALL_PREFIX_EXEC)
+    ;
+explicit install scripts ;
