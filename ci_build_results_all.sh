@@ -100,6 +100,7 @@ build_setup()
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/lexical_cast
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/math
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/move
+    git_submodule_update "${cwd}/boost-reports/boost_root" libs/mp11
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/mpl
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/numeric/conversion
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/optional
