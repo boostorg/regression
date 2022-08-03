@@ -233,7 +233,7 @@ void process_test_log(test_structure_t::test_log_t& test_log,
                 test_log.fail_info = test_structure_t::fail_cerr;
             } else if ( find_regex(val, "second time limit exceeded") ) {
                 test_log.fail_info = test_structure_t::fail_time;
-            } else if ( find_regex(val, "(File too big)|(/bigobj)") ) {
+            } else if ( find_regex(val, "File too big") ) {
                 test_log.fail_info = test_structure_t::fail_file;
             } else if ( find_regex(val, "virtual memory exhausted") ) {
                 test_log.fail_info = test_structure_t::fail_other;
