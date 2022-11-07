@@ -85,6 +85,7 @@ build_setup()
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/core
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/crc
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/date_time
+    git_submodule_update "${cwd}/boost-reports/boost_root" libs/describe
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/detail
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/exception
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/filesystem
