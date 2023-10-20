@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+      - develop
+      - feature/**
+
+jobs:
+  posix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Boost
+        run: |
+          BOOST_BRANCH=develop
+          cd ..
+          git clone -b $BOOST_BRANCH --depth 1 https://github.com/boostorg/boost.git boost-root
+          cd boost-root
+          git submodule update --init
+          ./bootstrap.sh
+          ./b2 -d0 -j2 headers
+
+      - name: Build tools
+        run: |
+          ../boost-root/b2 -j2 --boost-root=../boost-root build//install

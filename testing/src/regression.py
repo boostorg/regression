@@ -230,7 +230,7 @@ class runner:
         self.timestamp_path = os.path.join( self.regression_root, 'timestamp' )
         if sys.platform == 'win32':
             self.patch_boost = 'patch_boost.bat'
-            self.bjam = { 'name' : 'bjam.exe' }
+            self.bjam = { 'name' : 'b2.exe' }
             self.process_jam_log = { 'name' : 'process_jam_log.exe' }
         elif sys.platform == 'cygwin':
             self.patch_boost = 'patch_boost'
@@ -254,7 +254,7 @@ class runner:
             'path' : os.path.join(self.tools_regression_root,'stage','bin',self.process_jam_log['name']),
             'source_dir' : os.path.join(self.tools_regression_root,'testing','build'),
             'build_dir' : os.path.join(self.tools_regression_root,'stage','bin'),
-            'build_args' : 'install -d2'
+            'build_args' : 'install -d2 -j2'
             }
 
         if self.debug_level > 0:

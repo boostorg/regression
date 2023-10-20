@@ -229,11 +229,11 @@ void process_test_log(test_structure_t::test_log_t& test_log,
             
             BOOST_ASSERT(it->second.contents);
             boost::string_ref val(it->second.contents->value(), it->second.contents->value_size());
-            if ( find_regex(val, "([Ii]nternal error)|([Ii]nternal compiler error)|([Ss]egmentation fault)|(unable to execute command: Aborted)") ) {
+            if ( find_regex(val, "([Ii]nternal error)|((?i)Internal compiler error(?-i))|([Ss]egmentation fault)|(unable to execute command: Abort)") ) {
                 test_log.fail_info = test_structure_t::fail_cerr;
             } else if ( find_regex(val, "second time limit exceeded") ) {
                 test_log.fail_info = test_structure_t::fail_time;
-            } else if ( find_regex(val, "(File too big)|(/bigobj)") ) {
+            } else if ( find_regex(val, "File too big") ) {
                 test_log.fail_info = test_structure_t::fail_file;
             } else if ( find_regex(val, "virtual memory exhausted") ) {
                 test_log.fail_info = test_structure_t::fail_other;
@@ -249,7 +249,7 @@ void process_test_log(test_structure_t::test_log_t& test_log,
         if ( ( it = test_log.targets.find("compile") ) != end ) {
             BOOST_ASSERT(it->second.contents);
             boost::string_ref val(it->second.contents->value(), it->second.contents->value_size());
-            if ( find_regex(val, "warning") ) {
+            if ( find_regex(val, "\\bwarning\\b") ) {
                 test_log.pass_warning = true;
             }
         }
