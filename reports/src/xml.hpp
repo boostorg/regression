@@ -18,6 +18,7 @@
 #include <boost/unordered_map.hpp>
 #include <boost/unordered_set.hpp>
 #include <boost/variant.hpp>
+#include <map>
 
 #include "html_writer.hpp"
 

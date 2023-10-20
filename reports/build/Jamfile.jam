@@ -16,6 +16,7 @@ exe boost_report
     :
     <define>BOOST_ALL_NO_LIB=1
     <implicit-dependency>/boost//headers
+    <variant>release:<optimization>space
     ;
 explicit boost_report ;
 
