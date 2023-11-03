@@ -347,6 +347,12 @@ class runner:
     def command_setup(self):
         self.command_patch()
         self.build_if_needed(self.bjam,self.bjam_toolset)
+        headers_cmd = self.bjam_cmd(None, 'headers')
+        cd = os.getcwd()
+        self.log( 'Updating headers (%s)...' % headers_cmd )
+        os.chdir( self.boost_root )
+        utils.system( [ headers_cmd ] )
+        os.chdir( cd )
         if self.pjl_toolset != 'python':
             self.build_if_needed(self.process_jam_log,self.pjl_toolset)
 
