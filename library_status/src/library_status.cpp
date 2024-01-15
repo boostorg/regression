@@ -25,6 +25,7 @@ program maintenance.
 *******************************************************************************/
 
 #include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/directory.hpp>
 #include <boost/filesystem/fstream.hpp>
 #include <boost/foreach.hpp>
 

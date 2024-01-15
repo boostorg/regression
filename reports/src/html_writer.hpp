@@ -10,7 +10,6 @@
 #define HTML_WRITER_HPP_INCLUDED
 
 #include <boost/filesystem/path.hpp>
-#include <boost/filesystem/convenience.hpp>
 #include <boost/iostreams/device/file_descriptor.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>

@@ -17,7 +17,6 @@
 #include "boost/filesystem/operations.hpp"
 #include "boost/filesystem/fstream.hpp"
 #include "boost/filesystem/exception.hpp"
-#include "boost/filesystem/convenience.hpp"
 
 #include <iostream>
 #include <string>
@@ -453,8 +452,8 @@ namespace
     ~test_log()
     {
       fs::path pth( locate_root / m_target_directory / "test_log.xml" );
-      if ( create_dirs && !fs::exists( pth.branch_path() ) )
-          fs::create_directories( pth.branch_path() );
+      if ( create_dirs && !fs::exists( pth.parent_path() ) )
+          fs::create_directories( pth.parent_path() );
       fs::ofstream file( pth );
       if ( !file )
       {
@@ -661,7 +660,7 @@ int process_jam_log( const std::vector<std::string> & args )
       }
       boost_root = fs::path( *args_i );
       if ( !boost_root.has_root_path() )
-        boost_root = ( fs::initial_path() / boost_root ).normalize();
+        boost_root = ( fs::initial_path() / boost_root ).lexically_normal();
     }
     else if ( *args_i == "--locate-root" )
     {
@@ -702,7 +701,7 @@ int process_jam_log( const std::vector<std::string> & args )
       std::cout << "Abort: not able to locate the boost root\n";
       return 1;
     }
-    boost_root.normalize();
+    boost_root = boost_root.lexically_normal();
   }
 
 
@@ -712,7 +711,7 @@ int process_jam_log( const std::vector<std::string> & args )
   }
   else if ( !locate_root.has_root_path() )
   {
-    locate_root = ( fs::initial_path() / locate_root ).normalize();
+    locate_root = ( fs::initial_path() / locate_root ).lexically_normal();
   }
 
   if ( input == 0 )
