@@ -225,10 +225,25 @@ upload_results()
     mv ${1}/report.zip ${1}.zip
     upload_ext=.zip.${LOGNAME}
     mv ${1}.zip ${1}${upload_ext}
+
+    # Upload to wowbagger
     rsync -vuz "--rsh=ssh -o StrictHostKeyChecking=no -l grafik" --stats \
-      ${1}${upload_ext} grafik@www.boost.org:/${upload_dir}/incoming/
+      ${1}${upload_ext} grafik@www.boost.org:/${upload_dir}/incoming/ || true
     ssh grafik@www.boost.org \
-      mv ${upload_dir}/incoming/${1}${upload_ext} ${upload_dir}/live/${1}.zip
+      mv ${upload_dir}/incoming/${1}${upload_ext} ${upload_dir}/live/${1}.zip || true
+
+    # Upload to regression.boost.io
+    BRANCH=${1}
+    upload_user="regression"
+    upload_server="regression.boost.io"
+    upload_dir_r=/home/regression/incoming
+    web_dir_r=/var/www/html/regression/${BRANCH}
+    rsync -vuz "--rsh=ssh -o StrictHostKeyChecking=no -l ${upload_user}" --stats \
+      ${BRANCH}${upload_ext} ${upload_user}@${upload_server}:${upload_dir_r}/ || true
+    ssh ${upload_user}@${upload_server} \
+      mv ${upload_dir_r}/${BRANCH}${upload_ext} ${web_dir_r}/${BRANCH}.zip || true
+    ssh ${upload_user}@${upload_server} "cd ${web_dir_r}; nohup unzip -o ${BRANCH}.zip > /tmp/unzip.txt 2>&1 < /dev/null &" || true
+
     mv ${1}${upload_ext} ${1}.zip
     cd "${cwd}"
 }
