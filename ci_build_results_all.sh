@@ -228,8 +228,8 @@ upload_results()
 
     # Upload to wowbagger
     rsync -vuz "--rsh=ssh -o StrictHostKeyChecking=no -l grafik" --stats \
-      ${1}${upload_ext} grafik@www.boost.org:/${upload_dir}/incoming/ || true
-    ssh grafik@www.boost.org \
+      ${1}${upload_ext} grafik@original.boost.org:/${upload_dir}/incoming/ || true
+    ssh grafik@original.boost.org \
       mv ${upload_dir}/incoming/${1}${upload_ext} ${upload_dir}/live/${1}.zip || true
 
     # Upload to regression.boost.io
