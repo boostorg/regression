@@ -111,6 +111,7 @@ build_setup()
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/preprocessor
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/property_tree
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/program_options
+    git_submodule_update "${cwd}/boost-reports/boost_root" libs/random
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/range
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/regex
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/scope
