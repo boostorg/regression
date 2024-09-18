@@ -93,6 +93,7 @@ build_setup()
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/format
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/function
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/functional
+    git_submodule_update "${cwd}/boost-reports/boost_root" libs/function_types
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/headers
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/integer
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/io
