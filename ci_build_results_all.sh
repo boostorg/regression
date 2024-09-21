@@ -74,9 +74,11 @@ build_setup()
     log_time "Git; boost_root [build_setup]"
     git_update "${cwd}/boost-reports/boost_root" master 'https://github.com/boostorg/boost.git'
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/algorithm
+    git_submodule_update "${cwd}/boost-reports/boost_root" libs/align
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/any
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/array
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/assert
+    git_submodule_update "${cwd}/boost-reports/boost_root" libs/atomic
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/bind
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/concept_check
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/config
@@ -92,8 +94,8 @@ build_setup()
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/foreach
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/format
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/function
-    git_submodule_update "${cwd}/boost-reports/boost_root" libs/functional
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/function_types
+    git_submodule_update "${cwd}/boost-reports/boost_root" libs/functional
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/fusion
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/headers
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/integer
@@ -123,10 +125,13 @@ build_setup()
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/tuple
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/type_index
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/type_traits
+    git_submodule_update "${cwd}/boost-reports/boost_root" libs/typeof
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/unordered
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/utility
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/variant
+    git_submodule_update "${cwd}/boost-reports/boost_root" libs/variant2
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/wave
+    git_submodule_update "${cwd}/boost-reports/boost_root" libs/winapi
     git_submodule_update "${cwd}/boost-reports/boost_root" tools/boost_install
     git_submodule_update "${cwd}/boost-reports/boost_root" tools/inspect
     log_time "Git; boost_regression [build_setup]"
