@@ -4,7 +4,7 @@
 #~ Distributed under the Boost Software License, Version 1.0.
 #~ (See accompanying file LICENSE_1_0.txt or http://www.boost.org/LICENSE_1_0.txt)
 
-set -e
+set -ex
 
 REGRESSION_BRANCH=develop
 
@@ -234,13 +234,18 @@ upload_results()
     upload_ext=.zip.${LOGNAME}
     mv ${1}.zip ${1}${upload_ext}
 
-    # Upload to wowbagger
+    echo "Upload to wowbagger"
+    date
     rsync -vuz "--rsh=ssh -o StrictHostKeyChecking=no -l grafik" --stats \
       ${1}${upload_ext} grafik@original.boost.org:/${upload_dir}/incoming/ || true
+    date
+    echo "Upload complete. Now relocating the file"
     ssh grafik@original.boost.org \
       mv ${upload_dir}/incoming/${1}${upload_ext} ${upload_dir}/live/${1}.zip || true
+    date
 
-    # Upload to regression.boost.io
+    echo "Upload to regression.boost.io"
+    date
     BRANCH=${1}
     upload_user="regression"
     upload_server="regression.boost.io"
@@ -248,9 +253,14 @@ upload_results()
     web_dir_r=/var/www/html/regression/${BRANCH}
     rsync -vuz "--rsh=ssh -o StrictHostKeyChecking=no -l ${upload_user}" --stats \
       ${BRANCH}${upload_ext} ${upload_user}@${upload_server}:${upload_dir_r}/ || true
+    date
+    echo "Upload complete. Now moving the file"
     ssh ${upload_user}@${upload_server} \
       mv ${upload_dir_r}/${BRANCH}${upload_ext} ${web_dir_r}/${BRANCH}.zip || true
+    date
+    echo "Unzip file"
     ssh ${upload_user}@${upload_server} "cd ${web_dir_r}; nohup unzip -o ${BRANCH}.zip > /tmp/unzip.txt 2>&1 < /dev/null &" || true
+    date
 
     mv ${1}${upload_ext} ${1}.zip
     cd "${cwd}"
