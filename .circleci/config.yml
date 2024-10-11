@@ -6,4 +6,6 @@ jobs:
     parallelism: 2
     steps:
       - checkout
-      - run: source ./ci_build_results_all.sh
+      - run:
+          no_output_timeout: 20m
+          command: source ./ci_build_results_all.sh
