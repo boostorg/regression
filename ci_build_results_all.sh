@@ -235,16 +235,6 @@ upload_results()
     upload_ext=.zip.${LOGNAME}
     mv ${1}.zip ${1}${upload_ext}
 
-    echo "Upload to wowbagger"
-    date
-    rsync -vuz "--rsh=ssh -o StrictHostKeyChecking=no -l grafik" --stats \
-      ${1}${upload_ext} grafik@original.boost.org:/${upload_dir}/incoming/ || true
-    date
-    echo "Upload complete. Now relocating the file"
-    ssh grafik@original.boost.org \
-      mv ${upload_dir}/incoming/${1}${upload_ext} ${upload_dir}/live/${1}.zip || true
-    date
-
     echo "Upload to regression.boost.io"
     date
     BRANCH=${1}
@@ -261,6 +251,16 @@ upload_results()
     date
     echo "Unzip file"
     ssh ${upload_user}@${upload_server} "cd ${web_dir_r}; nohup unzip -o ${BRANCH}.zip > /tmp/unzip.txt 2>&1 < /dev/null &" || true
+    date
+
+    echo "Upload to wowbagger"
+    date
+    rsync -vuz "--rsh=ssh -o StrictHostKeyChecking=no -l grafik" --stats \
+      ${1}${upload_ext} grafik@original.boost.org:/${upload_dir}/incoming/ || true
+    date
+    echo "Upload complete. Now relocating the file"
+    ssh grafik@original.boost.org \
+      mv ${upload_dir}/incoming/${1}${upload_ext} ${upload_dir}/live/${1}.zip || true
     date
 
     mv ${1}${upload_ext} ${1}.zip
