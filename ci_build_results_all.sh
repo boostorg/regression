@@ -101,6 +101,7 @@ build_setup()
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/fusion
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/headers
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/integer
+    git_submodule_update "${cwd}/boost-reports/boost_root" libs/intrusive
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/io
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/iostreams
     git_submodule_update "${cwd}/boost-reports/boost_root" libs/iterator
