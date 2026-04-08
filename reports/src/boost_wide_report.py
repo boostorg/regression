@@ -290,7 +290,30 @@ def ftp_task( site, site_path , destination, filter_runners = None ):
     utils.log( 'ftp_task: "ftp://%s/%s" -> %s' % ( '??', '??', destination ) )
 
     utils.log( '    logging on ftp site %s' % '??' )
-    f = ftplib.FTP( site )
+    max_attempts = 5
+    retry_delay = 5  # seconds between attempts
+
+    f = None
+    for attempt in range(1, max_attempts + 1):
+        try:
+            utils.log(
+                " connecting to ftp site %s (attempt %d of %d)"
+                % ("??", attempt, max_attempts)
+            )
+            f = ftplib.FTP( site )
+            break  # success — exit the retry loop
+        except Exception as e:
+            utils.log(" connection attempt %d failed: %s" % (attempt, e))
+            if attempt < max_attempts:
+                utils.log(" retrying in %d seconds..." % retry_delay)
+                time.sleep(retry_delay)
+            else:
+                utils.log(
+                    "ftp_task: failed to connect to %s after %d attempts, giving up."
+                    % ("??", max_attempts)
+                )
+                raise  # re-raise the last exception so the caller/CI sees the failure
+
     f.login()
     utils.log( '    cwd to "%s"' % '??' )
     f.cwd( site_path )
