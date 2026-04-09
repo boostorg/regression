@@ -8,9 +8,10 @@ def accept_args( args_spec, args, options, usage ):
     defaults_num = len(options)
     
     ( option_pairs, rest_args ) = getopt.getopt( args, '', args_spec )
-    map( lambda x: options.__setitem__( x[0], x[1] ), option_pairs )
+    for x in option_pairs:
+        options.__setitem__( x[0], x[1] )
 
-    if ( options.has_key( '--help' ) or len( options.keys() ) == defaults_num ):
+    if ( '--help' in options or len( options.keys() ) == defaults_num ):
         usage()
         sys.exit( 1 )
 
@@ -25,6 +26,6 @@ def accept_args( args_spec, args, options, usage ):
             if m:
                 options[ '--%s' % m.group( 'name' ) ] = m.group( 'value' )
             else:
-                raise 'Invalid format of config line "%s"' % l
+                raise Exception( 'Invalid format of config line "%s"' % l )
 
     return rest_args

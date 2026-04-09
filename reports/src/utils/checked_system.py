@@ -6,7 +6,7 @@ import sys
 def system( commands ):
     if sys.platform == 'win32':
         f = open( 'tmp.cmd', 'w' )
-        f.write( string.join( commands, '\n' ) )
+        f.write( '\n'.join( commands ) )
         f.close()
         rc = os.system( 'tmp.cmd' )
         return rc
