@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: boostorg/boost_regression_docker
+      - image: cppalliance/boost_regression_docker:1
     parallelism: 2
     steps:
       - checkout
