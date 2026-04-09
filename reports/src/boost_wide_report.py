@@ -301,7 +301,7 @@ def ftp_task( site, site_path , destination, filter_runners = None ):
                 % ("??", attempt, max_attempts)
             )
             f = ftplib.FTP( site )
-            break  # success — exit the retry loop
+            break  # success. exit the retry loop
         except Exception as e:
             utils.log(" connection attempt %d failed: %s" % (attempt, e))
             if attempt < max_attempts:
