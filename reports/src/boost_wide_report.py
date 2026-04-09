@@ -5,6 +5,8 @@
 # (See accompanying file LICENSE_1_0.txt or copy at 
 # http://www.boost.org/LICENSE_1_0.txt)
 
+from __future__ import print_function
+
 import shutil
 import codecs
 import xml.sax.handler
@@ -214,7 +216,7 @@ def _modtime_timestamp( file ):
 root_paths = []
 
 def shorten( file_path ):
-    root_paths.sort( lambda x, y: cmp( len(y ), len( x ) ) )
+    root_paths.sort( key=lambda x: len(x), reverse=True )
     for root in root_paths:
         if file_path.lower().startswith( root.lower() ):
             return file_path[ len( root ): ].replace( "\\", "/" )
@@ -280,7 +282,7 @@ class unzip_action( action ):
         try:
             utils.log( '  Unzipping "%s" ... into "%s"' % ( shorten( self.source_ ), os.path.dirname( self.file_path_ ) ) )
             self.unzip_func_( self.source_, os.path.dirname( self.file_path_ ) )
-        except Exception, msg:
+        except Exception as msg:
             utils.log( '  Skipping "%s" due to errors (%s)' % ( self.source_, msg ) )
 
 
@@ -455,7 +457,7 @@ def build_reports(
     extended_test_results = os.path.join( output_dir, 'extended_test_results.xml' )
     
     if filter_runners == None:
-        if default_filter_runners.has_key(tag):
+        if tag in default_filter_runners:
             filter_runners = default_filter_runners[tag]
         
     execute_tasks(
@@ -511,7 +513,7 @@ def accept_args( args ):
           '--comment': ''
         , '--expected-results': ''
         , '--failures-markup': ''
-        , '--reports': string.join( report_types, ',' )
+        , '--reports': ','.join( report_types )
         , '--boost-report': None
         , '--tag': None
         , '--user': None
@@ -520,10 +522,10 @@ def accept_args( args ):
         }
     
     utils.accept_args( args_spec, args, options, usage )
-    if not options.has_key( '--results-dir' ):
+    if '--results-dir' not in options:
          options[ '--results-dir' ] = options[ '--locate-root' ]
 
-    if not options.has_key( '--results-prefix' ):
+    if '--results-prefix' not in options:
         options[ '--results-prefix' ] = 'all'
 
     warnings = []
@@ -536,19 +538,19 @@ def accept_args( args ):
         , options[ '--comment' ]
         , options[ '--results-dir' ]
         , options[ '--results-prefix' ]
-        , options.has_key( '--dont-collect-logs' )
+        , '--dont-collect-logs' in options
         , options[ '--reports' ].split( ',' )
         , options[ '--boost-report' ]
         , warnings
         , options[ '--user' ]
-        , options.has_key( '--upload' )
+        , '--upload' in options
         , options[ '--filter-runners' ]
         )
 
 
 def usage():
-    print 'Usage: %s [options]' % os.path.basename( sys.argv[0] )
-    print    '''
+    print('Usage: %s [options]' % os.path.basename( sys.argv[0] ))
+    print('''
 \t--locate-root         the same as --locate-root in compiler_status
 \t--tag                 the tag for the results (i.e. 'trunk')
 \t--expected-results    the file with the results to be compared with
@@ -578,7 +580,7 @@ The following options are useful in debugging:
 \t                        n  - runner comment files
 \t--filter-runners    use only those runners that match specified
 \t                    regex (case insensitive)
-'''
+''')
 
 def main():
     build_reports( *accept_args( sys.argv[ 1 : ] ) )
