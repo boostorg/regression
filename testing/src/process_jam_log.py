@@ -64,19 +64,19 @@ class BJamLog2Results:
             'run-type' : run_type,
             'revision' : self.revision,
             } )
-        
+
         self.test = {}
         self.target_to_test = {}
         self.target = {}
         self.parent = {}
         self.log = {}
-        
+
         self.add_log()
         self.gen_output()
-        
+
         #~ print self.test
         #~ print self.target
-    
+
     def add_log(self):
         if self.input[0]:
             bjam_xml = self.input[0]
@@ -110,7 +110,7 @@ class BJamLog2Results:
                 if item:
                     test_run.appendChild(self.results.createTextNode("\n"))
                     test_run.appendChild(item)
-    
+
     def gen_output(self):
         if self.output:
             out = open(self.output,'w')
@@ -118,10 +118,10 @@ class BJamLog2Results:
             out = sys.stdout
         if out:
             self.results.writexml(out,encoding='utf-8')
-    
+
     def tostring(self):
         return self.results.toxml('utf-8')
-    
+
     def x_name_(self, *context, **kwargs):
         node = None
         names = [ ]
@@ -139,7 +139,7 @@ class BJamLog2Results:
                 if hasattr(self,name):
                     return (name,getattr(self,name))
         return None
-    
+
     def x(self, *context, **kwargs):
         node = None
         names = [ ]
@@ -159,13 +159,13 @@ class BJamLog2Results:
                 else:
                     assert False, 'Unknown node type %s'%(name)
         return None
-    
+
     #~ The timestamp goes to the corresponding attribute in the result.
     def x_build_timestamp( self, node ):
         test_run = self.results.documentElement
         test_run.setAttribute('timestamp',self.get_data(node).strip())
         return None
-    
+
     #~ Comment file becomes a comment node.
     def x_build_comment( self, node ):
         comment = None
@@ -177,7 +177,7 @@ class BJamLog2Results:
         if not comment:
             comment = ''
         return [self.new_text('comment',comment)]
-    
+
     #~ Tests are remembered for future reference.
     def x_build_test( self, node ):
         test_run = self.results.documentElement
@@ -195,7 +195,7 @@ class BJamLog2Results:
         self.target_to_test[self.test[test_name]['target']] = test_name
         #~ print "--- %s\n => %s" %(self.test[test_name]['target'],test_name)
         return None
-    
+
     #~ Process the target dependency DAG into an ancestry tree so we can look up
     #~ which top-level library and test targets specific build actions correspond to.
     def x_build_targets_target( self, node ):
@@ -219,7 +219,7 @@ class BJamLog2Results:
             #~ print "--- %s\n  ^ %s" %(jam_target,child_jam_target)
             dep_node = self.get_sibling(dep_node.nextSibling,tag='dependency')
         return None
-    
+
     #~ Given a build action log, process into the corresponding test log and
     #~ specific test log sub-part.
     def x_build_action( self, node ):
@@ -297,7 +297,7 @@ class BJamLog2Results:
                     result_node.appendChild(self.results.createTextNode("\n"))
                     result_node.appendChild(self.results.createTextNode(result_data))
         return None
-    
+
     #~ The command executed for the action. For run actions we omit the command
     #~ as it's just noise.
     def get_action_command( self, action_node, action_type ):
@@ -305,11 +305,11 @@ class BJamLog2Results:
             return self.get_child_data(action_node,tag='command')
         else:
             return ''
-    
+
     #~ The command output.
     def get_action_output( self, action_node, action_type ):
         return self.get_child_data(action_node,tag='output',default='')
-    
+
     #~ Some basic info about the action.
     def get_action_info( self, action_node, action_type ):
         info = ""
@@ -327,7 +327,7 @@ class BJamLog2Results:
                 info += "Define: %s\n" %(self.get_data(define,strip=True))
                 define = self.get_sibling(define.nextSibling,name='define')
         return info
-    
+
     #~ Find the test corresponding to an action. For testing targets these
     #~ are the ones pre-declared in the --dump-test option. For libraries
     #~ we create a dummy test as needed.
@@ -355,12 +355,12 @@ class BJamLog2Results:
             test = self.test[lib]
         else:
             target_name_ = self.target[target]['name']
-            if self.target_to_test.has_key(target_name_):
+            if target_name_ in self.target_to_test:
                 test = self.test[self.target_to_test[target_name_]]
             else:
                 test = None
         return (base,test)
-    
+
     #~ Find, or create, the test-log node to add results to.
     def get_log( self, node, test ):
         target_directory = os.path.dirname(self.get_child_data(
@@ -381,7 +381,7 @@ class BJamLog2Results:
                 target_directory=target_directory,
                 show_run_output=show_run_output)
         return self.log[target_directory]
-    
+
     #~ The precise toolset from the build properties.
     def get_toolset( self, node ):
         toolset = self.get_child_data(self.get_child(node,tag='properties'),
@@ -389,9 +389,9 @@ class BJamLog2Results:
         toolset_version = self.get_child_data(self.get_child(node,tag='properties'),
             name='toolset-%s:version'%toolset,strip=True)
         return '%s-%s' %(toolset,toolset_version)
-    
+
     #~ XML utilities...
-    
+
     def get_sibling( self, sibling, tag = None, id = None, name = None, type = None ):
         n = sibling
         while n:
@@ -413,10 +413,10 @@ class BJamLog2Results:
                 return n
             n = n.nextSibling
         return None
-    
+
     def get_child( self, root, tag = None, id = None, name = None, type = None ):
         return self.get_sibling(root.firstChild,tag=tag,id=id,name=name,type=type)
-    
+
     def get_data( self, node, strip = False, default = None ):
         data = None
         if node:
@@ -439,10 +439,10 @@ class BJamLog2Results:
             if strip:
                 data = data.strip()
         return data
-    
+
     def get_child_data( self, root, tag = None, id = None, name = None, strip = False, default = None ):
         return self.get_data(self.get_child(root,tag=tag,id=id,name=name),strip=strip,default=default)
-    
+
     def new_node( self, tag, *child, **kwargs ):
         result = self.results.createElement(tag)
         for k in kwargs.keys():
@@ -457,7 +457,7 @@ class BJamLog2Results:
             if c:
                 result.appendChild(c)
         return result
-    
+
     def new_text( self, tag, data, **kwargs ):
         result = self.new_node(tag,**kwargs)
         data = data.strip()

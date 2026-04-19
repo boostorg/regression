@@ -3,8 +3,8 @@
 # Copyright (c) MetaCommunications, Inc. 2003-2007
 # Copyright Rene Rivera 2015
 #
-# Distributed under the Boost Software License, Version 1.0. 
-# (See accompanying file LICENSE_1_0.txt or copy at 
+# Distributed under the Boost Software License, Version 1.0.
+# (See accompanying file LICENSE_1_0.txt or copy at
 # http://www.boost.org/LICENSE_1_0.txt)
 
 import xml.sax.saxutils
@@ -13,46 +13,55 @@ import ftplib
 import time
 import stat
 import xml.dom.minidom
-import xmlrpclib
-import httplib
+try:
+    import xmlrpc.client as xmlrpclib
+except ImportError:
+    import xmlrpclib
+try:
+    import http.client as httplib
+except ImportError:
+    import httplib
 
 import os.path
 import string
 import sys
 import re
-import urlparse
+try:
+    import urllib.parse as urlparse
+except ImportError:
+    import urlparse
 import getopt
 import inspect
 
 
 class utils:
-    
+
     @staticmethod
     def log_level():
        frames = inspect.stack()
        level = 0
        for i in frames[ 3: ]:
-           if i[0].f_locals.has_key( '__log__' ):
+           if '__log__' in i[0].f_locals:
                level = level + i[0].f_locals[ '__log__' ]
        return level
-    
+
     @staticmethod
     def log( message ):
         sys.stderr.write( '# ' + '    ' * utils.log_level() +  message + '\n' )
         sys.stderr.flush()
-    
+
     @staticmethod
     def accept_args( args_spec, args, options, usage ):
-        
+
         defaults_num = len(options)
-        
+
         ( option_pairs, rest_args ) = getopt.getopt( args, '', args_spec )
         map( lambda x: options.__setitem__( x[0], x[1] ), option_pairs )
-    
-        if ( options.has_key( '--help' ) or len( options.keys() ) == defaults_num ):
+
+        if ( '--help' in options or len( options.keys() ) == defaults_num ):
             usage()
             sys.exit( 1 )
-    
+
         if len( rest_args ) > 0 and rest_args[0][0] == '@':
             f = open( rest_args[0][1:], 'r' )
             config_lines  = f.read().splitlines()
@@ -65,7 +74,7 @@ class utils:
                     options[ '--%s' % m.group( 'name' ) ] = m.group( 'value' )
                 else:
                     raise 'Invalid format of config line "%s"' % l
-    
+
         return rest_args
 
 
@@ -75,7 +84,13 @@ def chr_or_question_mark( c ):
     else:
         return '?'
 
-char_translation_table = string.maketrans( 
+
+if sys.version_info[0] == 3:
+    maketrans = str.maketrans
+else:
+    maketrans = string.maketrans
+
+char_translation_table = maketrans(
       ''.join( map( chr, range(0, 256) ) )
     , ''.join( map( chr_or_question_mark, range(0, 256) ) )
     )
@@ -83,13 +98,13 @@ char_translation_table = string.maketrans(
 
 def process_xml_file( input_file, output_file ):
     utils.log( 'Processing test log "%s"' % input_file )
-    
+
     f = open( input_file, 'r' )
     xml = f.readlines()
     f.close()
-    
+
     for i in range( 0, len(xml)):
-        xml[i] = string.translate( xml[i], char_translation_table )
+        xml[i] = xml[i].translate( char_translation_table )
 
     output_file.writelines( xml )
 
@@ -105,7 +120,8 @@ def collect_test_logs( input_dirs, test_results_writer ):
     utils.log( 'Collecting test logs ...' )
     for input_dir in input_dirs:
         utils.log( 'Walking directory "%s" ...' % input_dir )
-        os.path.walk( input_dir, process_test_log_files, test_results_writer )
+        for name, dirs, files in os.walk( input_dir ):
+            process_test_log_files(test_results_writer, name, files)
 
 dart_status_from_result = {
     'succeed': 'passed',
@@ -139,12 +155,12 @@ class xmlrpcProxyTransport(xmlrpclib.Transport):
         self.proxy = proxy
     def make_connection(self, host):
         self.realhost = host
-        return httplib.HTTP(self.proxy)
+        return httplib.HTTPConnection(self.proxy)
     def send_request(self, connection, handler, request_body):
         connection.putrequest('POST','http://%s%s' % (self.realhost,handler))
     def send_host(self, connection, host):
         connection.putheader('Host',self.realhost)
-    
+
 
 def publish_test_logs(
     input_dirs,
@@ -157,7 +173,7 @@ def publish_test_logs(
     utils.log( 'Publishing test logs ...' )
     dart_rpc = None
     dart_dom = {}
-    
+
     def _publish_test_log_files_ ( unused, dir, names ):
         for file in names:
             if os.path.basename( file ) == 'test_log.xml':
@@ -177,7 +193,7 @@ def publish_test_logs(
                         test['test-name'] = 'unknown'
                     if not test['toolset'] or test['toolset'] == '':
                         test['toolset'] = 'unknown'
-                    if not dart_dom.has_key(test['toolset']):
+                    if not test['toolset'] in dart_dom:
                         dart_dom[test['toolset']] = xml.dom.minidom.parseString(
 '''<?xml version="1.0" encoding="UTF-8"?>
 <DartSubmission version="2.0" createdby="collect_and_upload_logs.py">
@@ -219,10 +235,11 @@ def publish_test_logs(
                                 })
                             submission_dom.documentElement.appendChild(
                                 test_dom.documentElement.cloneNode(1) )
-    
+
     for input_dir in input_dirs:
         utils.log( 'Walking directory "%s" ...' % input_dir )
-        os.path.walk( input_dir, _publish_test_log_files_, None )
+        for name, dirs, files in os.path.walk( input_dir ):
+            _publish_test_log_files_( None, name, files)
     if dart_server:
         try:
             rpc_transport = None
@@ -234,24 +251,24 @@ def publish_test_logs(
             for dom in dart_dom.values():
                 #~ utils.log('Dart XML: %s' % dom.toxml('utf-8'))
                 dart_rpc.Submit.put(xmlrpclib.Binary(dom.toxml('utf-8')))
-        except Exception, e:
+        except Exception as e:
             utils.log('Dart server error: %s' % e)
 
 
 def upload_to_ftp( tag, results_file, ftp_proxy, debug_level, ftp_url ):
-    
+
     if not ftp_url:
         ftp_host = 'results.boost.org'
         ftp_url = ''.join(['ftp','://anonymous','@',ftp_host,'/boost/do-not-publish-this-url/results/'])
     utils.log( 'Uploading log archive "%s" to %s' % ( results_file, tag ) )
-    
+
     ftp_parts = urlparse.urlparse(ftp_url)
     ftp_netloc = re.split('[@]',ftp_parts[1])
     ftp_user = re.split('[:]',ftp_netloc[0])[0]
     ftp_password = re.split('[:]',ftp_netloc[0]+':anonymous')[1]
     ftp_site = re.split('[:]',ftp_netloc[1])[0]
     ftp_path = ftp_parts[2]
-    
+
     if not ftp_proxy:
         ftp = ftplib.FTP( ftp_site )
         ftp.set_debuglevel( debug_level )
@@ -285,7 +302,7 @@ def copy_comments( results_xml, comment_file ):
         try:
             results_xml.characters( f.read() )
         finally:
-            f.close()    
+            f.close()
     else:
         utils.log( 'Warning: comment file "%s" is not found.' % comment_file )
 
@@ -316,7 +333,7 @@ def copy_comments( results_xml, comment_file ):
     results_xml.characters( '</pre>' )
     results_xml.characters( '</dd>' )
     results_xml.characters( '</dl>\n' )
- 
+
     results_xml.endElement( 'comment' )
 
 
@@ -328,7 +345,7 @@ def compress_file( file_path, archive_path ):
         z.write( file_path, os.path.basename( file_path ) )
         z.close()
         utils.log( 'Done writing "%s".'% archive_path )
-    except Exception, msg:
+    except Exception as msg:
         utils.log( 'Warning: Compressing falied (%s)' % msg )
         utils.log( '         Trying to compress using a platform-specific tool...' )
         try: import zip_cmd
@@ -340,7 +357,7 @@ def compress_file( file_path, archive_path ):
             if os.path.exists( archive_path ):
                 os.unlink( archive_path )
                 utils.log( 'Removing stale "%s".' % archive_path )
-                
+
             zip_cmd.main( file_path, archive_path )
             utils.log( 'Done compressing "%s".' % archive_path )
 
@@ -355,7 +372,7 @@ def read_timestamp( file ):
     return time.gmtime( os.stat( file ).st_mtime )
 
 
-def collect_logs( 
+def collect_logs(
           results_dir
         , runner_id
         , tag
@@ -370,24 +387,24 @@ def collect_logs(
         , revision = ''
         , **unused
         ):
-    
+
     timestamp = time.strftime( '%Y-%m-%dT%H:%M:%SZ', read_timestamp( timestamp_file ) )
-    
+
     if dart_server:
         publish_test_logs( [ results_dir ],
             runner_id, tag, platform, comment_file, timestamp, user, source, run_type,
             dart_server = dart_server,
             http_proxy = http_proxy )
-    
+
     results_file = os.path.join( results_dir, '%s.xml' % runner_id )
     results_writer = open( results_file, 'w' )
     utils.log( 'Collecting test logs into "%s"...' % results_file )
-        
+
     results_xml = xml.sax.saxutils.XMLGenerator( results_writer )
     results_xml.startDocument()
-    results_xml.startElement( 
+    results_xml.startElement(
           'test-run'
-        , { 
+        , {
               'tag':        tag
             , 'platform':   platform
             , 'runner':     runner_id
@@ -397,7 +414,7 @@ def collect_logs(
             , 'revision':   revision
             }
         )
-    
+
     copy_comments( results_xml, comment_file )
     collect_test_logs( [ results_dir ], results_writer )
 
@@ -439,7 +456,7 @@ def upload_logs(
         upload_to_ftp( '%s/logs' % tag, logs_archive, ftp_proxy, debug_level, ftp_url )
 
 
-def collect_and_upload_logs( 
+def collect_and_upload_logs(
           results_dir
         , runner_id
         , tag
@@ -458,8 +475,8 @@ def collect_and_upload_logs(
         , ftp_url = None
         , **unused
         ):
-    
-    collect_logs( 
+
+    collect_logs(
           results_dir
         , runner_id
         , tag
@@ -473,7 +490,7 @@ def collect_and_upload_logs(
         , dart_server = dart_server
         , http_proxy = http_proxy
         )
-    
+
     upload_logs(
           results_dir
         , runner_id
@@ -489,7 +506,7 @@ def collect_and_upload_logs(
 
 
 def accept_args( args ):
-    args_spec = [ 
+    args_spec = [
           'locate-root='
         , 'runner='
         , 'tag='
@@ -508,7 +525,7 @@ def accept_args( args ):
         , 'revision='
         , 'ftp='
         ]
-    
+
     options = {
           '--tag'           : 'trunk'
         , '--platform'      : sys.platform
@@ -523,11 +540,11 @@ def accept_args( args ):
         , '--dart-server'   : 'beta.boost.org:8081'
         , '--revision'      : None
         , '--ftp'           : None
-        
+
         }
-    
+
     utils.accept_args( args_spec, args, options, usage )
-        
+
     return {
           'results_dir'     : options[ '--locate-root' ]
         , 'runner_id'       : options[ '--runner' ]
@@ -541,7 +558,7 @@ def accept_args( args ):
         , 'ftp_proxy'       : options[ '--ftp-proxy' ]
         , 'http_proxy'      : options[ '--proxy' ]
         , 'debug_level'     : int(options[ '--debug-level' ])
-        , 'send_bjam_log'   : options.has_key( '--send-bjam-log' )
+        , 'send_bjam_log'   : '--send-bjam-log' in options
         , 'dart_server'     : options[ '--dart-server' ]
         , 'revision'        : options[ '--revision' ]
         , 'ftp'             : options[ '--ftp' ]
@@ -555,15 +572,15 @@ commands = {
     }
 
 def usage():
-    print 'Usage: %s [command] [options]' % os.path.basename( sys.argv[0] )
-    print    '''
+    print('Usage: %s [command] [options]' % os.path.basename( sys.argv[0] ))
+    print(    '''
 Commands:
 \t%s
 
 Options:
 \t--locate-root   directory to to scan for "test_log.xml" files
 \t--runner        runner ID (e.g. "Metacomm")
-\t--timestamp     path to a file which modification time will be used 
+\t--timestamp     path to a file which modification time will be used
 \t                as a timestamp of the run ("timestamp" by default)
 \t--comment       an HTML comment file to be inserted in the reports
 \t                ("comment.html" by default)
@@ -577,13 +594,13 @@ Options:
 \t--proxy         HTTP proxy server address and port (e.g.
 \t                'http://www.someproxy.com:3128', optional)
 \t--ftp-proxy     FTP proxy server (e.g. 'ftpproxy', optional)
-\t--debug-level   debugging level; controls the amount of debugging 
+\t--debug-level   debugging level; controls the amount of debugging
 \t                output printed; 0 by default (no debug output)
 \t--dart-server   The dart server to send results to.
 \t--ftp           The ftp URL to upload results to.
 ''' % '\n\t'.join( commands.keys() )
+)
 
-    
 def main():
     if len(sys.argv) > 1 and sys.argv[1] in commands:
         command = sys.argv[1]
@@ -591,7 +608,7 @@ def main():
     else:
         command = 'collect-and-upload'
         args = sys.argv[ 1: ]
-    
+
     commands[ command ]( **accept_args( args ) )
 
 
