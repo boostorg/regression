@@ -1,4 +1,4 @@
-version: 2
+version: 2.1
 jobs:
   build:
     docker:
@@ -9,3 +9,8 @@ jobs:
       - run:
           no_output_timeout: 20m
           command: source ./ci_build_results_all.sh
+
+workflows:
+  build:
+    jobs:
+      - build
